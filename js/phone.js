@@ -15,9 +15,14 @@ const Phone = {
                 document.querySelectorAll('.phone-tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.phone-tab-content').forEach(c => c.classList.remove('active'));
                 tab.classList.add('active');
-                document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                const content = document.getElementById(`tab-${tab.dataset.tab}`);
+                if (content) content.classList.add('active');
                 if (tab.dataset.tab === 'mondo') this.initTerritorioSubTabs();
                 if (tab.dataset.tab === 'attivita') this.initWorkSubTabs();
+                if (tab.dataset.tab === 'favori') {
+                    this.renderFavori();
+                    if (window.SR) SR.announce('Tab Favori attivata. Elenco favori e crediti disponibile.', 'polite');
+                }
             });
         });
 
@@ -857,7 +862,8 @@ const Phone = {
                     return;
                 }
                 if (typeof Favors !== 'undefined' && Favors.fulfillFavor) {
-                    Favors.fulfillFavor(btn.dataset.favorid);
+                    const ok = Favors.fulfillFavor(btn.dataset.favorid);
+                    if (ok && window.SR) SR.announce('Favore riscosso con successo.', 'assertive');
                     this.renderFavori();
                     this.renderUrgenti();
                 }
@@ -872,6 +878,7 @@ const Phone = {
                 }
                 if (typeof Favors !== 'undefined' && Favors.declineFavor) {
                     Favors.declineFavor(btn.dataset.favorid);
+                    if (window.SR) SR.announce('Favore rifiutato.', 'assertive');
                     this.renderFavori();
                     this.renderUrgenti();
                 }
@@ -890,6 +897,7 @@ const Phone = {
                 const realIndex = (Game.state.favors?.credits || []).findIndex(c => c === credit);
                 if (realIndex >= 0) {
                     Favors.spendCredit(realIndex);
+                    if (window.SR) SR.announce('Credito usato.', 'assertive');
                     this.renderFavori();
                 }
             });

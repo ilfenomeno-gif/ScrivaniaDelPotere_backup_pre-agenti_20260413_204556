@@ -317,6 +317,14 @@
                 </div>
             </div>
 
+            <!-- Row 2.5: Calendario accessibile -->
+            <div class="desk-item desk-item-large" id="item-calendar" data-tooltip="Calendario" tabindex="0" role="region" aria-label="Calendario">
+                <div class="calendar-frame">
+                    <div class="calendar-header">📅 Calendario</div>
+                    <div class="calendar-body" id="calendar-body" role="list" aria-label="Appuntamenti pianificati"></div>
+                    <button id="btn-add-appointment" class="calendar-add-btn" aria-label="Aggiungi appuntamento">➕ Nuovo Appuntamento</button>
+                </div>
+            </div>
             <!-- Row 3: Statistiche -->
             <div class="desk-item desk-item-large" id="item-stats" data-tooltip="Scheda Personaggio">
                 <div class="stats-dossier">
@@ -354,6 +362,7 @@
                     <button class="phone-tab" data-tab="partner">💕 Vita</button>
                     <button class="phone-tab" data-tab="social">📰 Social</button>
                     <button class="phone-tab" data-tab="attivita">⚡ Attività</button>
+                    <button class="phone-tab" data-tab="favori">🤝 Favori</button>
                     <button class="phone-tab" data-tab="mondo">🌍 Mondo</button>
                     <button class="phone-tab" data-tab="archivio">📦 Archivio</button>
                 </div>
@@ -383,6 +392,10 @@
                             </div>
                             <div class="contacts-tree" id="contacts-tree-overlay"></div>
                         </div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-favori" role="list" aria-label="Favori in sospeso" style="display:none">
+                        <h3>🤝 Favori in Sospeso</h3>
+                        <div id="favori-list"></div>
                     </div>
                     <div class="phone-tab-content" id="tab-partner">
                         <h3>💕 Vita Sentimentale</h3>
@@ -657,6 +670,7 @@
     <script src="js/character.js"></script>
         <script src="js/map.patch.js"></script>
     <script src="js/desk.js"></script>
+    <script src="js/calendar.js"></script>
     <script src="js/compass.js"></script>
     <script src="js/ticker.js"></script>
     <script src="js/advisor.js"></script>

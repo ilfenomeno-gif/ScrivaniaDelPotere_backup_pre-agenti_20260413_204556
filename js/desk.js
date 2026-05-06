@@ -12,6 +12,7 @@ const Desk = {
         if (this._initialized) return;
         this._initialized = true;
 
+
         this.panels = {
             phone: document.getElementById('panel-phone'),
             tasks: document.getElementById('panel-tasks'),
@@ -23,6 +24,18 @@ const Desk = {
         document.getElementById('item-tasks').addEventListener('click', () => this.openPanel('tasks'));
         document.getElementById('item-house').addEventListener('click', () => this.openPanel('house'));
         document.getElementById('item-stats').addEventListener('click', () => this.openPanel('stats'));
+        // Calendario: focus e scorciatoia tastiera
+        const calendarItem = document.getElementById('item-calendar');
+        if (calendarItem) {
+            calendarItem.addEventListener('focus', () => calendarItem.classList.add('focused'));
+            calendarItem.addEventListener('blur', () => calendarItem.classList.remove('focused'));
+            calendarItem.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    document.getElementById('btn-add-appointment')?.focus();
+                }
+            });
+        }
 
 
         document.getElementById('phone-close').addEventListener('click', () => this.closePanel('phone'));
@@ -159,6 +172,7 @@ const Desk = {
                     case '2': this.openPanel('tasks'); e.preventDefault(); break;
                     case '3': this.openPanel('house'); e.preventDefault(); break;
                     case '4': this.openPanel('stats'); e.preventDefault(); break;
+                    case '5': document.getElementById('item-calendar')?.focus(); e.preventDefault(); break;
                     case ' ': // Space = advance time
                         e.preventDefault();
                         document.getElementById('btn-advance-day').click();
