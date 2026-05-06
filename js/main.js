@@ -1,3 +1,46 @@
+    // Export/Import anche dal menu Opzioni
+    const optExportBtn = document.getElementById('opt-export');
+    if (optExportBtn) {
+        optExportBtn.addEventListener('click', () => {
+            try {
+                const saveData = JSON.stringify(Game.state, null, 2);
+                const blob = new Blob([saveData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'scrivania_save.json';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (e) {
+                alert('Errore durante l\'esportazione del salvataggio.');
+            }
+        });
+    }
+    const optImportBtn = document.getElementById('opt-import');
+    const optImportInput = document.getElementById('opt-import-file');
+    if (optImportBtn && optImportInput) {
+        optImportBtn.addEventListener('click', () => optImportInput.click());
+        optImportInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = JSON.parse(evt.target.result);
+                    if (typeof data !== 'object' || !data.character) throw new Error('Formato non valido');
+                    localStorage.setItem('scrivaniaDelPotere_save', JSON.stringify(data));
+                    alert('Salvataggio importato! Ricarica la pagina per continuare.');
+                } catch (err) {
+                    alert('Errore: file di salvataggio non valido.');
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
 /* ============================================
    MAIN — Application Entry Point (v2)
    ============================================ */
@@ -128,10 +171,53 @@
         }
     });
 
-    /* ----- Restart ----- */
+
+    /* ----- Restart & Export/Import Save ----- */
     const restartBtn = document.getElementById('btn-restart');
     if (restartBtn) {
         restartBtn.addEventListener('click', () => location.reload());
+    }
+    const exportBtn = document.getElementById('btn-export-save');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            try {
+                const saveData = JSON.stringify(Game.state, null, 2);
+                const blob = new Blob([saveData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'scrivania_save.json';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (e) {
+                alert('Errore durante l\'esportazione del salvataggio.');
+            }
+        });
+    }
+    const importBtn = document.getElementById('btn-import-save');
+    const importInput = document.getElementById('import-save-file');
+    if (importBtn && importInput) {
+        importBtn.addEventListener('click', () => importInput.click());
+        importInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = JSON.parse(evt.target.result);
+                    if (typeof data !== 'object' || !data.character) throw new Error('Formato non valido');
+                    localStorage.setItem('scrivaniaDelPotere_save', JSON.stringify(data));
+                    alert('Salvataggio importato! Ricarica la pagina per continuare.');
+                } catch (err) {
+                    alert('Errore: file di salvataggio non valido.');
+                }
+            };
+            reader.readAsText(file);
+        });
     }
 
     /* ----- Init All Modules ----- */

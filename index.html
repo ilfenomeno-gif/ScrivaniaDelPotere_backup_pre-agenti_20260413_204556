@@ -596,7 +596,12 @@
             <p id="gameover-reason"></p>
             <div class="gameover-epitaph" id="gameover-epitaph"></div>
             <div class="gameover-stats" id="gameover-stats"></div>
-            <button id="btn-restart" class="approve-stamp restart">RICOMINCIA</button>
+            <div class="gameover-actions">
+                <button id="btn-restart" class="approve-stamp restart">RICOMINCIA</button>
+                <button id="btn-export-save" class="approve-stamp">💾 Esporta Salvataggio</button>
+                <button id="btn-import-save" class="approve-stamp">📂 Importa Salvataggio</button>
+                <input type="file" id="import-save-file" accept="application/json" style="display:none" />
+            </div>
         </div>
     </div>
 
@@ -618,6 +623,9 @@
             <h2 class="options-title">⚙️ Opzioni</h2>
             <div class="options-actions">
                 <button class="options-btn opt-save" id="opt-save">💾 Salva Partita</button>
+                <button class="options-btn opt-export" id="opt-export">💾 Esporta Salvataggio</button>
+                <button class="options-btn opt-import" id="opt-import">📂 Importa Salvataggio</button>
+                <input type="file" id="opt-import-file" accept="application/json" style="display:none" />
                 <button class="options-btn opt-restart" id="opt-restart">🔄 Ricomincia</button>
                 <button class="options-btn opt-exit" id="opt-exit">↩️ Torna al Gioco</button>
             </div>
@@ -647,6 +655,7 @@
     <script src="js/confirm.js"></script>
     <script src="js/balance.js"></script>
     <script src="js/character.js"></script>
+        <script src="js/map.patch.js"></script>
     <script src="js/desk.js"></script>
     <script src="js/compass.js"></script>
     <script src="js/ticker.js"></script>
@@ -662,6 +671,7 @@
     <script src="js/territory.js"></script>
     <script src="js/stats.js"></script>
     <script src="js/hud.js"></script>
+    <script src="js/screen-reader.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/events.js"></script>
     <script src="js/mafia.js"></script>
@@ -674,6 +684,7 @@
     <script src="js/favors.js"></script>
     <script src="js/diary.js"></script>
     <script src="js/map.js"></script>
+        <script src="js/game-agents.js"></script>
     <script src="js/tutorial.js"></script>
     <script src="js/main.js"></script>
 </body>
