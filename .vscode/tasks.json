@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "AI: Analizza e migliora gioco",
+            "type": "shell",
+            "command": "node",
+            "args": ["scripts/agentAnalyzer.js", "--auto"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Simula partita headless",
+            "type": "shell",
+            "command": "node",
+            "args": ["scripts/headlessSimulation.js"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Dev Panel (UI grafica)",
+            "type": "shell",
+            "command": "node",
+            "args": ["scripts/panel-server.js"],
+            "problemMatcher": [],
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "AI: Watch automatico",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "watch"],
+            "problemMatcher": [],
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Scrivania del Potere</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.5/dist/driver.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.5/dist/driver.js.iife.js"></script>
+</head>
+<body>
+    <!-- ===== SCREEN: CHARACTER CREATION (L'Anagrafe — Colloquio con il Partito) ===== -->
+    <div id="screen-character" class="screen active">
+        <!-- F. Background scrivania sfocata che "aspetta" -->
+        <div class="anagrafe-desk-bg" id="anagrafe-desk-bg"></div>
+
+        <div class="anagrafe-table">
+            <div class="document" id="document-main">
+                <!-- Timbro RISERVATO fisso -->
+                <div class="doc-riservato" id="doc-riservato">RISERVATO</div>
+
+                <div class="document-header">
+                    <div class="doc-seal">★</div>
+                    <h1>SCHEDA D'ISCRIZIONE</h1>
+                    <p class="doc-subtitle">Partito della Vita Quotidiana — Sezione Anagrafe</p>
+                    <p class="doc-protocol">Protocollo N° <span id="doc-protocol-num">PVQ-000000</span></p>
+                    <div class="doc-line"></div>
+                </div>
+
+                <div class="document-body">
+                    <div class="form-row">
+                        <label>NOME E COGNOME</label>
+                        <div class="dotted-input">
+                            <input type="text" id="char-name" maxlength="30" placeholder="Scrivi qui..." autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>GENERE</label>
+                        <div class="stamp-choices">
+                            <button class="stamp-btn" data-value="M" data-group="gender">
+                                <span class="stamp-icon">♂</span>
+                                <span class="stamp-label">Maschio</span>
+                            </button>
+                            <button class="stamp-btn" data-value="F" data-group="gender">
+                                <span class="stamp-icon">♀</span>
+                                <span class="stamp-label">Femmina</span>
+                            </button>
+                            <button class="stamp-btn" data-value="X" data-group="gender">
+                                <span class="stamp-icon">⚧</span>
+                                <span class="stamp-label">Altro</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>TRATTO IDEOLOGICO</label>
+                        <div class="ideology-cards">
+                            <button class="ideology-card" data-value="estrema-sinistra">
+                                <div class="card-icon">🚩</div>
+                                <div class="card-title">Sinistra Radicale</div>
+                                <div class="card-desc">Base fedele (min 20%). Stress da compromesso. Irrilevanza parlamentare (-50%).</div>
+                            </button>
+                            <button class="ideology-card" data-value="centro">
+                                <div class="card-icon">⚖️</div>
+                                <div class="card-title">Centro Liberale</div>
+                                <div class="card-desc">Ago della bilancia. Alleanze +30%, sconti cene. Rischio estinzione elettorale.</div>
+                            </button>
+                            <button class="ideology-card" data-value="populista">
+                                <div class="card-icon">📢</div>
+                                <div class="card-title">Populista</div>
+                                <div class="card-desc">Consenso social +80%. Coerenza in caduta libera con ogni compromesso.</div>
+                            </button>
+                            <button class="ideology-card" data-value="tecnocrate">
+                                <div class="card-icon">📊</div>
+                                <div class="card-title">Tecnocrate</div>
+                                <div class="card-desc">Stipendio +50%. Rispettato dalle istituzioni. Inviso ai populisti, distante dal "paese reale".</div>
+                            </button>
+                            <button class="ideology-card" data-value="estrema-destra">
+                                <div class="card-icon">🦅</div>
+                                <div class="card-title">Destra Sovranista</div>
+                                <div class="card-desc">Potere e controllo. Base fedele (min 20%). Coalizione ingovernabile (+Stress alleati).</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label>NAZIONE</label>
+                        <p class="nation-instructions">Scegli la nazione dove iniziare la tua carriera politica.</p>
+                        <div class="stamp-choices nation-choices" id="nation-choices">
+                            <button class="stamp-btn" data-value="italy" data-group="nation">
+                                <span class="stamp-icon">🇮🇹</span>
+                                <span class="stamp-label">Italia</span>
+                            </button>
+                            <button class="stamp-btn" data-value="france" data-group="nation">
+                                <span class="stamp-icon">🇫🇷</span>
+                                <span class="stamp-label">Francia</span>
+                            </button>
+                            <button class="stamp-btn" data-value="germany" data-group="nation">
+                                <span class="stamp-icon">🇩🇪</span>
+                                <span class="stamp-label">Germania</span>
+                            </button>
+                            <button class="stamp-btn" data-value="uk" data-group="nation">
+                                <span class="stamp-icon">🇬🇧</span>
+                                <span class="stamp-label">Regno Unito</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row avatar-row hidden" id="avatar-selection">
+                        <label>FOTO IDENTIFICATIVA — <span class="avatar-warning">NON SORRIDERE</span></label>
+                        <p class="avatar-instructions">Lo sguardo sarà utilizzato per la tessera del partito e per i manifesti elettorali. Scegli con cura.</p>
+                        <div class="stamp-choices avatar-stamps" id="avatar-stamps">
+                        </div>
+                    </div>
+
+                    <div class="form-row photo-row">
+                        <div class="photo-box">
+                            <div class="photo-placeholder" id="char-avatar">
+                                <span>FOTO</span>
+                            </div>
+                        </div>
+                        <!-- H. Tessera Anteprima in tempo reale -->
+                        <div class="preview-card" id="preview-card">
+                            <div class="preview-card-header">TESSERA PROVVISORIA</div>
+                            <div class="preview-card-avatar" id="preview-avatar">?</div>
+                            <div class="preview-card-name" id="preview-name">—</div>
+                            <div class="preview-card-ideology" id="preview-ideology">—</div>
+                            <div class="preview-card-number" id="preview-number">N° 000000</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B. Macchia di caffè dopo inattività -->
+                <div class="doc-coffee-stain hidden" id="doc-coffee-stain">☕</div>
+
+                <div class="document-footer">
+                    <!-- B/G. Timbro APPROVATO: grigio → rosso vivo quando valido, animazione sbatte -->
+                    <button id="btn-approve" class="approve-stamp" disabled>
+                        <span>APPROVATO</span>
+                    </button>
+                    <div class="error-msg" id="char-error"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- I. Burocrate impaziente -->
+        <div class="burocrate-msg hidden" id="burocrate-msg"></div>
+    </div>
+
+    <!-- ===== SCREEN: LETTERA DEL SEGRETARIO (E + K) ===== -->
+    <div id="screen-letter" class="screen">
+        <div class="letter-overlay">
+            <div class="letter-paper" id="letter-paper">
+                <div class="letter-watermark">PVQ</div>
+                <div class="letter-content" id="letter-content"></div>
+                <button class="letter-continue-btn" id="letter-continue">AVANTI →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN: SCELTA MENTORE (J) ===== -->
+    <div id="screen-mentor" class="screen">
+        <div class="mentor-overlay">
+            <div class="mentor-header">
+                <h2>📞 CHIAMATA IN ARRIVO...</h2>
+                <p class="mentor-subtitle">Sei mentori ti osservano. Ogni scelta apre un percorso diverso.</p>
+            </div>
+            <div class="mentor-choices" id="mentor-choices">
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN: SELEZIONE CITTÀ ===== -->
+    <div id="screen-cityselect" class="screen">
+        <div class="city-select-overlay">
+            <div id="city-select-container"></div>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN: MAIN DESK ===== -->
+    <div id="screen-desk" class="screen">
+        <!-- HUD Top Bar -->
+        <div id="hud">
+            <!-- Date & Time -->
+            <div class="hud-date-block">
+                <div class="hud-date-line" id="hud-date">Lunedì 6 Gennaio 2025</div>
+                <div class="hud-time-line">
+                    <span class="hud-time-icon" id="hud-time-icon">🌅</span>
+                    <span class="hud-time-label" id="hud-time-label">Mattina</span>
+                </div>
+            </div>
+
+            <!-- Action Points -->
+            <div class="hud-ap" id="hud-ap">
+                <span class="ap-label">Azioni:</span>
+                <span class="ap-dot filled" id="ap-dot-1">●</span>
+                <span class="ap-dot filled" id="ap-dot-2">●</span>
+                <span class="ap-value">(<span id="ap-count">2</span>/2)</span>
+            </div>
+
+            <!-- Mini Bars -->
+            <div class="hud-bar" id="hud-stanchezza">
+                <span class="hud-icon hud-tooltip" data-tip="Stanchezza: 0=riposato, 100=esausto. Riposati per ridurla.">😴</span>
+                <div class="hud-bar-track"><div class="hud-bar-fill stanchezza" data-stat="stanchezza"></div></div>
+                <span class="hud-value" data-stat="stanchezza">0</span>
+            </div>
+            <div class="hud-bar" id="hud-stress">
+                <span class="hud-icon hud-tooltip" data-tip="Stress: sale con compiti difficili, bollette scadute e tensioni. Abbassalo con relazioni e riposo.">😰</span>
+                <div class="hud-bar-track"><div class="hud-bar-fill stress" data-stat="stress"></div></div>
+                <span class="hud-value" data-stat="stress">10</span>
+            </div>
+            <div class="hud-bar" id="hud-morale">
+                <span class="hud-icon hud-tooltip" data-tip="Morale: il tuo umore. Cresce con relazioni, svago e successi. Cala con fallimenti e stress.">😊</span>
+                <div class="hud-bar-track"><div class="hud-bar-fill morale" data-stat="morale"></div></div>
+                <span class="hud-value" data-stat="morale">60</span>
+            </div>
+            <div class="hud-bar" id="hud-salute">
+                <span class="hud-icon hud-tooltip" data-tip="Salute: il tuo benessere fisico. Cala se sei stanco e stressato. Sali con sport e cure.">❤️</span>
+                <div class="hud-bar-track"><div class="hud-bar-fill salute" data-stat="salute"></div></div>
+                <span class="hud-value" data-stat="salute">80</span>
+            </div>
+
+            <!-- Coffee cup coherence indicator -->
+            <div class="hud-bar" id="hud-coherence">
+                <span class="hud-icon hud-tooltip" data-tip="Coerenza: quanto le tue azioni sono in linea con la tua ideologia. Cala con scelte contraddittorie.">🧩</span>
+                <div class="coffee-cup" id="coffee-reflection">
+                    <div class="coffee-surface" id="coffee-surface"></div>
+                </div>
+            </div>
+
+            <!-- Money -->
+            <div class="hud-money">
+                <span class="hud-icon">💶</span>
+                <span class="hud-money-val" id="hud-money">€100</span>
+            </div>
+
+            <!-- City + National Rep -->
+            <div class="hud-city" id="hud-city" title="Città attuale">
+                <span class="hud-icon">📍</span>
+                <span class="hud-city-name" id="hud-city-name">—</span>
+            </div>
+            <div class="hud-bar hud-rep-nazionale" title="Reputazione Nazionale">
+                <span class="hud-icon">🌐</span>
+                <div class="hud-bar-track">
+                    <div class="hud-bar-fill rep-nazionale-fill" id="hud-rep-nazionale" style="width: 5%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Effects Layer -->
+        <div id="vfx-layer">
+            <div class="coffee-stain" id="vfx-stain1"></div>
+            <div class="coffee-stain" id="vfx-stain2"></div>
+            <div class="burn-mark" id="vfx-burn1"></div>
+            <div class="burn-mark" id="vfx-burn2"></div>
+        </div>
+
+        <!-- Dimming overlay for unpaid bills -->
+        <div id="dim-overlay"></div>
+        <div class="hud-vignette" id="hud-vignette"></div>
+        <div id="candle" class="hidden">
+            <div class="candle-flame"></div>
+            <div class="candle-body"></div>
+        </div>
+
+        <!-- No AP toast -->
+        <div class="toast hidden" id="toast-noap">⚠️ Punti azione esauriti! Avanza il turno.</div>
+
+        <!-- THE DESK (2 columns, 3 rows) -->
+        <div id="desk">
+            <!-- Row 1: Fascicolo Casa (left) | Avanza Turno (right) -->
+            <div class="desk-item desk-item-large" id="item-house" data-tooltip="Fascicolo Casa">
+                <div class="folder">
+                    <div class="folder-tab">CONTRATTI E UTENZE</div>
+                    <div class="folder-body">
+                        <span class="folder-icon">🏠</span>
+                        <span class="folder-sublabel">Casa</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="advance-day-area">
+                <button id="btn-advance-day" class="desk-button">
+                    <span class="clock-icon">⏰</span>
+                    <span id="btn-advance-label">Avanza Turno</span>
+                </button>
+                <div class="advance-info" id="advance-info">→ Pomeriggio</div>
+            </div>
+
+            <!-- Row 2: Foglio Mansioni (left) | Telefono (right) -->
+            <div class="desk-item desk-item-large" id="item-tasks" data-tooltip="Foglio Mansioni">
+                <div class="notepad">
+                    <div class="notepad-spiral"></div>
+                    <div class="notepad-page">
+                        <span class="notepad-title">DA FARE</span>
+                        <div class="notepad-lines">
+                            <div class="notepad-line"></div>
+                            <div class="notepad-line"></div>
+                            <div class="notepad-line"></div>
+                            <div class="notepad-line"></div>
+                            <div class="notepad-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="desk-item desk-item-large" id="item-phone" data-tooltip="Telefono">
+                <div class="phone-device">
+                    <div class="phone-screen-preview">
+                        <div class="phone-time" id="phone-time-preview">09:00</div>
+                        <div class="phone-notif-badge hidden" id="phone-badge">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Statistiche -->
+            <div class="desk-item desk-item-large" id="item-stats" data-tooltip="Scheda Personaggio">
+                <div class="stats-dossier">
+                    <div class="dossier-clip">📎</div>
+                    <div class="dossier-body">
+                        <span class="dossier-title">SCHEDA P.G.</span>
+                        <span class="dossier-icon">📊</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4 (extra): Decorations -->
+
+            <div id="desk-center">
+                <div class="desk-pen"></div>
+                <div class="desk-paperclip"></div>
+                <div class="desk-coffeecup">☕</div>
+            </div>
+
+            <!-- 🎨 Desk Decorations Container -->
+            <div id="desk-decorations"></div>
+        </div>
+
+        <!-- ===== PANEL: PHONE ===== -->
+        <div class="panel hidden" id="panel-phone">
+            <div class="panel-phone-frame">
+                <div class="phone-header">
+                    <button class="phone-back" id="phone-close">✕</button>
+                    <span class="phone-title">SmartPolitica</span>
+                    <span class="phone-clock" id="phone-clock">00:00</span>
+                    <span class="phone-battery">🔋</span>
+                </div>
+                <div class="phone-tabs">
+                    <button class="phone-tab active" data-tab="friends">👥 Contatti</button>
+                    <button class="phone-tab" data-tab="partner">💕 Vita</button>
+                    <button class="phone-tab" data-tab="social">📰 Social</button>
+                    <button class="phone-tab" data-tab="attivita">⚡ Attività</button>
+                    <button class="phone-tab" data-tab="mondo">🌍 Mondo</button>
+                    <button class="phone-tab" data-tab="archivio">📦 Archivio</button>
+                </div>
+                <div class="phone-actions-bar">
+                    <span>📱 Azioni:</span>
+                    <span class="phone-ap-dot filled" id="phone-ap-1"></span>
+                    <span class="phone-ap-dot filled" id="phone-ap-2"></span>
+                </div>
+                <div class="phone-content">
+                    <div class="phone-tab-content active" id="tab-friends">
+                        <div class="contacts-topbar">
+                            <button class="contacts-hamburger-btn" id="contacts-hamburger" title="Apri albero contatti">☰ Albero Contatti</button>
+                        </div>
+                        <p class="relation-desc">Sezione contatti disponibile solo tramite Albero Contatti.</p>
+
+                        <div class="contacts-overlay-panel hidden" id="contacts-overlay-panel">
+                            <button class="contacts-overlay-close" id="contacts-overlay-close">✕</button>
+                            <div class="contacts-overlay-header">
+                                <h3>👥 Albero Contatti</h3>
+                                <p>Vista completa delle relazioni senza coprire le hotbar superiori.</p>
+                            </div>
+                            <div class="contacts-overlay-stats">
+                                <div class="relation-meter-full">
+                                    <div class="relation-fill-full" id="relation-global-fill-overlay"></div>
+                                </div>
+                                <p class="relation-desc-overlay" id="relation-desc-overlay">Le tue relazioni sono nella media.</p>
+                            </div>
+                            <div class="contacts-tree" id="contacts-tree-overlay"></div>
+                        </div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-partner">
+                        <h3>💕 Vita Sentimentale</h3>
+                        <div id="partner-content"></div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-social">
+                        <h3>📰 Social Buzz</h3>
+                        <div id="radio-locale-panel" class="social-special-panel hidden">
+                            <div class="social-special-title">📻 Radio Locale</div>
+                            <div class="social-special-text">Nel comune piccolo contano le voci del paese: impatto locale alto, zero eco nazionale.</div>
+                            <button class="social-post-btn" id="btn-passaparola-comune">📣 Passaparola <span class="phone-cost-badge">1 📱</span></button>
+                        </div>
+                        <div id="city-regional-panel" class="social-special-panel hidden">
+                            <div class="social-special-title">🗞️ Quotidiano Regionale</div>
+                            <button class="social-post-btn" id="btn-quotidiano-regionale">📰 Compra articolo (€30) <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-inchiesta-civica">🔎 Inchiesta civica <span class="phone-cost-badge">1 📱</span></button>
+                        </div>
+                        <div id="metropolis-media-panel" class="social-special-panel hidden">
+                            <div class="social-special-title">📡 Media Nazionali</div>
+                            <button class="social-post-btn" id="btn-metropolis-manager">🎛️ Gestione comunicazione (€200) <span class="phone-cost-badge">1 📱</span></button>
+                        </div>
+                        <div id="capital-regional-panel" class="social-special-panel hidden">
+                            <div class="social-special-title">📺 TGR Regionale</div>
+                            <button class="social-post-btn" id="btn-tgr-intervista">🎤 Intervista TGR <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-lobby-regionale">🏛️ Lobby regionale (€150) <span class="phone-cost-badge">1 📱</span></button>
+                        </div>
+                        <div id="social-trend-box" class="social-trend-box"></div>
+                        <div id="election-hq" class="election-hq"></div>
+                        <div class="social-targeting-bar">
+                            <label for="social-target">🎯 Target:</label>
+                            <select id="social-target" class="social-target-select">
+                                <option value="all">🌍 Tutti</option>
+                                <option value="contacts">👥 Solo contatti</option>
+                                <option value="moderates">🏛️ Moderati</option>
+                                <option value="base">🔴 Base ideologica</option>
+                                <option value="journalists">📰 Giornalisti</option>
+                            </select>
+                            <button class="social-post-btn" id="btn-trend-ask">🧓 Chiedi trend</button>
+                            <button class="social-post-btn" id="btn-trend-paper">🗞️ Giornale (€2)</button>
+                        </div>
+                        <div class="social-feed" id="social-feed"></div>
+                        <div class="social-post-actions">
+                            <button class="social-post-btn" id="btn-post-affondo">📢 Affondo Populista <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn social-btn-fire" id="btn-post-fire"
+                                data-preview="1 📱 | ⭐+6~12 | 😰+8~15 | Rischio: 🧩-5~8">🔥 Post Incendiario <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn social-btn-formal" id="btn-post-formal"
+                                data-preview="1 📱 | ⭐+3~6 | 😰+2~4 | Possibile: 🧩+3~5">🏛️ Post Istituzionale <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-post-emotional">😢 Commovente <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-post-collab">🤝 Collaborazione <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-post-annuncio">📢 Annuncio <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-post-ricordo">🕯️ Ricordo <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-post-investigativo">🔍 Investigativo <span class="phone-cost-badge">1 📱</span></button>
+                            <button class="social-post-btn" id="btn-post-evento">🎉 Evento <span class="phone-cost-badge">1 📱</span> <span class="task-ap-cost">€50</span></button>
+                        </div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-attivita">
+                        <div class="phone-work-tabs">
+                            <button class="phone-work-tab active" data-wtab="urgenti">🔴 Urgenti</button>
+                            <button class="phone-work-tab" data-wtab="lavoro">🟡 Lavoro</button>
+                            <button class="phone-work-tab" data-wtab="favori">🟢 Favori</button>
+                        </div>
+                        <div class="phone-work-content active" id="phone-wtab-urgenti">
+                            <div id="urgenti-list"></div>
+                        </div>
+                        <div class="phone-work-content" id="phone-wtab-lavoro">
+                            <div id="work-notifications"></div>
+                            <div id="work-messages"></div>
+                        </div>
+                        <div class="phone-work-content" id="phone-wtab-favori">
+                            <div id="favori-list"></div>
+                        </div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-archivio">
+                        <h3>📭 Contatti Persi</h3>
+                        <div id="archivio-list"></div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-mondo">
+                        <div class="phone-territory-tabs">
+                            <button class="phone-terr-tab" data-ttab="bussola">🧭 Bussola</button>
+                            <button class="phone-terr-tab active" data-ttab="luoghi">🏘️ Luoghi</button>
+                            <button class="phone-terr-tab" data-ttab="mappa">🗺️ Mappa</button>
+                        </div>
+                        <div class="phone-terr-content" id="phone-ttab-bussola">
+                            <div id="compass-body"></div>
+                        </div>
+                        <div class="phone-terr-content active" id="phone-ttab-luoghi">
+                            <div id="phone-territory"></div>
+                        </div>
+                        <div class="phone-terr-content" id="phone-ttab-mappa">
+                            <div id="phone-map-body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: TASKS ===== -->
+        <div class="panel hidden" id="panel-tasks">
+            <div class="panel-notepad-frame">
+                <button class="panel-close" id="tasks-close">✕</button>
+                <div class="notepad-header-full">
+                    <h2>📝 Foglio delle Mansioni</h2>
+                </div>
+                <div class="task-tabs">
+                    <button class="task-tab active" data-tab="work-tasks">Lavoro Normale</button>
+                    <button class="task-tab" data-tab="political-tasks">Politico</button>
+                    <button class="task-tab" data-tab="lifestyle-tasks">Vita Quotidiana</button>
+                </div>
+                <div class="task-content">
+                    <div class="task-tab-content active" id="tab-work-tasks">
+                        <div class="task-list" id="work-tasks"></div>
+                    </div>
+                    <div class="task-tab-content" id="tab-political-tasks">
+                        <div class="task-list" id="political-tasks"></div>
+                    </div>
+                    <div class="task-tab-content" id="tab-lifestyle-tasks">
+                        <div class="lifestyle-tabs">
+                            <button class="lifestyle-tab active" data-ltab="lavoretti">💼 Lavoretti</button>
+                            <button class="lifestyle-tab" data-ltab="abitudini">🏃 Abitudini</button>
+                            <button class="lifestyle-tab" data-ltab="negozi">🛍️ Negozi</button>
+                            <button class="lifestyle-tab" data-ltab="migliorie">⬆️ Migliorie</button>
+                            <button class="lifestyle-tab" data-ltab="npcs">👥 Persone</button>
+                            <button class="lifestyle-tab" data-ltab="obiettivo">🎯 Sfida</button>
+                        </div>
+                        <div class="lifestyle-content">
+                            <div class="lifestyle-tab-content active" id="ltab-lavoretti"></div>
+                            <div class="lifestyle-tab-content" id="ltab-abitudini"></div>
+                            <div class="lifestyle-tab-content" id="ltab-negozi"></div>
+                            <div class="lifestyle-tab-content" id="ltab-migliorie"></div>
+                            <div class="lifestyle-tab-content" id="ltab-npcs"></div>
+                            <div class="lifestyle-tab-content" id="ltab-obiettivo"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="financial-footer">
+                    <span class="money-icon">💶</span>
+                    <span class="money-label">Saldo:</span>
+                    <span class="money-value" id="tasks-balance">€100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: STATS (Scheda Personaggio) ===== -->
+        <div class="panel hidden" id="panel-stats">
+            <div class="panel-stats-frame">
+                <button class="panel-close" id="stats-close">✕</button>
+                <div class="stats-header">
+                    <h2>📊 Scheda Valutazione — Profilo P.G.</h2>
+                </div>
+                <div class="stats-body" id="stats-body">
+                    <!-- Rendered by stats.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: HOUSE ===== -->
+        <div class="panel hidden" id="panel-house">
+            <div class="panel-folder-frame">
+                <button class="panel-close" id="house-close">✕</button>
+                <div class="folder-header-full">
+                    <h2>🏠 Contratti e Utenze</h2>
+                </div>
+                <div class="house-tabs">
+                    <button class="house-tab active" data-tab="property">Proprietà</button>
+                    <button class="house-tab" data-tab="migliorie">Migliorie</button>
+                    <button class="house-tab" data-tab="economia">Economia</button>
+                </div>
+                <div class="house-content">
+                    <div class="house-tab-content active" id="tab-property">
+                        <div id="property-info"></div>
+                        <div id="upgrade-options"></div>
+                    </div>
+                    <div class="house-tab-content" id="tab-migliorie">
+                        <div id="home-improvements"></div>
+                    </div>
+                    <div class="house-tab-content" id="tab-economia">
+                        <div id="payments-list"></div>
+                        <div id="mortgage-options"></div>
+                        <div id="debt-summary"></div>
+                        <div id="bank-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 💡 Consigliere Fantasma -->
+        <div id="advisor-hint" class="advisor-hint hidden">
+            <span class="advisor-icon">💡</span>
+            <span class="advisor-text"></span>
+            <button class="advisor-dismiss" onclick="Advisor.dismiss()">✕</button>
+        </div>
+
+        <!-- 📻 Radio del Partito Ticker -->
+        <div id="ticker-bar" class="ticker-bar">
+            <span id="ticker-text" class="ticker-text"></span>
+        </div>
+
+        <!-- Breaking News Popup -->
+        <div class="breaking-news hidden" id="breaking-news">
+            <div class="bn-header">⚡ BREAKING NEWS</div>
+            <div class="bn-body" id="bn-body"></div>
+            <button class="bn-dismiss" id="bn-dismiss">Chiudi</button>
+        </div>
+    </div>
+
+    <!-- ===== SCREEN: GAME OVER ===== -->
+    <div id="screen-gameover" class="screen">
+        <div class="gameover-overlay">
+            <h1 id="gameover-title">GAME OVER</h1>
+            <p id="gameover-reason"></p>
+            <div class="gameover-epitaph" id="gameover-epitaph"></div>
+            <div class="gameover-stats" id="gameover-stats"></div>
+            <button id="btn-restart" class="approve-stamp restart">RICOMINCIA</button>
+        </div>
+    </div>
+
+    <!-- ===== OVERLAY: MANOVRA DI BILANCIO ===== -->
+    <div class="fullscreen-overlay hidden" id="budget-overlay"></div>
+
+    <!-- ===== OVERLAY: DIARIO DELLA CARRIERA ===== -->
+    <div class="fullscreen-overlay hidden" id="diary-overlay"></div>
+
+    <!-- ===== OVERLAY: TIMELINE (Diario Visivo) ===== -->
+    <div class="fullscreen-overlay hidden" id="timeline-overlay">
+        <div class="timeline-body"></div>
+    </div>
+
+    <!-- ===== OVERLAY: OPTIONS MENU ===== -->
+    <div class="fullscreen-overlay hidden" id="options-overlay">
+        <div class="options-panel">
+            <button class="options-close" id="options-close">✕</button>
+            <h2 class="options-title">⚙️ Opzioni</h2>
+            <div class="options-actions">
+                <button class="options-btn opt-save" id="opt-save">💾 Salva Partita</button>
+                <button class="options-btn opt-restart" id="opt-restart">🔄 Ricomincia</button>
+                <button class="options-btn opt-exit" id="opt-exit">↩️ Torna al Gioco</button>
+            </div>
+            <div class="options-settings">
+                <h3>Impostazioni</h3>
+                <div class="options-toggle">
+                    <label for="toggle-advisor">💡 Consigliere Fantasma</label>
+                    <input type="checkbox" id="toggle-advisor" checked>
+                </div>
+                <div class="options-toggle">
+                    <label for="toggle-ticker">📻 Radio del Partito</label>
+                    <input type="checkbox" id="toggle-ticker" checked>
+                </div>
+            </div>
+            <div class="options-footer">
+                <button class="options-btn opt-timeline" id="opt-timeline">📖 La Tua Storia</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/nations.js"></script>
+    <script src="js/localization.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/scheduler.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/debtmanager.js"></script>
+    <script src="js/confirm.js"></script>
+    <script src="js/balance.js"></script>
+    <script src="js/character.js"></script>
+    <script src="js/desk.js"></script>
+    <script src="js/compass.js"></script>
+    <script src="js/ticker.js"></script>
+    <script src="js/advisor.js"></script>
+    <script src="js/timeline.js"></script>
+    <script src="js/options.js"></script>
+    <script src="js/deskdecor.js"></script>
+    <script src="js/memento.js"></script>
+    <script src="js/phone.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/house.js"></script>
+    <script src="js/bank.js"></script>
+    <script src="js/territory.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/hud.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/mafia.js"></script>
+    <script src="js/agents.js"></script>
+    <script src="js/dilemmas.js"></script>
+    <script src="js/lifestyle.js"></script>
+    <script src="js/budget.js"></script>
+    <script src="js/factions.js"></script>
+    <script src="js/intel.js"></script>
+    <script src="js/favors.js"></script>
+    <script src="js/diary.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

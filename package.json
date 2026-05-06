@@ -1,0 +1,20 @@
+{
+  "name": "scrivaniadelpotere",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automation scripts for ScrivaniaDelPotere",
+  "scripts": {
+    "analyze": "node scripts/agentAnalyzer.js --dry-run --runs 5 --day 10",
+    "analyze:auto": "node scripts/agentAnalyzer.js --auto --runs 3 --day 8",
+    "analyze:fast": "node scripts/agentAnalyzer.js --fast",
+    "runtime:check": "node scripts/runtimeChecker.js",
+    "simulate": "node scripts/headlessSimulation.js --runs 10 --day 15",
+    "panel": "node scripts/panel-server.js",
+    "watch": "node scripts/watch.js",
+    "watch:runtime": "node scripts/watch.js --runtime-every 1"
+  },
+  "dependencies": {
+    "chokidar": "^5.0.0",
+    "puppeteer": "^24.40.0"
+  }
+}
