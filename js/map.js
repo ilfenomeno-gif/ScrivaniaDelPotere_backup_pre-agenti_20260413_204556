@@ -1,7 +1,3 @@
-// Espone GameMap su window per i test automatici e runtimeChecker.js
-if (typeof window !== 'undefined') {
-    window.GameMap = GameMap;
-// }
 /* ============================================
     MAP — Mappa d'Italia Videoludica & Trasferimenti
     ============================================ */
@@ -17,9 +13,9 @@ const CITY_SEEDS = {
     ],
     uk: [
         ['london','Londra','Greater London',51.5074,-0.1278,'city','large',1],['manchester','Manchester','North West',53.4808,-2.2426,'city','large',2],['birmingham','Birmingham','West Midlands',52.4862,-1.8904,'city','large',2],['edinburgh','Edimburgo','Scotland',55.9533,-3.1883,'city','large',2],['glasgow','Glasgow','Scotland',55.8642,-4.2518,'municipality','large',3],['leeds','Leeds','Yorkshire',53.8008,-1.5491,'municipality','medium',3],['liverpool','Liverpool','North West',53.4084,-2.9916,'municipality','medium',3],['bristol','Bristol','South West',51.4545,-2.5879,'municipality','medium',3],['newcastle','Newcastle','North East',54.9783,-1.6178,'municipality','small',3],['sheffield','Sheffield','Yorkshire',53.3811,-1.4701,'municipality','small',3],['cardiff','Cardiff','Wales',51.4816,-3.1791,'municipality','medium',3],['belfast','Belfast','Northern Ireland',54.5973,-5.9301,'municipality','medium',3],['southampton','Southampton','South East',50.9097,-1.4044,'municipality','small',3],['portsmouth','Portsmouth','South East',50.8198,-1.088,'municipality','small',3],['leicester','Leicester','East Midlands',52.6369,-1.1398,'municipality','small',3],['coventry','Coventry','West Midlands',52.4068,-1.5197,'municipality','small',3],['nottingham','Nottingham','East Midlands',52.9548,-1.1581,'municipality','small',3],['kingston','Kingston upon Hull','Yorkshire',53.7676,-0.3274,'municipality','small',3],['plymouth','Plymouth','South West',50.3755,-4.1427,'municipality','small',3],['aberdeen','Aberdeen','Scotland',57.1497,-2.0943,'municipality','small',3],['reading','Reading','South East',51.4543,-0.9781,'municipality','small',3],['brighton','Brighton','South East',50.8225,-0.1372,'municipality','small',3],['milton_keynes','Milton Keynes','South East',52.0406,-0.7594,'municipality','small',3],['luton','Luton','East',51.8787,-0.420,'municipality','small',3],['swansea','Swansea','Wales',51.6214,-3.9436,'municipality','small',3],['derby','Derby','East Midlands',52.9225,-1.4746,'municipality','small',3],['york','York','Yorkshire',53.959,-1.0815,'municipality','small',3],['northampton','Northampton','East Midlands',52.2405,-0.9027,'municipality','small',3],['blackpool','Blackpool','North West',53.8142,-3.0503,'municipality','small',3],['cambridge','Cambridge','East',52.2053,0.1218,'municipality','small',3],['oxford','Oxford','South East',51.752,-1.2577,'municipality','small',3]
-    },
+    ],
+};
 
-    async showNationTransferUI() {
 const CITY_SPECIALS = {
     roma: ['capital'], milano: ['industry'], napoli: ['port'], torino: ['industry'], venezia: ['tourism'], firenze: ['tourism'],
     bologna: ['university'], perugia: ['university'], padova: ['university'],
@@ -1493,6 +1489,7 @@ const GameMap = {
                 renderTransferList(visible, map);
             });
         }
+        }, 0);
     },
 
     _highlightListItem(cityId, map, city) {
@@ -1590,7 +1587,7 @@ const GameMap = {
             modal.remove();
             if (!ok) return;
         };
-    }
+    },
 
     async transferToNation(newNationId) {
         const nations = typeof Nations !== 'undefined' && Nations.getAvailableNations
@@ -1888,3 +1885,7 @@ const GameMap = {
         }
     },
 };
+
+if (typeof window !== 'undefined') {
+    window.GameMap = GameMap;
+}
