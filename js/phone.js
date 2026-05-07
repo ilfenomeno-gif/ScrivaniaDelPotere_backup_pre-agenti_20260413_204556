@@ -13,9 +13,17 @@ const Phone = {
             if (!tab) return;
             tab.addEventListener('click', () => {
                 this.closeContactsOverlay && this.closeContactsOverlay();
-                document.querySelectorAll('.phone-tab').forEach(t => t && t.classList && t.classList.remove('active'));
+                document.querySelectorAll('.phone-tab').forEach(t => {
+                    if (t && t.classList) {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                    }
+                });
                 document.querySelectorAll('.phone-tab-content').forEach(c => c && c.classList && c.classList.remove('active'));
-                if (tab && tab.classList) tab.classList.add('active');
+                if (tab && tab.classList) {
+                    tab.classList.add('active');
+                    tab.setAttribute('aria-selected', 'true');
+                }
                 const content = document.getElementById(`tab-${tab.dataset.tab}`);
                 if (content && content.classList) content.classList.add('active');
                 if (tab.dataset.tab === 'mondo' && this.initTerritorioSubTabs) this.initTerritorioSubTabs();

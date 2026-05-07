@@ -357,22 +357,22 @@
                     <span class="phone-clock" id="phone-clock">00:00</span>
                     <span class="phone-battery">🔋</span>
                 </div>
-                <div class="phone-tabs">
-                    <button class="phone-tab active" data-tab="friends">👥 Contatti</button>
-                    <button class="phone-tab" data-tab="partner">💕 Vita</button>
-                    <button class="phone-tab" data-tab="social">📰 Social</button>
-                    <button class="phone-tab" data-tab="attivita">⚡ Attività</button>
-                    <button class="phone-tab" data-tab="favori">🤝 Favori</button>
-                    <button class="phone-tab" data-tab="mondo">🌍 Mondo</button>
-                    <button class="phone-tab" data-tab="archivio">📦 Archivio</button>
+                <div class="phone-tabs" role="tablist" aria-label="Sezioni telefono">
+                    <button class="phone-tab active" data-tab="friends" role="tab" aria-selected="true" aria-controls="tab-friends" id="ptab-friends">👥 Contatti</button>
+                    <button class="phone-tab" data-tab="partner" role="tab" aria-selected="false" aria-controls="tab-partner" id="ptab-partner">💕 Vita</button>
+                    <button class="phone-tab" data-tab="social" role="tab" aria-selected="false" aria-controls="tab-social" id="ptab-social">📰 Social</button>
+                    <button class="phone-tab" data-tab="attivita" role="tab" aria-selected="false" aria-controls="tab-attivita" id="ptab-attivita">⚡ Attività</button>
+                    <button class="phone-tab" data-tab="favori" role="tab" aria-selected="false" aria-controls="tab-favori" id="ptab-favori">🤝 Favori</button>
+                    <button class="phone-tab" data-tab="mondo" role="tab" aria-selected="false" aria-controls="tab-mondo" id="ptab-mondo">🌍 Mondo</button>
+                    <button class="phone-tab" data-tab="archivio" role="tab" aria-selected="false" aria-controls="tab-archivio" id="ptab-archivio">📦 Archivio</button>
                 </div>
                 <div class="phone-actions-bar">
                     <span>📱 Azioni:</span>
                     <span class="phone-ap-dot filled" id="phone-ap-1"></span>
                     <span class="phone-ap-dot filled" id="phone-ap-2"></span>
                 </div>
-                <div class="phone-content">
-                    <div class="phone-tab-content active" id="tab-friends">
+                <div class="phone-content" role="presentation">
+                    <div class="phone-tab-content active" id="tab-friends" role="tabpanel" aria-labelledby="ptab-friends">
                         <div class="contacts-topbar">
                             <button class="contacts-hamburger-btn" id="contacts-hamburger" title="Apri albero contatti">☰ Albero Contatti</button>
                         </div>
@@ -393,15 +393,15 @@
                             <div class="contacts-tree" id="contacts-tree-overlay"></div>
                         </div>
                     </div>
-                    <div class="phone-tab-content" id="tab-favori" role="list" aria-label="Favori in sospeso">
+                    <div class="phone-tab-content" id="tab-favori" role="tabpanel" aria-labelledby="ptab-favori" aria-label="Favori in sospeso">
                         <h3>🤝 Favori in Sospeso</h3>
                         <div id="favori-list"></div>
                     </div>
-                    <div class="phone-tab-content" id="tab-partner">
+                    <div class="phone-tab-content" id="tab-partner" role="tabpanel" aria-labelledby="ptab-partner">
                         <h3>💕 Vita Sentimentale</h3>
                         <div id="partner-content"></div>
                     </div>
-                    <div class="phone-tab-content" id="tab-social">
+                    <div class="phone-tab-content" id="tab-social" role="tabpanel" aria-labelledby="ptab-social">
                         <h3>📰 Social Buzz</h3>
                         <div id="radio-locale-panel" class="social-special-panel hidden">
                             <div class="social-special-title">📻 Radio Locale</div>
@@ -451,7 +451,7 @@
                             <button class="social-post-btn" id="btn-post-evento">🎉 Evento <span class="phone-cost-badge">1 📱</span> <span class="task-ap-cost">€50</span></button>
                         </div>
                     </div>
-                    <div class="phone-tab-content" id="tab-attivita">
+                    <div class="phone-tab-content" id="tab-attivita" role="tabpanel" aria-labelledby="ptab-attivita">
                         <div class="phone-work-tabs">
                             <button class="phone-work-tab active" data-wtab="urgenti">🔴 Urgenti</button>
                             <button class="phone-work-tab" data-wtab="lavoro">🟡 Lavoro</button>
@@ -468,11 +468,11 @@
                             <div id="favori-list"></div>
                         </div>
                     </div>
-                    <div class="phone-tab-content" id="tab-archivio">
+                    <div class="phone-tab-content" id="tab-archivio" role="tabpanel" aria-labelledby="ptab-archivio">
                         <h3>📭 Contatti Persi</h3>
                         <div id="archivio-list"></div>
                     </div>
-                    <div class="phone-tab-content" id="tab-mondo">
+                    <div class="phone-tab-content" id="tab-mondo" role="tabpanel" aria-labelledby="ptab-mondo">
                                             <!-- Patch: placeholder per tab-mondo richiesto dai test automatici -->
                                             <div id="tab-mondo" style="display:none"></div>
                         <div class="phone-territory-tabs">
@@ -505,19 +505,19 @@
                 <div class="notepad-header-full">
                     <h2>📝 Foglio delle Mansioni</h2>
                 </div>
-                <div class="task-tabs">
-                    <button class="task-tab active" data-tab="work-tasks">Lavoro Normale</button>
-                    <button class="task-tab" data-tab="political-tasks">Politico</button>
-                    <button class="task-tab" data-tab="lifestyle-tasks">Vita Quotidiana</button>
+                <div class="task-tabs" role="tablist" aria-label="Sezioni mansioni">
+                    <button class="task-tab active" data-tab="work-tasks" role="tab" aria-selected="true" aria-controls="tab-work-tasks" id="ttab-work">Lavoro Normale</button>
+                    <button class="task-tab" data-tab="political-tasks" role="tab" aria-selected="false" aria-controls="tab-political-tasks" id="ttab-political">Politico</button>
+                    <button class="task-tab" data-tab="lifestyle-tasks" role="tab" aria-selected="false" aria-controls="tab-lifestyle-tasks" id="ttab-lifestyle">Vita Quotidiana</button>
                 </div>
-                <div class="task-content">
-                    <div class="task-tab-content active" id="tab-work-tasks">
+                <div class="task-content" role="presentation">
+                    <div class="task-tab-content active" id="tab-work-tasks" role="tabpanel" aria-labelledby="ttab-work">
                         <div class="task-list" id="work-tasks"></div>
                     </div>
-                    <div class="task-tab-content" id="tab-political-tasks">
+                    <div class="task-tab-content" id="tab-political-tasks" role="tabpanel" aria-labelledby="ttab-political">
                         <div class="task-list" id="political-tasks"></div>
                     </div>
-                    <div class="task-tab-content" id="tab-lifestyle-tasks">
+                    <div class="task-tab-content" id="tab-lifestyle-tasks" role="tabpanel" aria-labelledby="ttab-lifestyle">
                         <div class="lifestyle-tabs">
                             <button class="lifestyle-tab active" data-ltab="lavoretti">💼 Lavoretti</button>
                             <button class="lifestyle-tab" data-ltab="abitudini">🏃 Abitudini</button>

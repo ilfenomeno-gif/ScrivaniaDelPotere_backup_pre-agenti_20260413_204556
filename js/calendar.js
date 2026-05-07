@@ -308,11 +308,3 @@ const Calendar = {
         }
     },
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof Game !== 'undefined' && Game.on) {
-        Calendar.init();
-    } else {
-        setTimeout(() => Calendar.init(), 800);
-    }
-});

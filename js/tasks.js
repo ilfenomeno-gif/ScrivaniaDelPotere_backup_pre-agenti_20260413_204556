@@ -85,8 +85,12 @@ const Tasks = {
         /* Task tab switching */
         document.querySelectorAll('.task-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                document.querySelectorAll('.task-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.task-tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
                 tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
                 const target = tab.dataset.tab;
                 document.querySelectorAll('.task-tab-content').forEach(c => c.classList.remove('active'));
                 const pane = document.getElementById(`tab-${target}`);

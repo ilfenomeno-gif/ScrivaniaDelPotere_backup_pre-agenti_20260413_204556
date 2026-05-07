@@ -242,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Intel.init();
     Favors.init();
     Diary.init();
+    if (typeof Calendar !== 'undefined') Calendar.init();
 
     // New systems
     Compass.init();
