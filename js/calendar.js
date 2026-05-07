@@ -16,6 +16,58 @@ const Calendar = {
         personal: { label: 'Personale',       icon: '📌', color: '#888'    },
     },
 
+    /* Descrizioni predefinite per tipo */
+    DESCRIPTIONS_BY_TYPE: {
+        meeting:  [
+            'Incontro con il sindaco',
+            'Riunione di partito',
+            'Assemblea pubblica',
+            'Colloquio con alleati politici',
+            'Vertice sindacale',
+            'Incontro con la stampa',
+        ],
+        deadline: [
+            'Presentazione del bilancio',
+            'Consegna relazione annuale',
+            'Scadenza pagamento bollette',
+            'Scadenza contratto di lavoro',
+            'Voto in commissione parlamentare',
+            'Presentazione proposta di legge',
+        ],
+        event: [
+            'Comizio elettorale',
+            'Inaugurazione opera pubblica',
+            'Convegno politico nazionale',
+            'Cena di gala con diplomatici',
+            'Conferenza stampa',
+            'Cerimonia ufficiale',
+        ],
+        election: [
+            'Elezioni comunali',
+            'Elezioni regionali',
+            'Elezioni nazionali',
+            'Voto di fiducia al governo',
+            'Primarie di partito',
+            'Referendum popolare',
+        ],
+        worktask: [
+            'Lavoro sindacale urgente',
+            'Campagna elettorale sul territorio',
+            'Progetto legislativo da firmare',
+            'Missione speciale del partito',
+            'Incontro con il mentore',
+            'Raccolta firme cittadini',
+        ],
+        personal: [
+            'Riposo e recupero',
+            'Studio e formazione politica',
+            'Appuntamento medico',
+            'Impegno familiare',
+            'Tempo libero',
+            'Attività fisica',
+        ],
+    },
+
     init() {
         this.load();
         this.render();
@@ -112,30 +164,38 @@ const Calendar = {
             `<option value="${id}">${t.icon} ${t.label}</option>`
         ).join('');
 
+        const firstType = 'meeting';
+        const firstDescs = this.DESCRIPTIONS_BY_TYPE[firstType] || [];
+        const firstDescOptions = firstDescs.map(d => `<option value="${Game.esc(d)}">${Game.esc(d)}</option>`).join('');
+
         overlay.innerHTML = `
             <div class="calendar-modal" role="dialog" aria-modal="true" aria-labelledby="${headingId}">
                 <h2 id="${headingId}" class="calendar-modal-title">📅 Nuovo Appuntamento</h2>
-                <p class="visually-hidden">Inserisci i dettagli dell'appuntamento. Usa Tab per navigare tra i campi.</p>
+                <p class="visually-hidden">Scegli il tipo e la descrizione dell'appuntamento. Usa Tab per navigare tra i campi, Spazio o Invio per aprire i menu.</p>
+                <div aria-live="polite" aria-atomic="true" class="visually-hidden" id="cal-live-region"></div>
                 <div class="calendar-form">
-                    <label for="cal-type">Tipo
-                        <select id="cal-type" class="calendar-input">${typeOptions}</select>
+                    <label for="cal-type">Tipo appuntamento
+                        <select id="cal-type" class="calendar-input" aria-required="true">${typeOptions}</select>
                     </label>
                     <label for="cal-desc">Descrizione
-                        <input id="cal-desc" class="calendar-input" type="text"
-                            placeholder="es: Incontro con il sindaco" maxlength="100"
-                            aria-required="true">
+                        <select id="cal-desc" class="calendar-input" aria-required="true"
+                            aria-describedby="cal-desc-hint">
+                            ${firstDescOptions}
+                        </select>
+                        <span id="cal-desc-hint" class="visually-hidden">Le opzioni cambiano in base al tipo selezionato.</span>
                     </label>
-                    <label for="cal-timeofday">Momento
+                    <label for="cal-timeofday">Momento della giornata
                         <select id="cal-timeofday" class="calendar-input">
-                            <option value="0">Mattina</option>
-                            <option value="1">Pomeriggio</option>
-                            <option value="2">Sera</option>
+                            <option value="0">🌅 Mattina</option>
+                            <option value="1">☀️ Pomeriggio</option>
+                            <option value="2">🌙 Sera</option>
                         </select>
                     </label>
                     <label for="cal-day">Giorno (attuale: ${Game.state.day || 1})
                         <input id="cal-day" class="calendar-input" type="number"
                             min="${(Game.state.day || 1) + 1}" value="${(Game.state.day || 1) + 1}"
-                            aria-required="true">
+                            aria-required="true" aria-describedby="cal-day-hint">
+                        <span id="cal-day-hint" class="visually-hidden">Inserisci un giorno successivo all'attuale.</span>
                     </label>
                 </div>
                 <div class="calendar-modal-footer">
@@ -145,37 +205,63 @@ const Calendar = {
             </div>
         `;
 
+        overlay.classList.remove('hidden');
+        overlay.removeAttribute('aria-hidden');
         overlay.style.display = 'flex';
         const modalEl = overlay.querySelector('[role="dialog"]');
-        if (window.SR) SR.openModal(modalEl, 'Nuovo Appuntamento', 'Compila i campi per aggiungere un appuntamento al calendario.');
+        if (window.SR) SR.openModal(modalEl, 'Nuovo Appuntamento', 'Scegli tipo e descrizione dell\'appuntamento dai menu.');
+
+        // Aggiorna descrizioni dinamicamente al cambio tipo
+        const typeSelect = overlay.querySelector('#cal-type');
+        const descSelect = overlay.querySelector('#cal-desc');
+        const liveRegion = overlay.querySelector('#cal-live-region');
+
+        const _updateDescriptions = (typeId, announce) => {
+            const descs = this.DESCRIPTIONS_BY_TYPE[typeId] || [];
+            descSelect.innerHTML = descs
+                .map(d => `<option value="${Game.esc(d)}">${Game.esc(d)}</option>`)
+                .join('');
+            if (announce && liveRegion) {
+                const typeLabel = this.APPOINTMENT_TYPES[typeId]?.label || typeId;
+                liveRegion.textContent = `Descrizioni aggiornate per ${typeLabel}. ${descs.length} opzioni disponibili.`;
+            }
+        };
+
+        typeSelect.addEventListener('change', () => {
+            _updateDescriptions(typeSelect.value, true);
+            descSelect.focus();
+        });
 
         overlay.querySelector('#cal-save-btn').addEventListener('click', () => {
-            const desc = overlay.querySelector('#cal-desc').value.trim();
-            const type = overlay.querySelector('#cal-type').value;
+            const desc = descSelect.value;
+            const type = typeSelect.value;
             const tod = parseInt(overlay.querySelector('#cal-timeofday').value, 10);
             const day = parseInt(overlay.querySelector('#cal-day').value, 10);
             if (!desc) {
-                if (window.SR) SR.announce('Inserisci una descrizione per l\'appuntamento.', 'assertive');
-                overlay.querySelector('#cal-desc').focus();
+                if (window.SR) SR.announce('Seleziona una descrizione per l\'appuntamento.', 'assertive');
+                descSelect.focus();
                 return;
             }
-            const typeData = this.APPOINTMENT_TYPES[type] || this.APPOINTMENT_TYPES.personal;
             const timeLabel = ['Mattina', 'Pomeriggio', 'Sera'][tod] || 'Mattina';
             const dateLabel = `Giorno ${day} — ${timeLabel}`;
             this.appointments.push({ day, timeOfDay: tod, desc, type, dateLabel });
             this.save();
             this.render();
             overlay.style.display = 'none';
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
             if (window.SR) SR.closeModal(_trigger, `Appuntamento "${desc}" pianificato per ${dateLabel}.`);
         });
 
         overlay.querySelector('#cal-cancel-btn').addEventListener('click', () => {
             overlay.style.display = 'none';
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
             if (window.SR) SR.closeModal(_trigger, 'Aggiunta appuntamento annullata.');
         });
 
-        // Focus prima campo
-        setTimeout(() => overlay.querySelector('#cal-desc')?.focus(), 50);
+        // Focus sul primo campo
+        setTimeout(() => overlay.querySelector('#cal-type')?.focus(), 50);
     },
 
     promptNewAppointment() {

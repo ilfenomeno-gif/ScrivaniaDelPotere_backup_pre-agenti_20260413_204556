@@ -40,6 +40,25 @@ const Parties = (() => {
         Game.on('panel-open', (d) => {
             if (d.panel === 'stats') _injectPartyUI();
         });
+
+        // Resetta partito e mentori quando il giocatore cambia nazione
+        function _onNationChange() {
+            Game.state.party = {
+                id: null, name: null, nationId: null, currentId: null,
+                joinedDay: 0,
+                ideologyMatrix: { tasse: 0, immigrazione: 0, ambiente: 0, difesa: 0, diritti: 0 },
+                currentInfluence: 0,
+                formerParties: (Game.state.party && Game.state.party.formerParties) ? Game.state.party.formerParties : [],
+                partyEvents: [],
+                _partyData: null,
+            };
+            Game.state.partyMentors = [];
+            _injectPartyUI();
+            Game.addWorkNotif('🏛️ Partito', 'Sei in un nuovo paese. Scegli un nuovo partito politico.', `Giorno ${Game.state.day}`);
+            if (window.SR) SR.announce('Cambiato paese. Seleziona un nuovo partito politico nel pannello statistiche.', 'polite');
+        }
+        Game.on('nation-change', _onNationChange);
+        Game.on('nation-changed', _onNationChange);
     }
 
     /* ── Caricamento dati partiti per nazione ── */

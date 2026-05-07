@@ -22,7 +22,7 @@ const CitySearch = (() => {
 
     /* ── Dati nazioni disponibili ────────────── */
     const _FILES = {
-        italy:   ['data/cities.json', 'data/cities_italy.json'],
+        italy:   ['data/cities.json'],
         france:  ['data/cities_france.json'],
         germany: ['data/cities_germany.json'],
         uk:      ['data/cities_uk.json'],
@@ -31,12 +31,14 @@ const CitySearch = (() => {
     /* ── Init ─────────────────────────────────── */
     async function init() {
         await _buildIndex();
-        Game.on('nation-change', async () => {
+        async function _onNationChange() {
             _cityIndex = null;
             _allCities = [];
             await _buildIndex();
             _renderSearchBar();
-        });
+        }
+        Game.on('nation-change', _onNationChange);
+        Game.on('nation-changed', _onNationChange);
     }
 
     /* ── Costruisce l'indice da tutti i JSON ──── */
