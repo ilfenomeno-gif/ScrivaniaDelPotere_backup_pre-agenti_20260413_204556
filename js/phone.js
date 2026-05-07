@@ -10,17 +10,18 @@ const Phone = {
         this._initialized = true;
 
         document.querySelectorAll('.phone-tab').forEach(tab => {
+            if (!tab) return;
             tab.addEventListener('click', () => {
-                this.closeContactsOverlay();
-                document.querySelectorAll('.phone-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.phone-tab-content').forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
+                this.closeContactsOverlay && this.closeContactsOverlay();
+                document.querySelectorAll('.phone-tab').forEach(t => t && t.classList && t.classList.remove('active'));
+                document.querySelectorAll('.phone-tab-content').forEach(c => c && c.classList && c.classList.remove('active'));
+                if (tab && tab.classList) tab.classList.add('active');
                 const content = document.getElementById(`tab-${tab.dataset.tab}`);
-                if (content) content.classList.add('active');
-                if (tab.dataset.tab === 'mondo') this.initTerritorioSubTabs();
-                if (tab.dataset.tab === 'attivita') this.initWorkSubTabs();
+                if (content && content.classList) content.classList.add('active');
+                if (tab.dataset.tab === 'mondo' && this.initTerritorioSubTabs) this.initTerritorioSubTabs();
+                if (tab.dataset.tab === 'attivita' && this.initWorkSubTabs) this.initWorkSubTabs();
                 if (tab.dataset.tab === 'favori') {
-                    this.renderFavori();
+                    this.renderFavori && this.renderFavori();
                     if (window.SR) SR.announce('Tab Favori attivata. Elenco favori e crediti disponibile.', 'polite');
                 }
             });
@@ -76,7 +77,7 @@ const Phone = {
         this.closeContactsOverlay();
         this.normalizeContacts();
         const activeTab = document.querySelector('.phone-tab-content.active');
-        const scrollPos = activeTab ? activeTab.scrollTop : 0;
+        const scrollPos = activeTab && typeof activeTab.scrollTop === 'number' ? activeTab.scrollTop : 0;
         this.renderContacts();
         this.renderPartner();
         this.renderWorkNotifs();
@@ -91,7 +92,7 @@ const Phone = {
         this.updateBadge();
         this.updatePhoneAPDots();
         Desk.renderCorkBoard();
-        if (activeTab) requestAnimationFrame(() => { activeTab.scrollTop = scrollPos; });
+        if (activeTab && typeof activeTab.scrollTop === 'number') requestAnimationFrame(() => { activeTab.scrollTop = scrollPos; });
     },
 
     normalizeContacts() {
@@ -908,16 +909,17 @@ const Phone = {
     initWorkSubTabs() {
         document.querySelectorAll('.phone-work-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                document.querySelectorAll('.phone-work-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.phone-work-content').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.phone-work-tab').forEach(t => t && t.classList.remove('active'));
+                document.querySelectorAll('.phone-work-content').forEach(c => c && c.classList.remove('active'));
                 tab.classList.add('active');
-                document.getElementById(`phone-wtab-${tab.dataset.wtab}`).classList.add('active');
+                const content = document.getElementById(`phone-wtab-${tab.dataset.wtab}`);
+                if (content) content.classList.add('active');
             });
         });
 
         const activeTab = document.querySelector('.phone-work-tab.active') || document.querySelector('.phone-work-tab');
         if (activeTab) {
-            document.querySelectorAll('.phone-work-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.phone-work-content').forEach(c => c && c.classList.remove('active'));
             const target = document.getElementById(`phone-wtab-${activeTab.dataset.wtab}`);
             if (target) target.classList.add('active');
         }
@@ -2250,21 +2252,23 @@ const Phone = {
 
     initTerritorioSubTabs() {
         document.querySelectorAll('.phone-terr-tab').forEach(tab => {
+            if (!tab) return;
             tab.onclick = () => {
-                document.querySelectorAll('.phone-terr-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.phone-terr-content').forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(`phone-ttab-${tab.dataset.ttab}`).classList.add('active');
-                if (tab.dataset.ttab === 'mappa') this.renderPhoneMap();
+                document.querySelectorAll('.phone-terr-tab').forEach(t => t && t.classList && t.classList.remove('active'));
+                document.querySelectorAll('.phone-terr-content').forEach(c => c && c.classList && c.classList.remove('active'));
+                if (tab && tab.classList) tab.classList.add('active');
+                const terrContent = document.getElementById(`phone-ttab-${tab.dataset.ttab}`);
+                if (terrContent && terrContent.classList) terrContent.classList.add('active');
+                if (tab.dataset.ttab === 'mappa' && this.renderPhoneMap) this.renderPhoneMap();
             };
         });
 
         const activeTab = document.querySelector('.phone-terr-tab.active') || document.querySelector('.phone-terr-tab');
         if (activeTab) {
-            document.querySelectorAll('.phone-terr-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.phone-terr-content').forEach(c => c && c.classList && c.classList.remove('active'));
             const target = document.getElementById(`phone-ttab-${activeTab.dataset.ttab}`);
-            if (target) target.classList.add('active');
-            if (activeTab.dataset.ttab === 'mappa') this.renderPhoneMap();
+            if (target && target.classList) target.classList.add('active');
+            if (activeTab.dataset.ttab === 'mappa' && this.renderPhoneMap) this.renderPhoneMap();
         }
     },
 

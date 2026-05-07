@@ -1,3 +1,6 @@
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+
     // Export/Import anche dal menu Opzioni
     const optExportBtn = document.getElementById('opt-export');
     if (optExportBtn) {
@@ -41,12 +44,6 @@
             reader.readAsText(file);
         });
     }
-/* ============================================
-   MAIN — Application Entry Point (v2)
-   ============================================ */
-
-(function () {
-    'use strict';
 
     /* ----- Screen Management ----- */
     function showScreen(id) {
@@ -171,7 +168,6 @@
         }
     });
 
-
     /* ----- Restart & Export/Import Save ----- */
     const restartBtn = document.getElementById('btn-restart');
     if (restartBtn) {
@@ -221,8 +217,12 @@
     }
 
     /* ----- Init All Modules ----- */
-    GameMap.init();
+    if (typeof GameMap !== 'undefined' && GameMap.init) {
+        GameMap.init();
+        if (typeof window !== 'undefined') window.GameMap = GameMap;
+    }
     Character.init();
+    if (typeof window !== 'undefined') window.Character = Character;
     Desk.init();
     Tasks.init();
     Phone.init();
@@ -343,4 +343,4 @@
         bootstrapNewGame();
         showScreen('screen-character');
     }
-})();
+});

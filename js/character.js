@@ -1,25 +1,3 @@
-    // Selezione città in-game dopo cambio nazione (flusso transfer)
-    showInGameCitySelection() {
-        const container = document.getElementById('phone-map-body')
-                       || document.getElementById('map-body');
-        if (!container) {
-            if (typeof Desk !== 'undefined' && Desk.openPanel) Desk.openPanel('map');
-            return;
-        }
-        container.insertAdjacentHTML('afterbegin', `
-            <div id="ingame-nation-banner" role="alert" aria-live="assertive"
-                 style="background:#1565C0;color:white;padding:10px 16px;border-radius:6px;margin-bottom:8px;font-size:13px;">
-                🌍 <strong>Sei arrivato in una nuova nazione.</strong> Seleziona la tua città per continuare.
-                <button id="ingame-nation-banner-close" aria-label="Chiudi avviso nazione"
-                        style="float:right;background:none;border:none;color:white;cursor:pointer;font-size:16px;">✕</button>
-            </div>
-        `);
-        document.getElementById('ingame-nation-banner-close')?.addEventListener('click', () => {
-            document.getElementById('ingame-nation-banner')?.remove();
-        });
-        if (typeof GameMap !== 'undefined' && GameMap.renderMapPanel)
-            GameMap.renderMapPanel(container.id);
-    },
 /* ============================================
    CHARACTER — Character Creation (v3)
    "Colloquio con il Partito" — Immersive Anagrafe
@@ -67,6 +45,7 @@ const Character = {
             { id: 'massimo5', archetype: 'massimo', name: 'Tommaso Grani', shortName: 'compagno Tommaso', icon: '🦅', ideology: 'destra sovranista', quote: 'Presidio costante, risultati certi.', bonusText: '+5 Muscoli, +€50 da attività territorio', effects: { muscoli: 5, moneyPerTerritory: 50 } },
             { id: 'massimo6', archetype: 'massimo', name: 'Vera Neri', shortName: 'compagna Vera', icon: '🦅', ideology: 'destra sovranista', quote: 'Comando chiaro, squadra compatta.', bonusText: '+10 Muscoli, +5 Coerenza', effects: { muscoli: 10, coherence: 5 } },
         ],
+
     },
 
     MENTOR_AUTONOMO: {
@@ -1131,3 +1110,8 @@ const Character = {
         // No partner at start — meet someone through territory exploration
     },
 };
+
+// Espone Character su window per test automatici e bootstrap headless
+if (typeof window !== 'undefined') {
+    window.Character = Character;
+}

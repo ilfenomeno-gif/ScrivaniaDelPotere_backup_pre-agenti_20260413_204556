@@ -1,7 +1,10 @@
+// Espone GameMap su window per i test automatici e runtimeChecker.js
+if (typeof window !== 'undefined') {
+    window.GameMap = GameMap;
+// }
 /* ============================================
-   MAP — Mappa d'Italia Videoludica & Trasferimenti
-   ============================================ */
-
+    MAP — Mappa d'Italia Videoludica & Trasferimenti
+    ============================================ */
 const CITY_SEEDS = {
     italy: [
         ['roma','Roma','Lazio',41.9028,12.4964,'city','large',1],['milano','Milano','Lombardia',45.4642,9.19,'city','large',1],['napoli','Napoli','Campania',40.8518,14.2681,'city','large',2],['torino','Torino','Piemonte',45.0703,7.6869,'city','medium',2],['palermo','Palermo','Sicilia',38.1157,13.3615,'city','large',2],['genova','Genova','Liguria',44.4056,8.9463,'city','medium',2],['bologna','Bologna','Emilia-Romagna',44.4949,11.3426,'city','medium',2],['firenze','Firenze','Toscana',43.7696,11.2558,'city','medium',2],['venezia','Venezia','Veneto',45.4408,12.3155,'city','medium',2],['verona','Verona','Veneto',45.4384,10.9916,'municipality','medium',3],['bari','Bari','Puglia',41.1171,16.8719,'municipality','medium',3],['catania','Catania','Sicilia',37.5079,15.083,'municipality','medium',3],['messina','Messina','Sicilia',38.1938,15.554,'municipality','medium',3],['padova','Padova','Veneto',45.4064,11.8768,'municipality','medium',3],['brescia','Brescia','Lombardia',45.5416,10.2118,'municipality','medium',3],['taranto','Taranto','Puglia',40.4637,17.247,'municipality','medium',3],['prato','Prato','Toscana',43.8777,11.1022,'municipality','medium',3],['modena','Modena','Emilia-Romagna',44.6471,10.9252,'municipality','medium',3],['reggio_calabria','Reggio Calabria','Calabria',38.1105,15.6613,'municipality','medium',3],['parma','Parma','Emilia-Romagna',44.8015,10.3279,'municipality','medium',3],['livorno','Livorno','Toscana',43.5529,10.3081,'municipality','medium',3],['rimini','Rimini','Emilia-Romagna',44.0632,12.5928,'municipality','small',3],['cagliari','Cagliari','Sardegna',39.2238,9.1217,'municipality','small',3],['trieste','Trieste','Friuli V.G.',45.6495,13.7768,'municipality','small',3],['perugia','Perugia','Umbria',43.1107,12.3908,'municipality','small',3],['ancona','Ancona','Marche',43.6158,13.5189,'municipality','small',3],['trento','Trento','Trentino-A.A.',46.0748,11.1217,'municipality','small',3],['laquila','LAquila','Abruzzo',42.3498,13.3995,'municipality','small',3],['aosta','Aosta','Valle dAosta',45.7375,7.3122,'municipality','small',3],['campobasso','Campobasso','Molise',41.5603,14.6685,'municipality','small',3],['potenza','Potenza','Basilicata',40.6404,15.8056,'municipality','small',3]
@@ -14,9 +17,9 @@ const CITY_SEEDS = {
     ],
     uk: [
         ['london','Londra','Greater London',51.5074,-0.1278,'city','large',1],['manchester','Manchester','North West',53.4808,-2.2426,'city','large',2],['birmingham','Birmingham','West Midlands',52.4862,-1.8904,'city','large',2],['edinburgh','Edimburgo','Scotland',55.9533,-3.1883,'city','large',2],['glasgow','Glasgow','Scotland',55.8642,-4.2518,'municipality','large',3],['leeds','Leeds','Yorkshire',53.8008,-1.5491,'municipality','medium',3],['liverpool','Liverpool','North West',53.4084,-2.9916,'municipality','medium',3],['bristol','Bristol','South West',51.4545,-2.5879,'municipality','medium',3],['newcastle','Newcastle','North East',54.9783,-1.6178,'municipality','small',3],['sheffield','Sheffield','Yorkshire',53.3811,-1.4701,'municipality','small',3],['cardiff','Cardiff','Wales',51.4816,-3.1791,'municipality','medium',3],['belfast','Belfast','Northern Ireland',54.5973,-5.9301,'municipality','medium',3],['southampton','Southampton','South East',50.9097,-1.4044,'municipality','small',3],['portsmouth','Portsmouth','South East',50.8198,-1.088,'municipality','small',3],['leicester','Leicester','East Midlands',52.6369,-1.1398,'municipality','small',3],['coventry','Coventry','West Midlands',52.4068,-1.5197,'municipality','small',3],['nottingham','Nottingham','East Midlands',52.9548,-1.1581,'municipality','small',3],['kingston','Kingston upon Hull','Yorkshire',53.7676,-0.3274,'municipality','small',3],['plymouth','Plymouth','South West',50.3755,-4.1427,'municipality','small',3],['aberdeen','Aberdeen','Scotland',57.1497,-2.0943,'municipality','small',3],['reading','Reading','South East',51.4543,-0.9781,'municipality','small',3],['brighton','Brighton','South East',50.8225,-0.1372,'municipality','small',3],['milton_keynes','Milton Keynes','South East',52.0406,-0.7594,'municipality','small',3],['luton','Luton','East',51.8787,-0.420,'municipality','small',3],['swansea','Swansea','Wales',51.6214,-3.9436,'municipality','small',3],['derby','Derby','East Midlands',52.9225,-1.4746,'municipality','small',3],['york','York','Yorkshire',53.959,-1.0815,'municipality','small',3],['northampton','Northampton','East Midlands',52.2405,-0.9027,'municipality','small',3],['blackpool','Blackpool','North West',53.8142,-3.0503,'municipality','small',3],['cambridge','Cambridge','East',52.2053,0.1218,'municipality','small',3],['oxford','Oxford','South East',51.752,-1.2577,'municipality','small',3]
-    ]
-};
+    },
 
+    async showNationTransferUI() {
 const CITY_SPECIALS = {
     roma: ['capital'], milano: ['industry'], napoli: ['port'], torino: ['industry'], venezia: ['tourism'], firenze: ['tourism'],
     bologna: ['university'], perugia: ['university'], padova: ['university'],
@@ -31,8 +34,8 @@ const CITY_OVERRIDES = {
         malus: { stress: 3, concorrenza: 0.88 },
         rentMultiplier: 0.9,
         salaryMultiplier: 0.9,
-    },
-};
+    }
+}
 
 const CITY_SIZE_BANDS = {
     smallMax: 50000,
@@ -315,6 +318,7 @@ const ZOOM_THRESHOLDS = {
     'citta_media':  6,
     'citta_grande': 5,   // sempre visibile (vista lontana)
 };
+
 
 const GameMap = {
     citiesData: null,
@@ -1578,6 +1582,7 @@ const GameMap = {
             refreshTransferCost();
         }
         
+
         document.getElementById('nation-cancel').onclick = () => modal.remove();
         document.getElementById('nation-confirm').onclick = async () => {
             const newNationId = document.getElementById('nation-select').value;
@@ -1585,7 +1590,7 @@ const GameMap = {
             modal.remove();
             if (!ok) return;
         };
-    },
+    }
 
     async transferToNation(newNationId) {
         const nations = typeof Nations !== 'undefined' && Nations.getAvailableNations
