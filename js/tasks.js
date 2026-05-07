@@ -89,7 +89,10 @@ const Tasks = {
                 tab.classList.add('active');
                 const target = tab.dataset.tab;
                 document.querySelectorAll('.task-tab-content').forEach(c => c.classList.remove('active'));
-                document.getElementById(`tab-${target}`).classList.add('active');
+                const pane = document.getElementById(`tab-${target}`);
+                if (pane) pane.classList.add('active');
+                // Announce tab change
+                if (window.SR) SR.announce(`Tab attiva: ${tab.textContent.trim()}`, 'polite');
                 // Refresh lifestyle content when its tab is selected
                 if (target === 'lifestyle-tasks' && typeof Lifestyle !== 'undefined') {
                     Lifestyle.refresh();
@@ -133,6 +136,16 @@ const Tasks = {
         const pool = this.getPool(category);
         const list = document.getElementById(`${category}-tasks`);
         list.innerHTML = '';
+
+        // Section heading + description for screen readers
+        const catLabel = category === 'work' ? 'Mansioni di lavoro' : 'Compiti politici';
+        const catDesc  = category === 'work'
+            ? 'Elenco delle attività lavorative disponibili. Clicca su un compito per completarlo e guadagnare ricompense.'
+            : 'Elenco degli incarichi politici. Completali per aumentare reputazione e avanzare nella carriera.';
+        if (window.SR) SR.sectionHeading(list, 3, catLabel, catDesc);
+        // Add list role and label for screen readers
+        list.setAttribute('role', 'list');
+        list.setAttribute('aria-label', catLabel);
 
         // Check bills lockout
         if (Game.state.flags.phoneLocked && category === 'work') {

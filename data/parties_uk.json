@@ -1,0 +1,112 @@
+[
+  {
+    "id": "uk_conservatives",
+    "name": "Conservative Party",
+    "shortName": "CON",
+    "icon": "🔵",
+    "color": "#003b5c",
+    "ideology": "conservative",
+    "country": "uk",
+    "ideologyMatrix": { "tasse": -7, "immigrazione": -7, "ambiente": -2, "difesa": 8, "diritti": -4 },
+    "currents": [
+      {
+        "id": "curr_con_thatcheriti",
+        "name": "Thatcherites",
+        "icon": "📊",
+        "leader": "Edward Harrington",
+        "influence": 55,
+        "ideologyMatrix": { "tasse": -9, "immigrazione": -6, "ambiente": -3, "difesa": 7, "diritti": -3 },
+        "bonus": "Deregulation: +£500 ogni turno da lobby private",
+        "malus": "Welfare cuts: -10 popolarità classi operaie"
+      },
+      {
+        "id": "curr_con_one_nation",
+        "name": "One Nation Tories",
+        "icon": "🇬🇧",
+        "leader": "Harriet Blythe",
+        "influence": 45,
+        "ideologyMatrix": { "tasse": -4, "immigrazione": -4, "ambiente": 2, "difesa": 6, "diritti": 0 },
+        "bonus": "Consenso trasversale: coalizioni con Labour moderato possibili",
+        "malus": "Ala hard-right -12 fedeltà"
+      }
+    ],
+    "bonuses": [
+      { "stat": "privateFunding", "value": 0.20, "condition": "always", "label": "+20% finanziamenti privati" },
+      { "stat": "defenseBonus", "value": 0.10, "condition": "always", "label": "+10% voti pro-difesa" }
+    ],
+    "maluses": [
+      { "stat": "workingClassPopularity", "value": -0.10, "condition": "always", "label": "-10% popolarità classi operaie" }
+    ],
+    "startingBonus": { "money": 80, "reputazioneNazionale": 5 }
+  },
+  {
+    "id": "uk_labour",
+    "name": "Labour Party",
+    "shortName": "LAB",
+    "icon": "🌹",
+    "color": "#d62828",
+    "ideology": "labour",
+    "country": "uk",
+    "ideologyMatrix": { "tasse": 7, "immigrazione": 5, "ambiente": 5, "difesa": 1, "diritti": 8 },
+    "currents": [
+      {
+        "id": "curr_lab_corbynisti",
+        "name": "Hard Left",
+        "icon": "✊",
+        "leader": "Roy Walters",
+        "influence": 40,
+        "ideologyMatrix": { "tasse": 9, "immigrazione": 7, "ambiente": 6, "difesa": -2, "diritti": 9 },
+        "bonus": "Nazionalizzazioni: +15 consenso città industriali",
+        "malus": "Press hostility: scandali mediatici +20% probabilità"
+      },
+      {
+        "id": "curr_lab_blairisti",
+        "name": "New Labour",
+        "icon": "🤝",
+        "leader": "Diana Ashworth",
+        "influence": 60,
+        "ideologyMatrix": { "tasse": 4, "immigrazione": 4, "ambiente": 4, "difesa": 4, "diritti": 6 },
+        "bonus": "Accordi centrodestra: coalizioni trasversali possibili",
+        "malus": "Base sindacale -10 fedeltà per ogni accordo moderato"
+      }
+    ],
+    "bonuses": [
+      { "stat": "unionRelations", "value": 0.15, "condition": "always", "label": "+15% relazioni sindacali" },
+      { "stat": "subsidyEffectiveness", "value": 0.10, "condition": "always", "label": "+10% efficacia sussidi disoccupazione" }
+    ],
+    "maluses": [
+      { "stat": "foreignInvestment", "value": -0.08, "condition": "always", "label": "-8% investimenti esteri" }
+    ],
+    "startingBonus": { "reputazione": 5, "coherence": 4 }
+  },
+  {
+    "id": "uk_libdems",
+    "name": "Liberal Democrats",
+    "shortName": "LD",
+    "icon": "🟡",
+    "color": "#FAA61A",
+    "ideology": "liberal",
+    "country": "uk",
+    "ideologyMatrix": { "tasse": 2, "immigrazione": 7, "ambiente": 7, "difesa": 0, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_ld_proeuropei",
+        "name": "Pro-Europeans",
+        "icon": "🇪🇺",
+        "leader": "Sarah Greenwood",
+        "influence": 70,
+        "ideologyMatrix": { "tasse": 2, "immigrazione": 8, "ambiente": 8, "difesa": 0, "diritti": 10 },
+        "bonus": "Relazioni europee +15, sblocca eventi diplomatici UE",
+        "malus": "Elettori Brexiteers -15 consenso"
+      }
+    ],
+    "bonuses": [
+      { "stat": "civilRightsPopularity", "value": 0.15, "condition": "always", "label": "+15% popolarità diritti civili" },
+      { "stat": "diplomacyBonus", "value": 0.10, "condition": "always", "label": "+10% bonus diplomazia" }
+    ],
+    "maluses": [
+      { "stat": "ruralConsensus", "value": -0.10, "condition": "always", "label": "-10% consenso rurale" }
+    ],
+    "startingBonus": { "reputazione": 3, "morale": 10 }
+  }
+]

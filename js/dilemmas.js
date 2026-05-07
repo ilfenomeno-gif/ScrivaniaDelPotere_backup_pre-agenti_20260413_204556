@@ -267,6 +267,7 @@ const Dilemmas = {
     },
 
     showDilemma(dilemma) {
+        const _triggerEl = document.activeElement;
         let overlay = document.getElementById('urgent-choice-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -279,22 +280,28 @@ const Dilemmas = {
             `<button class="urgent-btn dilemma-btn" data-idx="${i}">${c.label}</button>`
         ).join('');
 
+        const headingId = 'dilemma-heading-' + Date.now();
         overlay.innerHTML = `
-            <div class="urgent-choice-modal dilemma-modal">
-                <div class="urgent-choice-header dilemma-header">⚖️ ${Game.esc(dilemma.title)}</div>
+            <div class="urgent-choice-modal dilemma-modal" role="dialog" aria-modal="true" aria-labelledby="${headingId}">
+                <div id="${headingId}" class="urgent-choice-header dilemma-header">⚖️ ${Game.esc(dilemma.title)}</div>
                 <div class="urgent-choice-from">Da: ${Game.esc(dilemma.from)}</div>
                 <div class="urgent-choice-body">${Game.esc(dilemma.body)}</div>
+                <p class="visually-hidden">Dilemma etico: scegli un'opzione. Usa Tab per muoverti, Invio per scegliere.</p>
                 <div class="urgent-choice-buttons dilemma-buttons">${buttonsHTML}</div>
             </div>
         `;
         overlay.classList.add('visible');
 
+        const modalEl = overlay.querySelector('[role="dialog"]');
+        if (window.SR) SR.openModal(modalEl, dilemma.title, dilemma.body);
+
         overlay.querySelectorAll('.dilemma-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const idx = parseInt(btn.dataset.idx);
                 const choice = dilemma.choices[idx];
-                this.applyChoice(dilemma, choice);
                 overlay.classList.remove('visible');
+                if (window.SR) SR.closeModal(_triggerEl, `Scelta effettuata: ${choice.label}.`);
+                this.applyChoice(dilemma, choice);
             }, { once: true });
         });
     },

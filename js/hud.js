@@ -298,6 +298,8 @@ const HUD = {
         if (!toast) return;
         toast.textContent = `⚠️ ${msg}`;
         toast.classList.remove('hidden');
+        // Screen reader: announce toast message
+        if (window.SR) SR.announce(msg, 'assertive');
         clearTimeout(this._toastTimer);
         this._toastTimer = setTimeout(() => toast.classList.add('hidden'), 2500);
     },

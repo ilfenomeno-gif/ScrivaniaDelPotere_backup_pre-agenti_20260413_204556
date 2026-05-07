@@ -1,0 +1,122 @@
+[
+  {
+    "id": "de_cdu",
+    "name": "CDU/CSU",
+    "shortName": "CDU",
+    "icon": "⬛",
+    "color": "#1a1a1a",
+    "ideology": "christian-democratic",
+    "country": "germany",
+    "ideologyMatrix": { "tasse": -4, "immigrazione": -3, "ambiente": 2, "difesa": 5, "diritti": 0 },
+    "currents": [
+      {
+        "id": "curr_cdu_merkeliani",
+        "name": "Merkelianer",
+        "icon": "🤝",
+        "leader": "Klaus Weber",
+        "influence": 60,
+        "ideologyMatrix": { "tasse": -3, "immigrazione": 0, "ambiente": 4, "difesa": 4, "diritti": 2 },
+        "bonus": "Grande coalizione con SPD: +10% stabilità governo",
+        "malus": "Base conservatrice -8 fedeltà per ogni accordo progressista"
+      },
+      {
+        "id": "curr_cdu_conservatori",
+        "name": "Traditionelle Konservative",
+        "icon": "🏰",
+        "leader": "Franz Müller",
+        "influence": 40,
+        "ideologyMatrix": { "tasse": -6, "immigrazione": -7, "ambiente": -1, "difesa": 7, "diritti": -5 },
+        "bonus": "+10% consenso Baviera e stati sud-orientali",
+        "malus": "Riforme progressiste costano doppio in Coerenza"
+      }
+    ],
+    "bonuses": [
+      { "stat": "stability", "value": 0.10, "condition": "coalition", "label": "+10% stabilità in coalizione" },
+      { "stat": "reputazioneNazionale", "value": 6, "condition": "always", "label": "+6 rep. nazionale alla partenza" }
+    ],
+    "maluses": [
+      { "stat": "popularityEast", "value": -0.05, "condition": "always", "label": "-5% popolarità stati orientali" }
+    ],
+    "startingBonus": { "reputazioneNazionale": 6, "coherence": 4 }
+  },
+  {
+    "id": "de_spd",
+    "name": "SPD",
+    "shortName": "SPD",
+    "icon": "🌹",
+    "color": "#e63946",
+    "ideology": "social-democratic",
+    "country": "germany",
+    "ideologyMatrix": { "tasse": 5, "immigrazione": 4, "ambiente": 5, "difesa": 2, "diritti": 7 },
+    "currents": [
+      {
+        "id": "curr_spd_sinistra",
+        "name": "Linker Flügel",
+        "icon": "✊",
+        "leader": "Andrea Braun",
+        "influence": 45,
+        "ideologyMatrix": { "tasse": 8, "immigrazione": 6, "ambiente": 6, "difesa": 0, "diritti": 9 },
+        "bonus": "Unioni sindacali +15 relazione, scioperi impossibili",
+        "malus": "Accordi con CDU costano -10 Coerenza"
+      },
+      {
+        "id": "curr_spd_pragmatici",
+        "name": "Pragmatiker",
+        "icon": "📋",
+        "leader": "Thomas Schröder",
+        "influence": 55,
+        "ideologyMatrix": { "tasse": 4, "immigrazione": 3, "ambiente": 4, "difesa": 3, "diritti": 5 },
+        "bonus": "Grande coalizione sbloccata da subito",
+        "malus": "Popolarità base militante -10"
+      }
+    ],
+    "bonuses": [
+      { "stat": "unionRelations", "value": 0.20, "condition": "always", "label": "+20% relazioni sindacali" },
+      { "stat": "urbanPopularity", "value": 0.08, "condition": "cityLevel >= 2", "label": "+8% popolarità urbana" }
+    ],
+    "maluses": [
+      { "stat": "businessFunding", "value": -0.08, "condition": "always", "label": "-8% fondi imprenditoriali" }
+    ],
+    "startingBonus": { "reputazione": 5, "morale": 8 }
+  },
+  {
+    "id": "de_gruene",
+    "name": "Grüne Zukunft",
+    "shortName": "GRÜNE",
+    "icon": "🌱",
+    "color": "#2d6a4f",
+    "ideology": "green-left",
+    "country": "germany",
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 8, "ambiente": 10, "difesa": -4, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_gruene_eco",
+        "name": "Ökos",
+        "icon": "🌍",
+        "leader": "Klara Hoffmann",
+        "influence": 65,
+        "ideologyMatrix": { "tasse": 5, "immigrazione": 8, "ambiente": 10, "difesa": -6, "diritti": 10 },
+        "bonus": "Sblocca decreto 'Energia Verde' senza costi politici. +20% popolarità under30",
+        "malus": "Alleanza con partiti industriali impossibile"
+      },
+      {
+        "id": "curr_gruene_realo",
+        "name": "Realos",
+        "icon": "🔄",
+        "leader": "Peter Steinbach",
+        "influence": 35,
+        "ideologyMatrix": { "tasse": 3, "immigrazione": 6, "ambiente": 7, "difesa": -1, "diritti": 7 },
+        "bonus": "Coalizioni con SPD/FDP +20% successo, sblocco governo tripartito",
+        "malus": "Base militante -8 fedeltà per ogni compromesso con destra"
+      }
+    ],
+    "bonuses": [
+      { "stat": "greenDecree", "value": 1, "condition": "always", "label": "Sblocca decreto energia verde" },
+      { "stat": "popularityUnder30", "value": 0.20, "condition": "always", "label": "+20% popolarità under 30" }
+    ],
+    "maluses": [
+      { "stat": "heavyIndustryRelations", "value": -0.12, "condition": "always", "label": "-12% produttività zone industriali" }
+    ],
+    "startingBonus": { "reputazione": 3, "morale": 12 }
+  }
+]

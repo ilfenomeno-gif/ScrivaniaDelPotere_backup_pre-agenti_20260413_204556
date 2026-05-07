@@ -110,6 +110,137 @@ const SR = (() => {
         _focusTrapEl = null; _focusTrapPrev = null;
     }
 
+    /* ── moveFocus: sposta focus di sistema a un elemento ─── */
+    function moveFocus(el, announcement, urgency) {
+        if (!el) return;
+        if (!el.getAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+        requestAnimationFrame(() => {
+            el.focus({ preventScroll: false });
+            if (announcement) announce(announcement, urgency || 'polite');
+        });
+    }
+
+    /* ── openModal: apre un modal con piena accessibilità ─── */
+    // titleId: id dell'elemento h2/h3 dentro il modal (per aria-labelledby)
+    // description: testo contestuale annunciato al SR
+    function openModal(el, title, description) {
+        if (!el) return;
+        // ARIA dialog attributes
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-modal', 'true');
+        if (title) {
+            // cerca o crea il nodo titolo
+            let hd = el.querySelector('[data-sr-heading]');
+            if (!hd) hd = el.querySelector('.urgent-choice-header,.modal-header,.nation-modal-content h3,.mafia-header,.confirm-header');
+            if (hd) {
+                if (!hd.id) hd.id = 'sr-modal-heading-' + Date.now();
+                el.setAttribute('aria-labelledby', hd.id);
+            } else {
+                el.setAttribute('aria-label', title);
+            }
+        }
+        if (description) {
+            let desc = el.querySelector('[data-sr-desc]');
+            if (!desc) {
+                desc = document.createElement('p');
+                desc.setAttribute('data-sr-desc', '1');
+                desc.className = 'visually-hidden';
+                desc.textContent = description;
+                el.insertBefore(desc, el.firstChild);
+            }
+            if (!desc.id) desc.id = 'sr-modal-desc-' + Date.now();
+            el.setAttribute('aria-describedby', desc.id);
+        }
+        trapFocus(el);
+        const msg = description ? `${title}. ${description}` : title;
+        if (msg) announce(msg, 'assertive');
+    }
+
+    /* ── closeModal: chiude modal e restituisce focus ──────── */
+    function closeModal(triggerEl, announcement) {
+        releaseFocus();
+        if (triggerEl) requestAnimationFrame(() => triggerEl.focus());
+        if (announcement) announce(announcement, 'polite');
+    }
+
+    /* ── openPanel: annuncia apertura pannello + sposta focus  */
+    const _PANEL_LABELS = {
+        phone:  'Telefono — Messaggi, relazioni, notifiche',
+        tasks:  'Blocco Note — Compiti politici e di carriera',
+        house:  'Casa — Gestione abitazione e stile di vita',
+        stats:  'Statistiche — Riepilogo personaggio',
+        map:    'Mappa — Città e trasferimenti',
+        budget: 'Budget — Entrate, uscite e finanze',
+    };
+    function openPanel(panelEl, panelName, context) {
+        if (!panelEl) return;
+        const label = _PANEL_LABELS[panelName] || panelName || 'Pannello';
+        if (!panelEl.getAttribute('role')) panelEl.setAttribute('role', 'region');
+        if (!panelEl.getAttribute('aria-label')) panelEl.setAttribute('aria-label', label);
+        // Ensure there's a visible heading for screen readers
+        _ensurePanelHeading(panelEl, label);
+        // Move focus to first focusable element (close button, first tab, or heading)
+        requestAnimationFrame(() => {
+            const closeBtn = panelEl.querySelector('[id$="-close"],[aria-label*="Chiudi"],button[class*="close"]');
+            const firstTab = panelEl.querySelector('[role="tab"],[class*="tab-btn"],[class*="-tab"]');
+            const heading  = panelEl.querySelector('h1,h2,h3,[data-sr-heading]');
+            const target   = closeBtn || firstTab || heading;
+            if (target) {
+                if (!target.getAttribute('tabindex') && target.tagName !== 'BUTTON' && target.tagName !== 'A') {
+                    target.setAttribute('tabindex', '-1');
+                }
+                target.focus({ preventScroll: false });
+            }
+        });
+        const contextMsg = context ? `. ${context}` : '';
+        announce(`${label} aperto${contextMsg}. Premi Escape per chiudere.`, 'assertive');
+    }
+
+    function _ensurePanelHeading(panelEl, label) {
+        if (panelEl.querySelector('[data-sr-panel-heading]')) return;
+        let existingH = panelEl.querySelector('h1,h2,h3');
+        if (existingH) { existingH.setAttribute('data-sr-panel-heading', '1'); return; }
+        const h = document.createElement('h2');
+        h.setAttribute('data-sr-panel-heading', '1');
+        h.className = 'visually-hidden';
+        h.textContent = label;
+        panelEl.insertBefore(h, panelEl.firstChild);
+    }
+
+    /* ── closePanel: restituisce focus al trigger ────────────  */
+    function closePanel(triggerEl, panelName, announcement) {
+        const label = _PANEL_LABELS[panelName] || panelName || 'Pannello';
+        if (triggerEl) requestAnimationFrame(() => triggerEl.focus());
+        announce(announcement || `${label} chiuso.`, 'polite');
+    }
+
+    /* ── sectionHeading: intestazione di sezione con descrizione */
+    // Inserisce h3 + p.visually-hidden prima degli elementi di una sezione.
+    // level: 2|3|4, text: titolo sezione, description: testo descrittivo opzionale
+    function sectionHeading(parentEl, level, text, description) {
+        if (!parentEl) return;
+        const tag = `h${level || 3}`;
+        const h = document.createElement(tag);
+        h.setAttribute('data-sr-section', '1');
+        h.className = 'visually-hidden';
+        h.textContent = text;
+        parentEl.insertBefore(h, parentEl.firstChild);
+        if (description) {
+            const p = document.createElement('p');
+            p.setAttribute('data-sr-section-desc', '1');
+            p.className = 'visually-hidden';
+            p.textContent = description;
+            parentEl.insertBefore(p, h.nextSibling);
+        }
+    }
+
+    /* ── labelList: aria-label su un elemento lista ───────── */
+    function labelList(listEl, label) {
+        if (!listEl) return;
+        if (!listEl.getAttribute('role')) listEl.setAttribute('role', 'list');
+        listEl.setAttribute('aria-label', label);
+    }
+
     /* ── ARIA HUD helpers ──────────────────────────────────── */
     function _ariaHudStat(k, v) {
         const wrap = document.getElementById(`hud-${k}`);
@@ -441,7 +572,9 @@ const SR = (() => {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else { const w = () => typeof Game !== 'undefined' ? init() : setTimeout(w, 400); w(); }
 
-    return { init, announce, log, silence, trapFocus, releaseFocus, updateHUD };
+    return { init, announce, log, silence, trapFocus, releaseFocus, updateHUD,
+             moveFocus, openModal, closeModal, openPanel, closePanel,
+             sectionHeading, labelList };
 })();
 
 if (typeof window !== 'undefined') window.SR = window.SR || SR;

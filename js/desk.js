@@ -266,6 +266,7 @@ const Desk = {
             return;
         }
 
+        const _triggerEl = document.activeElement;
         Object.keys(this.panels).forEach(k => {
             if (k !== name) this.panels[k].classList.add('hidden');
         });
@@ -274,14 +275,23 @@ const Desk = {
 
         // Paper shuffle sound
         if (typeof Audio !== 'undefined' && Audio.playPaperShuffle) Audio.playPaperShuffle();
+
+        // Screen reader: announce panel, move focus
+        if (window.SR) SR.openPanel(this.panels[name], name);
     },
 
     closePanel(name) {
         this.panels[name].classList.add('hidden');
+        // Return focus to the desk item that opened this panel
+        const itemMap = { phone: 'item-phone', tasks: 'item-tasks', house: 'item-house', stats: 'item-stats' };
+        const itemEl = document.getElementById(itemMap[name]);
+        if (window.SR) SR.closePanel(itemEl, name);
+        else if (itemEl) itemEl.focus();
     },
 
     closeAllPanels() {
         Object.values(this.panels).forEach(p => p.classList.add('hidden'));
+        if (window.SR) SR.announce('Tutti i pannelli chiusi.', 'polite');
     },
 
     updatePhoneTime() {

@@ -35,6 +35,8 @@ const Budget = {
 
         this.render();
         overlay.classList.remove('hidden');
+        // Screen reader: announce budget panel opening
+        if (window.SR) SR.announce('Manovra di Bilancio aperta. Distribuisci il tuo stipendio tra le voci di spesa, poi conferma.', 'assertive');
     },
 
     render() {
@@ -389,6 +391,7 @@ const Budget = {
         const savings = salary - spent;
         // Close
         document.getElementById('budget-overlay').classList.add('hidden');
+        if (window.SR) SR.announce(`Manovra approvata. Stipendio €${salary}, speso €${spent}.`, 'assertive');
         Game.addWorkNotif('📊 Manovra', `Manovra approvata. Stipendio €${salary}, speso €${spent} (rate €${a.rate})${savings > 0 ? ', risparmiato €' + savings : ''}.`, `Giorno ${Game.state.day}`);
     },
 };

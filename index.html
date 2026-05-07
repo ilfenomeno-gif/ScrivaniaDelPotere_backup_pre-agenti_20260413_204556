@@ -273,7 +273,7 @@
         <!-- THE DESK (2 columns, 3 rows) -->
         <div id="desk">
             <!-- Row 1: Fascicolo Casa (left) | Avanza Turno (right) -->
-            <div class="desk-item desk-item-large" id="item-house" data-tooltip="Fascicolo Casa">
+            <div class="desk-item desk-item-large" id="item-house" data-tooltip="Fascicolo Casa" role="button" tabindex="0" aria-label="Fascicolo Casa: apri pannello Casa">
                 <div class="folder">
                     <div class="folder-tab">CONTRATTI E UTENZE</div>
                     <div class="folder-body">
@@ -292,7 +292,7 @@
             </div>
 
             <!-- Row 2: Foglio Mansioni (left) | Telefono (right) -->
-            <div class="desk-item desk-item-large" id="item-tasks" data-tooltip="Foglio Mansioni">
+            <div class="desk-item desk-item-large" id="item-tasks" data-tooltip="Foglio Mansioni" role="button" tabindex="0" aria-label="Blocco Note: apri elenco mansioni e compiti">
                 <div class="notepad">
                     <div class="notepad-spiral"></div>
                     <div class="notepad-page">
@@ -308,7 +308,7 @@
                 </div>
             </div>
 
-            <div class="desk-item desk-item-large" id="item-phone" data-tooltip="Telefono">
+            <div class="desk-item desk-item-large" id="item-phone" data-tooltip="Telefono" role="button" tabindex="0" aria-label="Telefono SmartPolitica: apri pannello notifiche e relazioni">
                 <div class="phone-device">
                     <div class="phone-screen-preview">
                         <div class="phone-time" id="phone-time-preview">09:00</div>
@@ -326,7 +326,7 @@
                 </div>
             </div>
             <!-- Row 3: Statistiche -->
-            <div class="desk-item desk-item-large" id="item-stats" data-tooltip="Scheda Personaggio">
+            <div class="desk-item desk-item-large" id="item-stats" data-tooltip="Scheda Personaggio" role="button" tabindex="0" aria-label="Scheda Personaggio: apri pannello statistiche">
                 <div class="stats-dossier">
                     <div class="dossier-clip">📎</div>
                     <div class="dossier-body">
@@ -349,10 +349,10 @@
         </div>
 
         <!-- ===== PANEL: PHONE ===== -->
-        <div class="panel hidden" id="panel-phone">
+        <div class="panel hidden" id="panel-phone" role="region" aria-label="Telefono — Messaggi, relazioni e notifiche">
             <div class="panel-phone-frame">
                 <div class="phone-header">
-                    <button class="phone-back" id="phone-close">✕</button>
+                    <button class="phone-back" id="phone-close" aria-label="Chiudi Telefono">✕</button>
                     <span class="phone-title">SmartPolitica</span>
                     <span class="phone-clock" id="phone-clock">00:00</span>
                     <span class="phone-battery">🔋</span>
@@ -489,6 +489,8 @@
                         <div class="phone-terr-content" id="phone-ttab-mappa">
                                                     <!-- Patch: placeholder per phone-ttab-mappa richiesto dai test automatici -->
                                                     <div id="phone-ttab-mappa" style="display:none"></div>
+                            <!-- Barra di ricerca città con fuzzy search e gerarchia -->
+                            <div id="city-search-bar" class="city-search-bar-container" aria-label="Ricerca città" role="search"></div>
                             <div id="phone-map-body"></div>
                         </div>
                     </div>
@@ -497,9 +499,9 @@
         </div>
 
         <!-- ===== PANEL: TASKS ===== -->
-        <div class="panel hidden" id="panel-tasks">
+        <div class="panel hidden" id="panel-tasks" role="region" aria-label="Blocco Note — Compiti politici e di carriera">
             <div class="panel-notepad-frame">
-                <button class="panel-close" id="tasks-close">✕</button>
+                <button class="panel-close" id="tasks-close" aria-label="Chiudi Blocco Note">✕</button>
                 <div class="notepad-header-full">
                     <h2>📝 Foglio delle Mansioni</h2>
                 </div>
@@ -543,9 +545,9 @@
         </div>
 
         <!-- ===== PANEL: STATS (Scheda Personaggio) ===== -->
-        <div class="panel hidden" id="panel-stats">
+        <div class="panel hidden" id="panel-stats" role="region" aria-label="Statistiche — Riepilogo personaggio">
             <div class="panel-stats-frame">
-                <button class="panel-close" id="stats-close">✕</button>
+                <button class="panel-close" id="stats-close" aria-label="Chiudi Statistiche">✕</button>
                 <div class="stats-header">
                     <h2>📊 Scheda Valutazione — Profilo P.G.</h2>
                 </div>
@@ -556,9 +558,9 @@
         </div>
 
         <!-- ===== PANEL: HOUSE ===== -->
-        <div class="panel hidden" id="panel-house">
+        <div class="panel hidden" id="panel-house" role="region" aria-label="Casa — Gestione abitazione e stile di vita">
             <div class="panel-folder-frame">
-                <button class="panel-close" id="house-close">✕</button>
+                <button class="panel-close" id="house-close" aria-label="Chiudi Casa">✕</button>
                 <div class="folder-header-full">
                     <h2>🏠 Contratti e Utenze</h2>
                 </div>
@@ -623,7 +625,13 @@
     </div>
 
     <!-- ===== OVERLAY: MANOVRA DI BILANCIO ===== -->
-    <div class="fullscreen-overlay hidden" id="budget-overlay"></div>
+    <div class="fullscreen-overlay hidden" id="budget-overlay" role="dialog" aria-modal="true" aria-label="Manovra di Bilancio"></div>
+
+    <!-- ===== OVERLAY: LAVORO POLITICO RAMIFICATO ===== -->
+    <div class="work-task-overlay hidden" id="work-task-overlay" style="display:none" aria-hidden="true"></div>
+
+    <!-- ===== OVERLAY: AGGIUNTA APPUNTAMENTO ===== -->
+    <div class="calendar-modal-overlay hidden" id="calendar-add-overlay" style="display:none" aria-hidden="true"></div>
 
     <!-- ===== OVERLAY: DIARIO DELLA CARRIERA ===== -->
     <div class="fullscreen-overlay hidden" id="diary-overlay"></div>
@@ -698,12 +706,15 @@
     <script src="js/lifestyle.js"></script>
     <script src="js/budget.js"></script>
     <script src="js/factions.js"></script>
+    <script src="js/parties.js"></script>
     <script src="js/intel.js"></script>
     <script src="js/favors.js"></script>
     <script src="js/diary.js"></script>
+    <script src="js/citySearch.js"></script>
     <script src="js/map.js"></script>
         <script src="js/game-agents.js"></script>
     <script src="js/tutorial.js"></script>
+    <script src="js/workTasks.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

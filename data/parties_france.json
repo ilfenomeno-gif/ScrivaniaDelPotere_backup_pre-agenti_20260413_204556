@@ -1,0 +1,110 @@
+[
+  {
+    "id": "fr_republicains",
+    "name": "Les Républicains",
+    "shortName": "LR",
+    "icon": "🔵",
+    "color": "#003189",
+    "ideology": "conservative",
+    "country": "france",
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -6, "ambiente": -1, "difesa": 7, "diritti": -3 },
+    "currents": [
+      {
+        "id": "curr_lr_gaullo",
+        "name": "Gaullisti",
+        "icon": "🇫🇷",
+        "leader": "Pierre Dumont",
+        "influence": 60,
+        "ideologyMatrix": { "tasse": -4, "immigrazione": -5, "ambiente": 0, "difesa": 9, "diritti": -4 },
+        "bonus": "+10% popolarità nelle città capoluogo e nelle regioni storiche",
+        "malus": "Riforme sociali costano +5 Stress"
+      },
+      {
+        "id": "curr_lr_liberali",
+        "name": "Libéraux",
+        "icon": "📊",
+        "leader": "Camille Verne",
+        "influence": 40,
+        "ideologyMatrix": { "tasse": -8, "immigrazione": -3, "ambiente": -2, "difesa": 5, "diritti": 0 },
+        "bonus": "Accordi commerciali +20% fondi partito",
+        "malus": "Popolarità operai -8%"
+      }
+    ],
+    "bonuses": [
+      { "stat": "reputazioneNazionale", "value": 5, "condition": "metropolis", "label": "+5 rep. nazionale nelle metropoli" }
+    ],
+    "maluses": [
+      { "stat": "popularityYouth", "value": -0.08, "condition": "always", "label": "-8% popolarità giovanile" }
+    ],
+    "startingBonus": { "reputazioneNazionale": 5, "money": 40 }
+  },
+  {
+    "id": "fr_socialistes",
+    "name": "Parti Socialiste",
+    "shortName": "PS",
+    "icon": "🌹",
+    "color": "#e63946",
+    "ideology": "social-democratic",
+    "country": "france",
+    "ideologyMatrix": { "tasse": 6, "immigrazione": 6, "ambiente": 5, "difesa": 2, "diritti": 8 },
+    "currents": [
+      {
+        "id": "curr_ps_tradizione",
+        "name": "Tradition Socialiste",
+        "icon": "✊",
+        "leader": "Henri Bernard",
+        "influence": 55,
+        "ideologyMatrix": { "tasse": 7, "immigrazione": 5, "ambiente": 4, "difesa": 3, "diritti": 7 },
+        "bonus": "Relazioni sindacali +20, eventi sciopero impossibili",
+        "malus": "Riformismo moderato non disponibile"
+      },
+      {
+        "id": "curr_ps_renovateurs",
+        "name": "Rénovateurs",
+        "icon": "🔄",
+        "leader": "Sophie Laurent",
+        "influence": 45,
+        "ideologyMatrix": { "tasse": 5, "immigrazione": 7, "ambiente": 7, "difesa": 2, "diritti": 9 },
+        "bonus": "Accordi con verdi e liberali +15% successo",
+        "malus": "Ala tradizionalista del partito -10 fedeltà"
+      }
+    ],
+    "bonuses": [
+      { "stat": "urbanPopularity", "value": 0.12, "condition": "cityLevel >= 2", "label": "+12% popolarità urbana" }
+    ],
+    "maluses": [
+      { "stat": "businessRelations", "value": -0.10, "condition": "always", "label": "-10% relazioni imprenditoriali" }
+    ],
+    "startingBonus": { "reputazione": 4, "coherence": 5 }
+  },
+  {
+    "id": "fr_verts",
+    "name": "Les Verts",
+    "shortName": "VERTS",
+    "icon": "🌿",
+    "color": "#2d6a4f",
+    "ideology": "green",
+    "country": "france",
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 9, "ambiente": 10, "difesa": -4, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_verts_militants",
+        "name": "Militants Écologistes",
+        "icon": "🌍",
+        "leader": "Claire Morin",
+        "influence": 70,
+        "ideologyMatrix": { "tasse": 5, "immigrazione": 9, "ambiente": 10, "difesa": -6, "diritti": 10 },
+        "bonus": "Ogni legge ambientale: +10 reputazione, sblocca eventi clima favorevoli",
+        "malus": "Alleanza con partiti industriali impossibile"
+      }
+    ],
+    "bonuses": [
+      { "stat": "popularityUnder30", "value": 0.25, "condition": "always", "label": "+25% popolarità under 30" },
+      { "stat": "climateEvents", "value": 0.10, "condition": "country === france", "label": "+10% eventi climatici favorevoli in Francia" }
+    ],
+    "maluses": [
+      { "stat": "industryFunding", "value": -0.15, "condition": "always", "label": "-15% fondi industriali" }
+    ],
+    "startingBonus": { "reputazione": 2, "morale": 15 }
+  }
+]

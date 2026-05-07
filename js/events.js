@@ -442,6 +442,7 @@ const Events = {
     },
 
     showMentorChoice(mentorData, event) {
+        const _triggerEl = document.activeElement;
         let overlay = document.getElementById('urgent-choice-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -450,11 +451,13 @@ const Events = {
             document.body.appendChild(overlay);
         }
 
+        const headingId = 'mentor-heading-' + Date.now();
         overlay.innerHTML = `
-            <div class="urgent-choice-modal">
-                <div class="urgent-choice-header">📞 ${Game.esc(event.title)}</div>
+            <div class="urgent-choice-modal" role="dialog" aria-modal="true" aria-labelledby="${headingId}">
+                <div id="${headingId}" class="urgent-choice-header">📞 ${Game.esc(event.title)}</div>
                 <div class="urgent-choice-from">Da: ${Game.esc(mentorData.icon + ' ' + mentorData.shortName)}</div>
                 <div class="urgent-choice-body">${Game.esc(event.body)}</div>
+                <p class="visually-hidden">Scegli una delle opzioni seguenti per rispondere al tuo mentore.</p>
                 <div class="urgent-choice-buttons">
                     ${event.choices.map(c => `<button class="urgent-btn urgent-btn-accept" data-mentor="${mentorData.id}" data-tag="${event.tag}" data-choice="${c.id}">${Game.esc(c.label)}</button>`).join('')}
                 </div>
@@ -462,10 +465,14 @@ const Events = {
         `;
         overlay.classList.add('visible');
 
+        const modalEl = overlay.querySelector('[role="dialog"]');
+        if (window.SR) SR.openModal(modalEl, event.title, event.body);
+
         overlay.querySelectorAll('.urgent-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.resolveMentorChoice(btn.dataset.mentor, btn.dataset.tag, btn.dataset.choice);
                 overlay.classList.remove('visible');
+                if (window.SR) SR.closeModal(_triggerEl, 'Scelta effettuata.');
+                this.resolveMentorChoice(btn.dataset.mentor, btn.dataset.tag, btn.dataset.choice);
             }, { once: true });
         });
     },
@@ -648,6 +655,7 @@ const Events = {
             Game.addUrgentMessage(event.from || 'Sconosciuto', event.body, event.urgentType || 'info');
             return;
         }
+        const _triggerEl = document.activeElement;
         // Create choice overlay
         let overlay = document.getElementById('urgent-choice-overlay');
         if (!overlay) {
@@ -656,11 +664,13 @@ const Events = {
             overlay.className = 'urgent-choice-overlay';
             document.body.appendChild(overlay);
         }
+        const headingId = 'urgent-heading-' + Date.now();
         overlay.innerHTML = `
-            <div class="urgent-choice-modal">
-                <div class="urgent-choice-header">📩 ${Game.esc(event.title)}</div>
+            <div class="urgent-choice-modal" role="dialog" aria-modal="true" aria-labelledby="${headingId}">
+                <div id="${headingId}" class="urgent-choice-header">📩 ${Game.esc(event.title)}</div>
                 <div class="urgent-choice-from">Da: ${Game.esc(event.from)}</div>
                 <div class="urgent-choice-body">${Game.esc(event.body)}</div>
+                <p class="visually-hidden">Scegli una delle opzioni seguenti. Usa Tab per spostarti tra i pulsanti, Invio per confermare.</p>
                 <div class="urgent-choice-buttons">
                     <button class="urgent-btn urgent-btn-accept" data-choice="accept">${event.choices.accept.label}</button>
                     <button class="urgent-btn urgent-btn-refuse" data-choice="refuse">${event.choices.refuse.label}</button>
@@ -668,6 +678,9 @@ const Events = {
             </div>
         `;
         overlay.classList.add('visible');
+
+        const modalEl = overlay.querySelector('[role="dialog"]');
+        if (window.SR) SR.openModal(modalEl, event.title, event.body);
 
         overlay.querySelectorAll('.urgent-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -723,6 +736,7 @@ const Events = {
                 Game.addWorkNotif(`📩 ${event.title}`, `${choiceLabel}: ${event.body}`, `Giorno ${Game.state.day}`);
                 Game.addUrgentMessage(event.from, event.body + ` [${choiceLabel}]`, event.urgentType || 'info');
                 overlay.classList.remove('visible');
+                if (window.SR) SR.closeModal(_triggerEl, `Scelta: ${choiceLabel}.`);
             }, { once: true });
         });
     },

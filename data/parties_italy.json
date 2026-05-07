@@ -1,0 +1,132 @@
+[
+  {
+    "id": "it_progressisti",
+    "name": "Progressisti",
+    "shortName": "PROG",
+    "icon": "🌹",
+    "color": "#e63946",
+    "ideology": "social-liberal",
+    "country": "italy",
+    "ideologyMatrix": { "tasse": 6, "immigrazione": 5, "ambiente": 7, "difesa": 2, "diritti": 8 },
+    "currents": [
+      {
+        "id": "curr_prog_giovani",
+        "name": "Ala Giovane",
+        "icon": "⚡",
+        "leader": "Valentina Ricci",
+        "influence": 35,
+        "ideologyMatrix": { "tasse": 7, "immigrazione": 7, "ambiente": 9, "difesa": 1, "diritti": 9 },
+        "bonus": "Task politici +15% efficacia nelle Metropoli",
+        "malus": "Relazione Mentori classici -10"
+      },
+      {
+        "id": "curr_prog_moderati",
+        "name": "Moderati di Centro",
+        "icon": "⚖️",
+        "leader": "Franco Bellini",
+        "influence": 40,
+        "ideologyMatrix": { "tasse": 5, "immigrazione": 4, "ambiente": 6, "difesa": 4, "diritti": 6 },
+        "bonus": "Coalizioni con altri partiti +20% probabilità successo",
+        "malus": "Coerenza -3 ogni riforma radicale approvata"
+      },
+      {
+        "id": "curr_prog_ambientalisti",
+        "name": "Verdi del Partito",
+        "icon": "🌿",
+        "leader": "Sara Fontana",
+        "influence": 25,
+        "ideologyMatrix": { "tasse": 5, "immigrazione": 6, "ambiente": 10, "difesa": 1, "diritti": 8 },
+        "bonus": "Sblocca mentore 'Attivista Verde' con +20 popolarità under30",
+        "malus": "Alleanza con partiti industriali impossibile"
+      }
+    ],
+    "bonuses": [
+      { "stat": "urbanPopularity", "value": 0.10, "condition": "cityLevel >= 3", "label": "+10% popolarità in città e metropoli" },
+      { "stat": "reputazione", "value": 5, "condition": "firstJoin", "label": "+5 Reputazione all'iscrizione" }
+    ],
+    "maluses": [
+      { "stat": "ruralConsensus", "value": -0.05, "condition": "cityPopulation < 10000", "label": "-5% consenso nei piccoli comuni" }
+    ],
+    "startingBonus": { "reputazione": 5, "coherence": 3 }
+  },
+  {
+    "id": "it_tradizionalisti",
+    "name": "Tradizionalisti",
+    "shortName": "TRAD",
+    "icon": "🏛️",
+    "color": "#1d3557",
+    "ideology": "conservative",
+    "country": "italy",
+    "ideologyMatrix": { "tasse": -6, "immigrazione": -7, "ambiente": -2, "difesa": 7, "diritti": -5 },
+    "currents": [
+      {
+        "id": "curr_trad_patrioti",
+        "name": "Patrioti",
+        "icon": "🇮🇹",
+        "leader": "Sergio Mantovani",
+        "influence": 50,
+        "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -1, "difesa": 9, "diritti": -7 },
+        "bonus": "+8% consenso nei comuni < 5.000 abitanti",
+        "malus": "Impossibile allearsi con partiti di sinistra"
+      },
+      {
+        "id": "curr_trad_liberisti",
+        "name": "Liberisti",
+        "icon": "📈",
+        "leader": "Alberto Croci",
+        "influence": 50,
+        "ideologyMatrix": { "tasse": -9, "immigrazione": -4, "ambiente": -4, "difesa": 5, "diritti": -2 },
+        "bonus": "Taglio tasse imprese: +12% popolarità capoluoghi",
+        "malus": "Proteste sindacali: blocco azioni per 1 turno"
+      }
+    ],
+    "bonuses": [
+      { "stat": "ruralConsensus", "value": 0.08, "condition": "cityPopulation < 5000", "label": "+8% consenso piccoli comuni" },
+      { "stat": "money", "value": 30, "condition": "taxCut", "label": "+€30/giorno per taglio fiscale" }
+    ],
+    "maluses": [
+      { "stat": "reformSpeed", "value": -0.05, "condition": "always", "label": "-5% velocità riforme" }
+    ],
+    "startingBonus": { "money": 50, "stress": -5 }
+  },
+  {
+    "id": "it_ecologisti",
+    "name": "Ecologisti Uniti",
+    "shortName": "ECO",
+    "icon": "🌱",
+    "color": "#2d6a4f",
+    "ideology": "green-left",
+    "country": "italy",
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 8, "ambiente": 10, "difesa": -3, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_eco_radicali",
+        "name": "Radicali Verdi",
+        "icon": "🌍",
+        "leader": "Elena Grassi",
+        "influence": 55,
+        "ideologyMatrix": { "tasse": 5, "immigrazione": 9, "ambiente": 10, "difesa": -5, "diritti": 10 },
+        "bonus": "Sblocca decreto 'Energia Rinnovabile' senza costi politici",
+        "malus": "Malcontento industria: -12% fondi aziendali campagna"
+      },
+      {
+        "id": "curr_eco_pragmatici",
+        "name": "Pragmatici Verdi",
+        "icon": "♻️",
+        "leader": "Marco Delvecchio",
+        "influence": 45,
+        "ideologyMatrix": { "tasse": 3, "immigrazione": 6, "ambiente": 8, "difesa": 0, "diritti": 7 },
+        "bonus": "Coalizioni centro-sinistra +15% successo",
+        "malus": "Base militante -5 fedeltà ogni accordo con industria"
+      }
+    ],
+    "bonuses": [
+      { "stat": "popularityUnder30", "value": 0.20, "condition": "always", "label": "+20% popolarità under 30" },
+      { "stat": "reputazione", "value": 8, "condition": "greenLawPassed", "label": "+8 reputazione per ogni legge verde approvata" }
+    ],
+    "maluses": [
+      { "stat": "industryRelations", "value": -0.12, "condition": "always", "label": "-12% relazioni industriali" }
+    ],
+    "startingBonus": { "reputazione": 3, "morale": 10 }
+  }
+]

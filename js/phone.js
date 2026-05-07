@@ -23,6 +23,8 @@ const Phone = {
                 if (tab.dataset.tab === 'favori') {
                     this.renderFavori && this.renderFavori();
                     if (window.SR) SR.announce('Tab Favori attivata. Elenco favori e crediti disponibile.', 'polite');
+                } else if (window.SR) {
+                    SR.announce(`Tab attiva: ${tab.textContent.trim()}`, 'polite');
                 }
             });
         });

@@ -238,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Budget.init();
     Agents.init();
     Factions.init();
+    if (typeof Parties !== 'undefined') Parties.init();
     Intel.init();
     Favors.init();
     Diary.init();
@@ -250,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Options.init();
     DeskDecor.init();
     Memento.init();
+    if (typeof WorkTasks !== 'undefined') WorkTasks.init();
     if (typeof Tutorial !== 'undefined' && Tutorial.init) Tutorial.init();
 
     /* ----- Diary entries for achievements ----- */

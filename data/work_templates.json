@@ -1,0 +1,361 @@
+[
+  {
+    "id": "wt_sindacati",
+    "title": "Riunione con i Sindacati",
+    "type": "negotiation",
+    "difficulty": 2,
+    "icon": "✊",
+    "cityLevel": 2,
+    "partyAffinities": ["it_progressisti", "it_ecologisti", "fr_socialistes", "de_spd", "uk_labour"],
+    "options": [
+      {
+        "id": "opt_promise_raise",
+        "text": "Prometti aumento del salario minimo",
+        "hint": "Rischioso ma premiante. Il tuo mentore sindacale ti supporta.",
+        "requirements": { "reputazione": 30 },
+        "successChance": 0.65,
+        "success": { "reputazione": 15, "unionRelation": 20, "morale": 10, "money": -500 },
+        "failure": { "reputazione": -5, "stress": 15, "strikeRisk": true }
+      },
+      {
+        "id": "opt_delay",
+        "text": "Rimanda: avvii un tavolo di consultazione",
+        "hint": "Sicuro ma non porta vantaggi immediati.",
+        "requirements": {},
+        "successChance": 1.0,
+        "success": { "reputazione": -2, "stress": 3 },
+        "failure": null
+      },
+      {
+        "id": "opt_refuse",
+        "text": "Rifiuta le richieste dei sindacati",
+        "hint": "Piacerà agli imprenditori, ma la base operaia si arrabbierà.",
+        "requirements": {},
+        "successChance": 1.0,
+        "success": { "reputazione": -8, "money": 200, "unionRelation": -15 },
+        "failure": null
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "reputazione": -10, "stress": 10 },
+    "chainEvents": {
+      "opt_promise_raise_success": "wt_legge_lavoro",
+      "opt_refuse_success": "wt_sciopero_generale"
+    }
+  },
+  {
+    "id": "wt_sciopero_generale",
+    "title": "Emergenza: Sciopero Generale",
+    "type": "crisis",
+    "difficulty": 4,
+    "icon": "🚨",
+    "cityLevel": 1,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_mediazione",
+        "text": "Avvia mediazione d'urgenza",
+        "hint": "Costa Punti Azione ma potrebbe risolvere la crisi.",
+        "requirements": { "reputazione": 40 },
+        "successChance": 0.55,
+        "success": { "reputazione": 12, "unionRelation": 15, "stress": 10 },
+        "failure": { "reputazione": -15, "stress": 20, "blockedTurns": 1 }
+      },
+      {
+        "id": "opt_cede",
+        "text": "Cedi immediatamente alle richieste",
+        "hint": "Risolve lo sciopero ma indebolisce la tua posizione.",
+        "requirements": {},
+        "successChance": 1.0,
+        "success": { "reputazione": -5, "money": -1000, "unionRelation": 10 },
+        "failure": null
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "reputazione": -20, "blockedTurns": 2 },
+    "chainEvents": {}
+  },
+  {
+    "id": "wt_legge_lavoro",
+    "title": "Presentazione Disegno di Legge sul Lavoro",
+    "type": "legislation",
+    "difficulty": 3,
+    "icon": "🏛️",
+    "cityLevel": 3,
+    "partyAffinities": ["it_progressisti", "fr_socialistes", "de_spd"],
+    "options": [
+      {
+        "id": "opt_full",
+        "text": "Proposta integrale: tutele complete",
+        "hint": "La corrente ambientalista e i sindacati ti supportano. Il centrodestra sarà contrario.",
+        "requirements": { "reputazione": 45, "coherence": 40 },
+        "successChance": 0.50,
+        "success": { "reputazione": 20, "coherence": -5, "unionRelation": 25, "popularityUnder30": 15 },
+        "failure": { "reputazione": -8, "coherence": -10, "stress": 20 }
+      },
+      {
+        "id": "opt_concessioni",
+        "text": "Proposta mediata: concessioni agli industriali",
+        "hint": "Aumenta le probabilità di approvazione ma la corrente verde si arrabbierà.",
+        "requirements": { "reputazione": 30 },
+        "successChance": 0.78,
+        "success": { "reputazione": 10, "money": 300, "greenCurrentRelation": -10 },
+        "failure": { "reputazione": -3, "stress": 10 }
+      }
+    ],
+    "deadline": false,
+    "failPenalty": {},
+    "chainEvents": {
+      "opt_full_success": "wt_congresso_corrente",
+      "opt_concessioni_success": "wt_chiarimento_interno"
+    }
+  },
+  {
+    "id": "wt_chiarimento_interno",
+    "title": "Chiarimento Interno alla Corrente",
+    "type": "meeting",
+    "difficulty": 2,
+    "icon": "🔥",
+    "cityLevel": 1,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_spiega",
+        "text": "Spiega la tua strategia: il compromesso era necessario",
+        "hint": "Funziona se hai alta Coerenza.",
+        "requirements": { "coherence": 50 },
+        "successChance": 0.70,
+        "success": { "coherence": 5, "currentRelation": 5 },
+        "failure": { "coherence": -10, "currentRelation": -20 }
+      },
+      {
+        "id": "opt_abbandona",
+        "text": "Abbandona la corrente per evitare lo scontro",
+        "hint": "Fine della militanza nella corrente, ma nessuna guerra interna.",
+        "requirements": {},
+        "successChance": 1.0,
+        "success": { "stress": 10, "reputazione": -5 },
+        "failure": null
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "currentRelation": -30, "reputazione": -8 },
+    "chainEvents": {
+      "opt_abbandona_success": null
+    }
+  },
+  {
+    "id": "wt_congresso_corrente",
+    "title": "Congresso di Corrente: Elezione del Segretario",
+    "type": "congress",
+    "difficulty": 4,
+    "icon": "🗳️",
+    "cityLevel": 2,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_candidati",
+        "text": "Presentati come candidato al segretariato",
+        "hint": "Alta ricompensa, alto rischio. Serve molta Reputazione.",
+        "requirements": { "reputazione": 60, "coherence": 55 },
+        "successChance": 0.45,
+        "success": { "reputazione": 30, "coherence": 10, "partyInfluence": 20 },
+        "failure": { "reputazione": -10, "stress": 25, "currentRelation": -15 }
+      },
+      {
+        "id": "opt_sostieni",
+        "text": "Sostieni il candidato della tua corrente",
+        "hint": "Più sicuro: rafforzi la tua posizione senza esporti.",
+        "requirements": { "reputazione": 35 },
+        "successChance": 0.65,
+        "success": { "reputazione": 8, "currentRelation": 15 },
+        "failure": { "reputazione": -3, "currentRelation": -5 }
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "partyInfluence": -10 },
+    "chainEvents": {}
+  },
+  {
+    "id": "wt_inaugurazione_opera",
+    "title": "Inaugurazione Opera Pubblica",
+    "type": "event",
+    "difficulty": 1,
+    "icon": "🏗️",
+    "cityLevel": 2,
+    "geolocalizedCity": true,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_presente",
+        "text": "Partecipa di persona e tieni un discorso",
+        "hint": "Sempre positivo, ma costa tempo.",
+        "requirements": {},
+        "successChance": 0.90,
+        "success": { "reputazione": 8, "localPoliticalWeight": 5, "stress": 3 },
+        "failure": { "reputazione": -2, "stress": 5 }
+      },
+      {
+        "id": "opt_delega",
+        "text": "Delega un mentore a rappresentarti",
+        "hint": "Risparmia tempo, ma meno impatto locale.",
+        "requirements": { "mentorAvailable": true },
+        "successChance": 0.75,
+        "success": { "reputazione": 3, "localPoliticalWeight": 2 },
+        "failure": { "reputazione": -4 }
+      }
+    ],
+    "deadline": false,
+    "failPenalty": { "localPoliticalWeight": -3 },
+    "chainEvents": {}
+  },
+  {
+    "id": "wt_scandalo_stampa",
+    "title": "Interrogazione Parlamentare: Risposta allo Scandalo",
+    "type": "crisis",
+    "difficulty": 5,
+    "icon": "📰",
+    "cityLevel": 3,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_trasparente",
+        "text": "Conferenza stampa: massima trasparenza",
+        "hint": "Funziona se sei davvero pulito. Coerenza alta aiuta.",
+        "requirements": { "coherence": 60 },
+        "successChance": 0.60,
+        "success": { "reputazione": 15, "coherence": 8, "stress": 10 },
+        "failure": { "reputazione": -20, "stress": 30, "rischioIndagini": 15 }
+      },
+      {
+        "id": "opt_silenzio",
+        "text": "No comment: aspetta che passi",
+        "hint": "Rischioso: i giornalisti continuano a scavare.",
+        "requirements": {},
+        "successChance": 0.40,
+        "success": { "reputazione": -5, "stress": 5 },
+        "failure": { "reputazione": -25, "rischioIndagini": 20, "stress": 25 }
+      },
+      {
+        "id": "opt_controattacca",
+        "text": "Controattacca: accusa gli avversari politici",
+        "hint": "Efficace a breve termine, pericoloso a lungo.",
+        "requirements": { "reputazione": 50 },
+        "successChance": 0.55,
+        "success": { "reputazione": 5, "stress": 8 },
+        "failure": { "reputazione": -30, "coherence": -15 }
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "reputazione": -20, "mozioneStifucia": true },
+    "chainEvents": {
+      "opt_silenzio_failure": "wt_mozione_sfiducia"
+    }
+  },
+  {
+    "id": "wt_mozione_sfiducia",
+    "title": "Mozione di Sfiducia",
+    "type": "vote",
+    "difficulty": 5,
+    "icon": "⚖️",
+    "cityLevel": 3,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_difendi",
+        "text": "Difendi il tuo operato in aula",
+        "hint": "Tutto o niente. Se il tuo partito ti supporta, puoi farcela.",
+        "requirements": { "reputazione": 55, "partySupport": true },
+        "successChance": 0.50,
+        "success": { "reputazione": 25, "coherence": 15, "stress": 20 },
+        "failure": { "gameOverRisk": true, "reputazione": -40 }
+      },
+      {
+        "id": "opt_dimissioni",
+        "text": "Rassegna le dimissioni prima del voto",
+        "hint": "Eviti il game over ma perdi una carica importante.",
+        "requirements": {},
+        "successChance": 1.0,
+        "success": { "reputazione": -15, "coherence": 5, "careerHit": 20 },
+        "failure": null
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "gameOver": true },
+    "chainEvents": {}
+  },
+  {
+    "id": "wt_campagna_elettorale",
+    "title": "Campagna Elettorale Locale",
+    "type": "election",
+    "difficulty": 3,
+    "icon": "🗳️",
+    "cityLevel": 2,
+    "geolocalizedCity": true,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_porta_a_porta",
+        "text": "Campagna porta a porta: visita i quartieri",
+        "hint": "Lento ma costruisce consenso duraturo. Molto efficace nei comuni piccoli.",
+        "requirements": {},
+        "successChance": 0.80,
+        "success": { "reputazione": 12, "localPoliticalWeight": 10, "stanchezza": 15 },
+        "failure": { "reputazione": 2, "stanchezza": 10 }
+      },
+      {
+        "id": "opt_social",
+        "text": "Campagna social media: video virali",
+        "hint": "Efficace nelle città grandi, meno nei comuni.",
+        "requirements": { "cityLevel": 3 },
+        "successChance": 0.65,
+        "success": { "reputazione": 10, "popularityUnder30": 15 },
+        "failure": { "reputazione": -5, "stress": 8 }
+      },
+      {
+        "id": "opt_comizio",
+        "text": "Organizza comizio in piazza",
+        "hint": "Alta visibilità se molte persone vengono. Rischioso se la piazza è vuota.",
+        "requirements": { "reputazione": 40 },
+        "successChance": 0.60,
+        "success": { "reputazione": 18, "localPoliticalWeight": 8, "morale": 10 },
+        "failure": { "reputazione": -10, "stress": 15 }
+      }
+    ],
+    "deadline": true,
+    "failPenalty": { "reputazione": -8, "localPoliticalWeight": -5 },
+    "chainEvents": {}
+  },
+  {
+    "id": "wt_incontro_mentore",
+    "title": "Colloquio con il Mentore",
+    "type": "meeting",
+    "difficulty": 1,
+    "icon": "🤝",
+    "cityLevel": 1,
+    "partyAffinities": [],
+    "options": [
+      {
+        "id": "opt_ascolta",
+        "text": "Ascolta i consigli del mentore",
+        "hint": "Sempre positivo. Ottieni un bonus basato sui tratti del mentore.",
+        "requirements": {},
+        "successChance": 0.95,
+        "success": { "mentorBonus": true, "mentorRelation": 10 },
+        "failure": { "mentorRelation": -5 }
+      },
+      {
+        "id": "opt_confronta",
+        "text": "Sfida il punto di vista del mentore",
+        "hint": "Se sei allineato ideologicamente, può rafforzare il rapporto.",
+        "requirements": { "coherence": 45 },
+        "successChance": 0.55,
+        "success": { "mentorRelation": 15, "coherence": 5 },
+        "failure": { "mentorRelation": -15, "stress": 8 }
+      }
+    ],
+    "deadline": false,
+    "failPenalty": {},
+    "chainEvents": {}
+  }
+]

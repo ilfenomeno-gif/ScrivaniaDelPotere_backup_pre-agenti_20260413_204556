@@ -735,6 +735,9 @@ const GameMap = {
             zoomHandler: null,
         };
         this.mapInstance = map;
+        this._map = map; // alias for CitySearch integration
+        // Inizializza ricerca città e marker gerarchici dopo la creazione della mappa
+        setTimeout(() => this.initCitySearchFeatures(), 500);
         return map;
     },
 
@@ -1565,8 +1568,25 @@ const GameMap = {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
         const modal = document.getElementById('nation-transfer-modal');
+        const _triggerEl = document.activeElement;
         const selectEl = document.getElementById('nation-select');
         const costEl = document.getElementById('nation-transfer-cost');
+
+        // Screen reader: modal ARIA + focus trap
+        const modalContent = modal.querySelector('.nation-modal-content');
+        if (modalContent) {
+            modalContent.setAttribute('role', 'dialog');
+            modalContent.setAttribute('aria-modal', 'true');
+            const h3 = modalContent.querySelector('h3');
+            if (h3) {
+                if (!h3.id) h3.id = 'nation-transfer-heading';
+                modalContent.setAttribute('aria-labelledby', h3.id);
+            }
+            const pDesc = modalContent.querySelector('p:nth-of-type(2)');
+            if (pDesc && !pDesc.id) { pDesc.id = 'nation-transfer-desc'; modalContent.setAttribute('aria-describedby', pDesc.id); }
+            if (window.SR) SR.trapFocus(modalContent);
+        }
+        if (window.SR) SR.announce(`${transferTitle}. ${transferWarning}. Seleziona la nazione destinazione.`, 'assertive');
 
         const refreshTransferCost = () => {
             if (!selectEl || !costEl) return;
@@ -1580,12 +1600,16 @@ const GameMap = {
         }
         
 
-        document.getElementById('nation-cancel').onclick = () => modal.remove();
+        document.getElementById('nation-cancel').onclick = () => {
+            modal.remove();
+            if (window.SR) SR.closeModal(_triggerEl, 'Trasferimento annullato.');
+        };
         document.getElementById('nation-confirm').onclick = async () => {
             const newNationId = document.getElementById('nation-select').value;
-            const ok = await this.transferToNation(newNationId);
             modal.remove();
-            if (!ok) return;
+            if (window.SR) SR.releaseFocus();
+            const ok = await this.transferToNation(newNationId);
+            if (!ok) { if (_triggerEl) requestAnimationFrame(() => _triggerEl.focus()); return; }
         };
     },
 
@@ -1882,6 +1906,39 @@ const GameMap = {
 
         if (recoverable.length > 0) {
             Game.addWorkNotif('📞 Contatti Ritrovati', `Hai ritrovato ${recoverable.length} vecchi contatti a ${Game.state.city.name}! (Relazioni parzialmente ripristinate)`, `Giorno ${Game.state.day}`);
+        }
+    },
+
+    /* ── CitySearch integration ─────────────── */
+
+    /* Vola verso una coordinata sulla mappa Leaflet */
+    flyTo(lat, lng, zoom) {
+        const map = this._map || this.mapInstance;
+        if (!map) return;
+        map.flyTo([lat, lng], zoom || 11, { duration: 1.2 });
+    },
+
+    /* Apre il popup di una città per id */
+    openCityPopup(cityId) {
+        const map = this._map || this.mapInstance;
+        if (!map) return;
+        map.eachLayer(layer => {
+            if (layer.options && layer.options.cityId === cityId && layer.openPopup) {
+                layer.openPopup();
+            }
+        });
+    },
+
+    /* Inizializza la barra di ricerca città e i marker gerarchici */
+    initCitySearchFeatures() {
+        // Barra di ricerca
+        if (typeof CitySearch !== 'undefined') {
+            CitySearch.init().then(() => {
+                CitySearch.renderSearchBar('city-search-bar');
+                // Marker gerarchici dopo init indice
+                CitySearch.injectMapMarkers();
+                CitySearch.initZoomLevels();
+            });
         }
     },
 };
