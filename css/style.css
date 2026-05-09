@@ -1,5 +1,5 @@
 /* ============================================
-   LA SCRIVANIA DEL POTERE — Master Stylesheet
+    POWER OF POLITICS — Master Stylesheet
    ============================================ */
 
 /* --- Reset & Base --- */
@@ -101,6 +101,191 @@ html, body {
 
 .screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; }
 .screen.active { display: flex; }
+
+#screen-login,
+#screen-home {
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(197, 162, 62, 0.16), transparent 34%),
+        radial-gradient(circle at 88% 20%, rgba(21, 101, 192, 0.22), transparent 36%),
+        linear-gradient(160deg, #171717 0%, #1f2329 48%, #252f3c 100%);
+}
+
+.auth-wrap,
+.home-wrap {
+    width: min(820px, 94vw);
+    padding: 24px;
+}
+
+.auth-card,
+.home-card {
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(13, 17, 24, 0.84);
+    backdrop-filter: blur(4px);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+}
+
+.auth-title,
+.home-title {
+    font-family: var(--font-typewriter);
+    letter-spacing: 2px;
+    color: #f5e9c8;
+    margin-bottom: 6px;
+}
+
+.auth-subtitle,
+.home-welcome {
+    color: #d5dae2;
+    margin-bottom: 16px;
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.auth-tab {
+    border: 1px solid #7a6a41;
+    background: #2a2f35;
+    color: #f3e8c8;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.auth-tab.active {
+    background: #6d5b2b;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-form input {
+    border: 1px solid #55606f;
+    background: #151b24;
+    color: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.auth-submit {
+    margin-top: 6px;
+    border: none;
+    background: #c5a23e;
+    color: #141414;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.auth-message,
+.home-message {
+    margin-top: 12px;
+    color: #f4d99b;
+    min-height: 20px;
+}
+
+.home-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.home-menu-item {
+    border: 1px solid #5d6876;
+    border-radius: 10px;
+    background: #1d2532;
+    color: #eef3fa;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.home-menu-item.home-exit {
+    background: #3a1f24;
+    border-color: #8b3f4a;
+}
+
+.home-panel {
+    border: 1px dashed #6b7481;
+    border-radius: 10px;
+    padding: 14px;
+    background: rgba(0,0,0,0.25);
+}
+
+.home-panel h2 {
+    color: #f4e4bd;
+    margin-bottom: 6px;
+}
+
+.home-panel p {
+    color: #ced5df;
+    margin-bottom: 10px;
+}
+
+.home-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.home-action-btn {
+    border: 1px solid #5f6978;
+    background: #222b38;
+    color: #eaf0f7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.home-action-btn.primary {
+    background: #c5a23e;
+    border-color: #c5a23e;
+    color: #141414;
+    font-weight: 700;
+}
+
+.home-action-btn.selected {
+    border-color: #c5a23e;
+    box-shadow: 0 0 0 1px #c5a23e inset;
+}
+
+.home-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.home-list-item {
+    border: 1px solid #596477;
+    border-radius: 8px;
+    padding: 10px;
+    background: #17202c;
+    color: #e3eaf4;
+}
+
+.home-list-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.home-list-tag {
+    color: #f4d99b;
+    font-size: 12px;
+}
 
 /* ============================================
    1. CHARACTER CREATION — L'ANAGRAFE

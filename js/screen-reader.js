@@ -1,6 +1,6 @@
 /* ================================================================
    SCREEN-READER.JS — Modulo Accessibilità Professionale
-   La Scrivania del Potere — 2026-05-06 | WCAG 2.1 AA
+    Power of Politics — 2026-05-06 | WCAG 2.1 AA
    ================================================================
    - Mantiene 3 live regions nel DOM (polite / assertive / log)
    - Aggancia tutti gli eventi Game.on per annunci SR
@@ -477,7 +477,7 @@ const SR = (() => {
     function _applyPanelARIA() {
         [
             { id: 'hud-stats',     label: 'Statistiche personaggio',  role: 'region' },
-            { id: 'desk',          label: 'Scrivania del potere',       role: 'main'   },
+            { id: 'desk',          label: 'Power of Politics',         role: 'main'   },
             { id: 'screen-desk',   label: 'Schermo scrivania',          role: 'region' },
             { id: 'item-phone',    label: 'Telefono di gioco',          role: 'region' },
             { id: 'item-tasks',    label: 'Blocco note compiti',        role: 'region' },
@@ -589,7 +589,7 @@ const SR = (() => {
             _prevCity      = Game.state.city?.name;
             _prevDay       = Game.state.day;
             _prevTimeOfDay = Game.state.calendar?.timeOfDay;
-            announce('Partita caricata. Benvenuto ne La Scrivania del Potere.', 'polite');
+            announce('Partita caricata. Benvenuto in Power of Politics.', 'polite');
             // Patch phone tab focus after game loaded
             setTimeout(_patchPhoneTabFocus, 500);
         });

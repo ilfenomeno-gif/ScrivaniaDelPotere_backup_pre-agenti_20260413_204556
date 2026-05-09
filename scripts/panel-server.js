@@ -110,7 +110,7 @@ const HTML = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScrivaniaDelPotere — Dev Panel</title>
+<title>Power of Politics — Dev Panel</title>
 <style>
   :root {
     --bg: #1e1e2e; --surface: #2a2a3e; --border: #3a3a5c;
@@ -189,7 +189,7 @@ const HTML = `<!DOCTYPE html>
 </head>
 <body>
 <header>
-  <h1>🖥 ScrivaniaDelPotere — Dev Panel</h1>
+  <h1>🖥 Power of Politics — Dev Panel</h1>
   <span id="status">Pronto</span>
 </header>
 <div class="layout">
@@ -422,7 +422,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-    console.log(`\n  ScrivaniaDelPotere Dev Panel`);
+    console.log(`\n  Power of Politics Dev Panel`);
     console.log(`  http://localhost:${PORT}\n`);
     console.log('  Apri il pannello nel browser o nel Simple Browser di VS Code.');
     console.log('  Ctrl+C per fermare.\n');

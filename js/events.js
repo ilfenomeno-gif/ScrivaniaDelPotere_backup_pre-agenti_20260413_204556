@@ -459,14 +459,128 @@ const Events = {
         ],
     },
 
-    triggerRandomEvent() {
-        // Filtra eventi globali + eventi della nazione corrente + eventi della citta corrente
-        const nationId = Game.state.nation?.id || 'italy';
-        const cityId = Game.state.city?.id;
+    DLC_EVENTS: {
+        dlc_stato_diritto_crimine: [
+            {
+                type: 'news',
+                title: 'Intercettazioni in Procura',
+                body: 'Una fuga di notizie cita il tuo nome in un fascicolo sensibile. Stress +16, reputazione -8, rischio indagini +10.',
+                effects: { stress: 16, reputazione: -8, rischioIndagini: 10 },
+            },
+            {
+                type: 'urgent',
+                title: 'Richiesta dal Collegio Difensivo',
+                body: 'I legali propongono una linea aggressiva che potrebbe salvarti oggi ma macchiare la tua coerenza.',
+                from: 'Studio Legale',
+                urgentType: 'info',
+                choices: {
+                    accept: { label: '⚖️ Accetta la linea dura', effects: { money: -220, stress: -6, coherence: -9, reputazione: 4 } },
+                    refuse: { label: '🧭 Difendi trasparenza', effects: { coherence: 7, reputazione: -4, stress: 5 } },
+                },
+            },
+        ],
+        dlc_elezioni_globali_europa: [
+            {
+                type: 'news',
+                title: 'Sondaggio Europeo Congelato',
+                body: 'Il tuo blocco politico guadagna fuori confine ma perde terreno locale. Rep nazionale +6, stress +7, morale -3.',
+                effects: { reputazioneNazionale: 6, stress: 7, morale: -3 },
+            },
+            {
+                type: 'urgent',
+                title: 'Patto Transnazionale Lampo',
+                body: 'Una lista alleata UE vuole un accordo in 24 ore: visibilita alta ma rischio incoerenza.',
+                from: 'Segreteria Europea',
+                urgentType: 'ally',
+                choices: {
+                    accept: { label: '🇪🇺 Firma l\'accordo', effects: { reputazioneNazionale: 10, money: 120, coherence: -6, stress: 6 } },
+                    refuse: { label: '🏛️ Mantieni linea interna', effects: { coherence: 6, reputazione: -4, stress: 2 } },
+                },
+            },
+        ],
+        dlc_media_infodemia: [
+            {
+                type: 'news',
+                title: 'Hashtag Hijack',
+                body: 'Una campagna coordinata distorce le tue dichiarazioni e domina i trend serali. Reputazione -10, notorieta +8, stress +12.',
+                effects: { reputazione: -10, notorieta: 8, stress: 12 },
+            },
+            {
+                type: 'urgent',
+                title: 'Scoop in Vendita',
+                body: 'Una redazione offre un dossier esclusivo: paghi molto ma puoi ribaltare il ciclo mediatico.',
+                from: 'Redazione Investigativa',
+                urgentType: 'info',
+                choices: {
+                    accept: { label: '📰 Compra lo scoop (€280)', effects: { money: -280, reputazione: 9, stress: -4, followers: 220 } },
+                    refuse: { label: '🤐 Non trattare', effects: { reputazione: -5, stress: 6, coherence: 3 } },
+                },
+            },
+        ],
+        dlc_storia_italia: [
+            {
+                type: 'news',
+                title: 'Archivio Storico Riemerso',
+                body: 'Un documento d\'epoca riapre il dibattito pubblico. Coerenza +6, reputazione nazionale +5, stress +4.',
+                effects: { coherence: 6, reputazioneNazionale: 5, stress: 4 },
+            },
+            {
+                type: 'urgent',
+                title: 'Commissione Memoria Civile',
+                body: 'Ti invitano a una commissione su una crisi storica: scelta simbolica ad alto impatto.',
+                from: 'Commissione Parlamentare',
+                urgentType: 'boss',
+                choices: {
+                    accept: { label: '📚 Partecipi e testimoni', effects: { coherence: 8, reputazione: 7, stanchezza: 8 } },
+                    refuse: { label: '🕳️ Evita esposizione', effects: { reputazioneNazionale: -6, stress: -2, morale: -4 } },
+                },
+            },
+        ],
+        dlc_geopolitica_diplomazia: [
+            {
+                type: 'news',
+                title: 'Crisi Diplomatica a Catena',
+                body: 'Un blocco internazionale impone sanzioni incrociate. Bilancio in tensione, consenso instabile.',
+                effects: { money: -180, stress: 10, reputazioneNazionale: -4 },
+            },
+            {
+                type: 'urgent',
+                title: 'Vertice su Trattato Strategico',
+                body: 'Puoi firmare un patto multilaterale: beneficio economico rapido o prudenza istituzionale.',
+                from: 'Consiglio Diplomatico',
+                urgentType: 'ally',
+                choices: {
+                    accept: { label: '🤝 Firma il trattato', effects: { money: 260, reputazioneNazionale: 6, coherence: -5, stress: 5 } },
+                    refuse: { label: '🛡️ Richiedi clausole etiche', effects: { coherence: 7, reputazioneNazionale: -2, stress: 3 } },
+                },
+            },
+        ],
+    },
+
+    getActiveDlcIds() {
+        const ids = Game.state && Game.state.flags && Array.isArray(Game.state.flags.activeDlc)
+            ? Game.state.flags.activeDlc
+            : [];
+        return ids.filter(Boolean);
+    },
+
+    getDlcEventPool() {
+        const active = this.getActiveDlcIds();
+        if (!active.length) return [];
+        return active.flatMap((id) => this.DLC_EVENTS[id] || []);
+    },
+
+    getFilteredPool() {
+        const cityId = Game.state.city && Game.state.city.id;
         const nationEvents = this.getNationEvents();
         const cityEvents = cityId ? (this.CITY_EVENTS[cityId] || []) : [];
-        const allEvents = [...this.eventPool, ...nationEvents, ...cityEvents];
-        const available = allEvents.filter(e => !e.condition || e.condition());
+        const dlcEvents = this.getDlcEventPool();
+        const allEvents = [...this.eventPool, ...nationEvents, ...cityEvents, ...dlcEvents];
+        return allEvents.filter(e => !e.condition || e.condition());
+    },
+
+    triggerRandomEvent() {
+        const available = this.getFilteredPool();
         if (available.length === 0) return;
 
         const event = available[Math.floor(Math.random() * available.length)];
@@ -823,6 +937,9 @@ const Events = {
                     Agents.recordAgentMemory(event.agentId, `urgent-${event.urgentType || 'agent'}-${choiceKey}`, memoryImpact);
                     if (Agents.syncAgentsToContacts) Agents.syncAgentsToContacts();
                 }
+                if (typeof event.onResolve === 'function') {
+                    try { event.onResolve(choiceKey, choice); } catch (_) { /* no-op */ }
+                }
                 // Log
                 const choiceLabel = choiceKey === 'accept' ? 'Accettato' : 'Rifiutato';
                 Game.addWorkNotif(`📩 ${event.title}`, `${choiceLabel}: ${event.body}`, `Giorno ${Game.state.day}`);
@@ -877,6 +994,7 @@ const Events = {
         if (effects.reputazione) Game.changeReputazione(effects.reputazione);
         if (effects.reputazioneNazionale) Game.changeReputazione(effects.reputazioneNazionale, 'nazionale');
         if (effects.repNazionale) Game.changeReputazione(effects.repNazionale, 'nazionale');
+        if (effects.notorieta) Game.changeNotorieta(effects.notorieta);
         if (effects.money) Game.changeMoney(effects.money);
         if (effects.intelligenza) Game.changeAttribute('intelligenza', effects.intelligenza);
         if (effects.carisma) Game.changeAttribute('carisma', effects.carisma);
