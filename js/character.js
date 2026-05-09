@@ -428,6 +428,8 @@ const Character = {
     _coffeeTimer: null,
     _idleCount: 0,
     _currentMentorPool: [],
+    _selectedMentorId: null,
+    _selectedStartingCityId: null,
 
     getNationState(nationId) {
         const fallback = {
@@ -448,10 +450,13 @@ const Character = {
         const tabContents = document.querySelectorAll('.character-tab-content');
         const nextBtns = document.querySelectorAll('.tab-next');
         const prevBtns = document.querySelectorAll('.tab-prev');
+        const self = this;
 
         function showTab(step) {
             tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.step == step));
             tabContents.forEach(tab => tab.classList.toggle('hidden', tab.id !== `character-step-${step}`));
+            if (String(step) === '3') self.renderMentorSelectionStep();
+            if (String(step) === '6') self.renderOnboardingCityStep();
         }
 
         nextBtns.forEach(btn => {
@@ -503,6 +508,8 @@ const Character = {
                 ideologyCards.forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
                 Game.state.character.ideology = card.dataset.value;
+                this._selectedMentorId = null;
+                this.renderMentorSelectionStep();
                 this.checkReady();
                 this.updatePreview();
                 this.updateProtocol();
@@ -510,7 +517,7 @@ const Character = {
             });
         });
 
-        // Step 3: Nazione
+        // Legacy nation picker (optional in new onboarding)
         const nationBtns = document.querySelectorAll('.stamp-btn[data-group="nation"]');
         nationBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -552,9 +559,68 @@ const Character = {
             if (defaultNationBtn) defaultNationBtn.classList.add('selected');
         }
         this.updateIdeologyDisplay(Game.state.nation.id);
+        this.renderMentorSelectionStep();
         this.checkReady();
         this.updatePreview();
         Game.on('new-day', ({ day }) => this.handleMentorProgression(day));
+    },
+
+    renderMentorSelectionStep() {
+        const container = document.getElementById('onboarding-mentor-choices');
+        if (!container) return;
+
+        const ideology = Game.state.character.ideology;
+        if (!ideology) {
+            container.innerHTML = '<p class="nation-instructions">Prima scegli l\'ideologia per vedere i mentori disponibili.</p>';
+            return;
+        }
+
+        const mentors = this.getAvailableMentorsForNation();
+        this._currentMentorPool = mentors;
+
+        container.innerHTML = mentors.map((mentor) => `
+            <button class="mentor-quick-card ${this._selectedMentorId === mentor.id ? 'selected' : ''}" data-mentor-id="${mentor.id}">
+                <div class="mentor-quick-head">
+                    <span class="mentor-quick-icon">${mentor.icon}</span>
+                    <span class="mentor-quick-name">${Game.esc(mentor.shortName || mentor.name)}</span>
+                </div>
+                <div class="mentor-quick-bonus">${Game.esc(mentor.bonusText || this.getMentorBonusText(mentor.id))}</div>
+            </button>
+        `).join('');
+
+        container.querySelectorAll('.mentor-quick-card').forEach((card) => {
+            card.addEventListener('click', () => {
+                container.querySelectorAll('.mentor-quick-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                this._selectedMentorId = card.dataset.mentorId;
+                this.checkReady();
+            });
+        });
+    },
+
+    async renderOnboardingCityStep() {
+        const holderId = 'onboarding-city-select-container';
+        const holder = document.getElementById(holderId);
+        if (!holder || holder.dataset.initialized === '1') return;
+
+        holder.dataset.initialized = '1';
+        const nation = (typeof Nations !== 'undefined' && Nations.getCurrentNation)
+            ? Nations.getCurrentNation()
+            : (Game.state.nation || { id: 'italy' });
+
+        try {
+            await GameMap.renderCitySelection(holderId, (cityId) => {
+                this._selectedStartingCityId = cityId;
+                this.checkReady();
+            }, {
+                nationId: nation.id || 'italy',
+                preferredCityId: (typeof Nations !== 'undefined' && Nations.getDefaultCityId)
+                    ? Nations.getDefaultCityId(nation.id || 'italy')
+                    : (nation.defaultCity || nation.startingCity || null),
+            });
+        } catch (err) {
+            holder.innerHTML = '<p class="nation-instructions">Errore caricamento mappa citta. Riprova.</p>';
+        }
     },
 
     /**
@@ -708,14 +774,15 @@ const Character = {
         const gender = Game.state.character.gender;
         const ideology = Game.state.character.ideology;
         const btn = document.getElementById('btn-approve');
-        const nation = Game.state.nation.id;
         const missing = [];
         if (!name) missing.push('Nome');
         if (!gender) missing.push('Genere');
         if (!ideology) missing.push('Ideologia');
-        if (!nation) missing.push('Nazione');
+        if (!this._selectedMentorId) missing.push('Mentore');
+        if (!this._selectedStartingCityId) missing.push('Mappa/Citta');
 
         const allValid = missing.length === 0;
+        if (!btn) return;
         btn.disabled = !allValid;
 
         // B. Timbro APPROVATO: grigio sbiadito → rosso vivo
@@ -736,7 +803,7 @@ const Character = {
 
     approve() {
         const name = this.sanitizeName(document.getElementById('char-name').value.trim());
-        if (!name || !Game.state.character.gender || !Game.state.character.ideology || !Game.state.nation.id) return;
+        if (!name || !Game.state.character.gender || !Game.state.character.ideology || !this._selectedMentorId || !this._selectedStartingCityId) return;
 
         // Stop idle timers
         Scheduler.clear(this._idleTimer);
@@ -780,11 +847,11 @@ const Character = {
         Game.state.reputazioneLocale = 39;
         Game.state.reputazioneNazionale = 5;
         Game.state.notorieta = 0;
-        Game.state.money = 250;  // Increased from 150 to provide early-game economic buffer
+        Game.state.money = 400;  // Increased from 250 to provide better early-game buffer for affitto + spese
         Game.state.coherence = 100;
         Game.state.city = null;
         Game.state.visitedCities = [];
-        Game.state.housing = { rent: 200, bonuses: [], maluses: [] };  // Set rent to 200 (balanced)
+        Game.state.housing = { rent: 250, bonuses: [], maluses: [] };  // Set rent to 250 (base, before city multiplier)
         Game.state.contacts = [];
         Game.state.flags = {};
 
@@ -819,12 +886,12 @@ const Character = {
         if (deskBg) deskBg.classList.add('desk-focusing');
 
         // Delay: stamp animation → letter screen
-        setTimeout(() => {
+        setTimeout(async () => {
             approveBtn.classList.remove('stamping');
             approveBtn.classList.add('stamped');
             Game.emit('character-created', Game.state.character);
-            // E. Show Secretary's letter instead of going straight to desk
-            this.showSecretaryLetter();
+            this.applyMentorChoice(this._selectedMentorId, { skipCitySelection: true });
+            await this.applyCityChoice(this._selectedStartingCityId);
         }, 700);
     },
 
@@ -961,7 +1028,7 @@ const Character = {
         if (e.stressMitigation) Game.state.flags.mentorStressMitigation = e.stressMitigation;
     },
 
-    applyMentorChoice(mentor) {
+    applyMentorChoice(mentor, options = {}) {
         const pick = this.getMentorById(mentor);
         if (!pick) return;
         const mentorArchetype = pick.archetype || pick.id;
@@ -1036,8 +1103,8 @@ const Character = {
 
             this.scheduleMentorEvents(pick.id);
 
-        // Transition to city selection
-        this.showCitySelection();
+        // Legacy flow fallback (now optional)
+        if (!options.skipCitySelection) this.showCitySelection();
     },
 
     scheduleMentorEvents(mentorId) {
@@ -1135,15 +1202,12 @@ const Character = {
         if (Game.changeNation) Game.changeNation(city.country || city.nationId || 'italy');
         if (Game.initCityFlags) Game.initCityFlags();
 
-        // Base starting money comes from the selected nation, with city fallback.
-        if (typeof nation.startingMoney === 'number') {
-            Game.state.money = nation.startingMoney;
-        } else if (city.startingMoney) {
-            Game.state.money = city.startingMoney;
-        }
+        // Base starting money: FIXED TO €400 for economic balance
+        // (Previously: nation.startingMoney which was too low)
+        Game.state.money = 400;  // HARDCODED FIX: Economic balance requires this minimum starting amount
 
-        // Adjust starting rent based on city multiplier
-        Game.state.housing.rent = Math.round(300 * city.rentMultiplier);
+        // Adjust starting rent based on city multiplier (using 250 base instead of 300)
+        Game.state.housing.rent = Math.round(250 * city.rentMultiplier);
 
         // Track starting city as visited
         if (!Game.state.visitedCities) Game.state.visitedCities = [];

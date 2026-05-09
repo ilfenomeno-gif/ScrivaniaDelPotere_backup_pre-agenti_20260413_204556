@@ -165,8 +165,15 @@ async function run() {
                 const n = setValue('#char-name', 'Runtime Tester');
                 const g = clickSel('.stamp-btn[data-group="gender"][data-value="M"]');
                 const i = clickSel('.ideology-card[data-value="centro"]');
-                const na = clickSel('.stamp-btn[data-group="nation"][data-value="italy"]');
-                return n && g && i && na;
+                if (typeof Character !== 'undefined') {
+                    if (!Character._selectedMentorId) {
+                        const firstMentor = document.querySelector('#onboarding-mentor-choices .mentor-quick-card');
+                        if (firstMentor) firstMentor.click();
+                    }
+                    if (!Character._selectedStartingCityId) Character._selectedStartingCityId = 'roma';
+                    if (Character.checkReady) Character.checkReady();
+                }
+                return n && g && i;
             });
             if (!ok) throw new Error('Elementi creazione personaggio non trovati');
 

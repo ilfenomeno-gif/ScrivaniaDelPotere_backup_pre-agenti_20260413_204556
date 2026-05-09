@@ -52,9 +52,7 @@ const Factions = {
             Game.state.faction = { current: null, joinedDay: 0 };
         }
 
-        Game.on('panel-open', (data) => {
-            if (data.panel === 'stats') this.injectFactionSection();
-        });
+        // Comitato Centrale ora vive nel Telefono (tab dedicata)
 
         // Daily faction effects
         Game.on('time-advance', (d) => {
@@ -182,6 +180,65 @@ const Factions = {
                 btn.addEventListener('click', () => { this.joinFaction(btn.dataset.faction); this.injectFactionSection(); });
             });
         }
+    },
+
+    renderPhoneCommittee() {
+        const container = document.getElementById('comitato-content');
+        if (!container) return;
+
+        const current = this.getCurrentFaction();
+        let html = `<div class="politica-section"><div class="politica-section-title">🏛️ Comitato Centrale</div>`;
+
+        if (current) {
+            html += `
+                <div class="faction-current">
+                    <div class="faction-badge">${current.icon}</div>
+                    <div class="faction-info">
+                        <div class="faction-name">${current.name}</div>
+                        <div class="faction-bonus">✅ ${current.bonus}</div>
+                        <div class="faction-malus">⚠️ ${current.malus}</div>
+                        <div class="faction-joined">Membro dal giorno ${Game.state.faction.joinedDay}</div>
+                    </div>
+                </div>
+                <button class="faction-leave-btn" id="phone-faction-leave">🚪 Lascia Corrente</button>
+            `;
+        } else {
+            html += `<p class="faction-hint">Raggiungi le soglie di Reputazione e Coerenza per unirti a una corrente.</p>`;
+            Object.values(this.CURRENTS).forEach(f => {
+                const canJoin = this.canUnlock(f.id);
+                html += `
+                    <div class="faction-card ${canJoin ? 'faction-available' : 'faction-locked'}">
+                        <div class="faction-badge">${f.icon}</div>
+                        <div class="faction-info">
+                            <div class="faction-name">${f.name}</div>
+                            <div class="faction-desc">${f.desc}</div>
+                            <div class="faction-bonus">✅ ${f.bonus}</div>
+                            <div class="faction-malus">⚠️ ${f.malus}</div>
+                            <div class="faction-req">${canJoin ? '✅' : '🔒'} Rep ≥${f.unlock.reputazione}, Coerenza ≥${f.unlock.coherence}</div>
+                        </div>
+                        ${canJoin ? `<button class="faction-join-btn" data-faction="${f.id}">Unisciti</button>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        const leaveBtn = container.querySelector('#phone-faction-leave');
+        if (leaveBtn) {
+            leaveBtn.addEventListener('click', () => {
+                this.leaveFaction();
+                this.renderPhoneCommittee();
+            });
+        }
+
+        container.querySelectorAll('.faction-join-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.joinFaction(btn.dataset.faction);
+                this.renderPhoneCommittee();
+            });
+        });
     },
 
     // Public API for other modules

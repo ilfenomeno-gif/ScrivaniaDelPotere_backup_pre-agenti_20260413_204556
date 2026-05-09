@@ -62,7 +62,6 @@ const Stats = {
         const container = document.getElementById('stats-body');
         container.innerHTML = this.buildStatsHTML();
         // Inject dynamic sections from new modules
-        if (typeof Factions !== 'undefined' && Factions.injectFactionSection) Factions.injectFactionSection();
         if (typeof Favors !== 'undefined' && Favors.renderCreditsInStats) Favors.renderCreditsInStats();
         if (typeof Diary !== 'undefined' && Diary.injectDiarySection) Diary.injectDiarySection();
     },

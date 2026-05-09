@@ -53,7 +53,7 @@ const Game = {
         reputazioneLocale: 39,    // fama nella città attuale
         reputazioneNazionale: 5,  // fama nazionale (TV, articoli)
         notorieta: 0,             // 0-100 fama pubblica (paparazzi, talk show)
-        money: 150,
+        money: 400,               // FIXED: Increased from 150 for economic balance
         coherence: 100,
 
         // 📍 Città attuale
@@ -368,10 +368,10 @@ const Game = {
     },
 
     CAREER_LEVELS: [
-        { label: 'Impiegato', salary: 200, polTimeMalus: 0 },  // Aumentato da 80 per evitare deficit economia
-        { label: 'Capo Reparto', salary: 280, polTimeMalus: -1 },
-        { label: 'Dirigente', salary: 360, polTimeMalus: -2 },
-        { label: 'Direttore', salary: 480, polTimeMalus: -3 },
+        { label: 'Impiegato', salary: 380, polTimeMalus: 0 },  // Aumentato da 200 per coprire affitti alti in grandi città
+        { label: 'Capo Reparto', salary: 520, polTimeMalus: -1 },  // Proporzionale
+        { label: 'Dirigente', salary: 660, polTimeMalus: -2 },  // Proporzionale
+        { label: 'Direttore', salary: 880, polTimeMalus: -3 },  // Proporzionale
     ],
 
     POLITICAL_LEVELS: [

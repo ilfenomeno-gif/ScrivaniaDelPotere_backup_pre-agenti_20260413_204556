@@ -37,9 +37,6 @@ const Parties = (() => {
             if (d.timeOfDay === 0) _dailyPartyEffects();
         });
         Game.on('city-change', () => _checkCareerAccess());
-        Game.on('panel-open', (d) => {
-            if (d.panel === 'stats') _injectPartyUI();
-        });
 
         // Resetta partito e mentori quando il giocatore cambia nazione
         async function _onNationChange() {
@@ -59,9 +56,8 @@ const Parties = (() => {
             if (typeof Game.loadMentorsForNation === 'function') {
                 await Game.loadMentorsForNation();
             }
-            _injectPartyUI();
             Game.addWorkNotif('🏛️ Partito', 'Sei in un nuovo paese. Scegli un nuovo partito politico.', `Giorno ${Game.state.day}`);
-            if (window.SR) SR.announce('Cambiato paese. Seleziona un nuovo partito politico nel pannello statistiche.', 'polite');
+            if (window.SR) SR.announce('Cambiato paese. Seleziona un nuovo partito politico nella sezione Politica del telefono.', 'polite');
         }
         Game.on('nation-change', _onNationChange);
         Game.on('nation-changed', _onNationChange);

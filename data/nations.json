@@ -23,7 +23,7 @@
     "taxRate": 0.25,
     "description": "Sistema parlamentare proporzionale. Coalizioni quasi sempre necessarie. Governo spesso instabile.",
     "startingCity": "roma",
-    "startingMoney": 100,
+    "startingMoney": 400,
     "ideologies": {
       "radicale": {
         "localName": "Sinistra Radicale",
@@ -144,7 +144,7 @@
     "taxRate": 0.28,
     "description": "Semi-presidenziale con doppio turno. Presidente ha potere significativo. Manifestazioni frequenti.",
     "startingCity": "paris",
-    "startingMoney": 120,
+    "startingMoney": 400,
     "ideologies": {
       "radicale": {
         "localName": "Gauche radicale",
@@ -474,7 +474,7 @@
     "taxRate": 0.32,
     "description": "Sistema proporzionale con soglia 5%. Coalizioni stabili ma complesse. Efficienza amministrativa.",
     "startingCity": "berlin",
-    "startingMoney": 140,
+    "startingMoney": 400,
     "ideologies": {
       "radicale": {
         "localName": "Radikale Linke",
@@ -805,7 +805,7 @@
     "taxRate": 0.24,
     "description": "Maggioritario first-past-the-post. Bipartitismo prevalente. Coalizioni rare.",
     "startingCity": "london",
-    "startingMoney": 130,
+    "startingMoney": 400,
     "ideologies": {
       "radicale": {
         "localName": "Radical Left",

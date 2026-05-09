@@ -39,7 +39,7 @@ const Bank = {
         if (!Array.isArray(b.checks)) b.checks = [];
         if (typeof b.creditScore !== 'number') b.creditScore = 50;
         if (typeof b.lastInterestDay !== 'number') b.lastInterestDay = 0;
-        if (b._baseRent == null) b._baseRent = Game.state.housing ? Game.state.housing.rent : 200;  // Ridotto da 300 per evitare deficit
+        if (b._baseRent == null) b._baseRent = Game.state.housing ? Game.state.housing.rent : 250;  // Base rent (from character init)
     },
 
     // ─────────────────────────────────────────

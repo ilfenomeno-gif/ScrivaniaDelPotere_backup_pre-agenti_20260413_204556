@@ -20,14 +20,15 @@
             <div class="anagrafe-sheet">
                 <div class="anagrafe-intro">
                     <h2>Inizia La Tua Carriera</h2>
-                    <p>Compila i 5 passaggi in ordine. Quando tutto e completo, il timbro APPROVATO si accende in rosso.</p>
+                    <p>Compila i 6 passaggi in ordine. Quando tutto e completo, il timbro APPROVATO si accende in rosso.</p>
                 </div>
             <div class="character-tabs" id="character-tabs">
                 <button class="char-tab active" data-step="1">1. Anagrafica</button>
                 <button class="char-tab" data-step="2">2. Ideologia</button>
-                <button class="char-tab" data-step="3">3. Nazione</button>
+                <button class="char-tab" data-step="3">3. Mentori</button>
                 <button class="char-tab" data-step="4">4. Avatar</button>
                 <button class="char-tab" data-step="5">5. Modalità</button>
+                <button class="char-tab" data-step="6">6. Mappa</button>
             </div>
             <div class="character-tab-content" id="character-step-1">
                 <div class="document-header">
@@ -102,26 +103,9 @@
             </div>
             <div class="character-tab-content hidden" id="character-step-3">
                 <div class="form-row">
-                    <label>NAZIONE</label>
-                    <p class="nation-instructions">Scegli la nazione dove iniziare la tua carriera politica.</p>
-                    <div class="stamp-choices nation-choices" id="nation-choices">
-                        <button class="stamp-btn" data-value="italy" data-group="nation">
-                            <span class="stamp-icon">🇮🇹</span>
-                            <span class="stamp-label">Italia</span>
-                        </button>
-                        <button class="stamp-btn" data-value="france" data-group="nation">
-                            <span class="stamp-icon">🇫🇷</span>
-                            <span class="stamp-label">Francia</span>
-                        </button>
-                        <button class="stamp-btn" data-value="germany" data-group="nation">
-                            <span class="stamp-icon">🇩🇪</span>
-                            <span class="stamp-label">Germania</span>
-                        </button>
-                        <button class="stamp-btn" data-value="uk" data-group="nation">
-                            <span class="stamp-icon">🇬🇧</span>
-                            <span class="stamp-label">Regno Unito</span>
-                        </button>
-                    </div>
+                    <label>MENTORE POLITICO</label>
+                    <p class="nation-instructions">Scegli chi ti guidera all'inizio del percorso.</p>
+                    <div class="mentor-quick-grid" id="onboarding-mentor-choices"></div>
                 </div>
                 <div class="tab-nav">
                     <button class="tab-prev" data-prev="2">← Indietro</button>
@@ -171,6 +155,17 @@
                 </div>
                 <div class="tab-nav">
                     <button class="tab-prev" data-prev="4">← Indietro</button>
+                    <button class="tab-next" data-next="6">Avanti →</button>
+                </div>
+            </div>
+            <div class="character-tab-content hidden" id="character-step-6">
+                <div class="form-row">
+                    <label>MAPPA DI PARTENZA</label>
+                    <p class="nation-instructions">Seleziona la citta da cui iniziare la campagna.</p>
+                    <div id="onboarding-city-select-container" class="onboarding-city-select"></div>
+                </div>
+                <div class="tab-nav">
+                    <button class="tab-prev" data-prev="5">← Indietro</button>
                     <button id="btn-approve" class="approve-stamp" disabled><span>APPROVATO</span></button>
                 </div>
                 <div class="error-msg" id="char-error"></div>
@@ -390,6 +385,7 @@
             <div class="panel-phone-frame">
                 <div class="phone-header">
                     <button class="phone-back" id="phone-close" aria-label="Chiudi Telefono">✕</button>
+                    <button class="phone-back hidden" id="phone-app-back" aria-label="Torna alla Home App">←</button>
                     <span class="phone-title">SmartPolitica</span>
                     <span class="phone-clock" id="phone-clock">00:00</span>
                     <span class="phone-battery">🔋</span>
@@ -404,11 +400,32 @@
                     <button class="phone-tab" data-tab="archivio" role="tab" aria-selected="false" aria-controls="tab-archivio" id="ptab-archivio">📦 Archivio</button>
                     <button class="phone-tab" data-tab="finanza" role="tab" aria-selected="false" aria-controls="tab-finanza" id="ptab-finanza">💰 Finanza</button>
                     <button class="phone-tab" data-tab="politica" role="tab" aria-selected="false" aria-controls="tab-politica" id="ptab-politica">🏛️ Politica</button>
+                    <button class="phone-tab" data-tab="comitato" role="tab" aria-selected="false" aria-controls="tab-comitato" id="ptab-comitato">🏛️ Comitato</button>
                 </div>
                 <div class="phone-actions-bar">
                     <span>📱 Azioni:</span>
                     <span class="phone-ap-dot filled" id="phone-ap-1"></span>
                     <span class="phone-ap-dot filled" id="phone-ap-2"></span>
+                </div>
+                <div class="phone-home active" id="phone-home">
+                    <div class="phone-home-head">
+                        <p class="phone-home-kicker">SmartPolitica OS</p>
+                        <h3 class="phone-home-title">App Principali</h3>
+                    </div>
+                    <div class="phone-app-grid" id="phone-app-grid-main">
+                        <button class="phone-app-btn" data-app="friends"><span class="phone-app-icon">👥</span><span class="phone-app-label">Contatti</span></button>
+                        <button class="phone-app-btn" data-app="social"><span class="phone-app-icon">📰</span><span class="phone-app-label">Social</span></button>
+                        <button class="phone-app-btn" data-app="attivita"><span class="phone-app-icon">⚡</span><span class="phone-app-label">Attivita</span></button>
+                        <button class="phone-app-btn" data-app="mondo"><span class="phone-app-icon">🌍</span><span class="phone-app-label">Mondo</span></button>
+                        <button class="phone-app-btn" data-app="more"><span class="phone-app-icon">⋯</span><span class="phone-app-label">Altre App</span></button>
+                    </div>
+                    <div class="phone-app-grid hidden" id="phone-app-grid-more">
+                        <button class="phone-app-btn" data-app="politica"><span class="phone-app-icon">🏛️</span><span class="phone-app-label">Politica</span></button>
+                        <button class="phone-app-btn" data-app="comitato"><span class="phone-app-icon">🏛️</span><span class="phone-app-label">Comitato</span></button>
+                        <button class="phone-app-btn" data-app="finanza"><span class="phone-app-icon">💰</span><span class="phone-app-label">Finanza</span></button>
+                        <button class="phone-app-btn" data-app="partner"><span class="phone-app-icon">💕</span><span class="phone-app-label">Vita</span></button>
+                        <button class="phone-app-btn" data-app="home"><span class="phone-app-icon">←</span><span class="phone-app-label">Indietro</span></button>
+                    </div>
                 </div>
                 <div class="phone-content" role="presentation">
                     <div class="phone-tab-content active" id="tab-friends" role="tabpanel" aria-labelledby="ptab-friends">
@@ -522,6 +539,9 @@
                         <div id="politica-content">
                             <!-- Rendered by Phone.renderPolitica() -->
                         </div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-comitato" role="tabpanel" aria-labelledby="ptab-comitato" aria-label="Comitato Centrale">
+                        <div id="comitato-content"></div>
                     </div>
                     <div class="phone-tab-content" id="tab-mondo" role="tabpanel" aria-labelledby="ptab-mondo">
                                             <!-- Patch: placeholder per tab-mondo richiesto dai test automatici -->
@@ -796,5 +816,6 @@
     <script src="js/tutorial.js?v=3"></script>
     <script src="js/workTasks.js"></script>
     <script src="js/main.js"></script>
+    <script src="scripts/auto-10-games.js"></script>
 </body>
 </html>

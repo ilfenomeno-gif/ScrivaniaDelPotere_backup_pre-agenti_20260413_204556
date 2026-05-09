@@ -4,6 +4,31 @@
 
 const Phone = {
     _initialized: false,
+    _activeApp: null,
+    _navTransitionTimer: null,
+
+    clearNavTransitionTimer() {
+        if (this._navTransitionTimer) {
+            clearTimeout(this._navTransitionTimer);
+            this._navTransitionTimer = null;
+        }
+    },
+
+    clearNavTransitionClasses() {
+        const home = document.getElementById('phone-home');
+        const content = document.querySelector('#panel-phone .phone-content');
+        [home, content].forEach((el) => {
+            if (!el || !el.classList) return;
+            el.classList.remove('phone-slide-out-left', 'phone-slide-out-right', 'phone-slide-in-left', 'phone-slide-in-right');
+        });
+    },
+
+    replayHomeAnimation() {
+        const home = document.getElementById('phone-home');
+        if (!home) return;
+        home.classList.remove('entering');
+        requestAnimationFrame(() => home.classList.add('entering'));
+    },
 
     init() {
         if (this._initialized) return;
@@ -11,33 +36,13 @@ const Phone = {
 
         document.querySelectorAll('.phone-tab').forEach(tab => {
             if (!tab) return;
-            tab.addEventListener('click', () => {
-                this.closeContactsOverlay && this.closeContactsOverlay();
-                document.querySelectorAll('.phone-tab').forEach(t => {
-                    if (t && t.classList) {
-                        t.classList.remove('active');
-                        t.setAttribute('aria-selected', 'false');
-                    }
-                });
-                document.querySelectorAll('.phone-tab-content').forEach(c => c && c.classList && c.classList.remove('active'));
-                if (tab && tab.classList) {
-                    tab.classList.add('active');
-                    tab.setAttribute('aria-selected', 'true');
-                }
-                const content = document.getElementById(`tab-${tab.dataset.tab}`);
-                if (content && content.classList) content.classList.add('active');
-                if (tab.dataset.tab === 'mondo' && this.initTerritorioSubTabs) this.initTerritorioSubTabs();
-                if (tab.dataset.tab === 'attivita' && this.initWorkSubTabs) this.initWorkSubTabs();
-                if (tab.dataset.tab === 'profilo' && typeof Stats !== 'undefined') Stats.renderPhoneProfile();
-                if (tab.dataset.tab === 'politica') this.renderPolitica();
-                if (tab.dataset.tab === 'favori') {
-                    this.renderFavori && this.renderFavori();
-                    if (window.SR) SR.announce('Tab Favori attivata. Elenco favori e crediti disponibile.', 'polite');
-                } else if (window.SR) {
-                    SR.announce(`Tab attiva: ${tab.textContent.trim()}`, 'polite');
-                }
-            });
+            tab.addEventListener('click', () => this.openApp(tab.dataset.tab));
         });
+
+        this.initAppLauncher();
+
+        const appBack = document.getElementById('phone-app-back');
+        if (appBack) appBack.addEventListener('click', () => this.goPhoneHome());
 
         const contactsHamburger = document.getElementById('contacts-hamburger');
         if (contactsHamburger) {
@@ -55,6 +60,10 @@ const Phone = {
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                if (this._activeApp) {
+                    this.goPhoneHome();
+                    return;
+                }
                 const overlay = document.getElementById('contacts-overlay-panel');
                 if (overlay && !overlay.classList.contains('hidden')) {
                     this.closeContactsOverlay();
@@ -67,6 +76,7 @@ const Phone = {
                 // Opening the phone acknowledges and clears visual push notifications.
                 document.querySelectorAll('.phone-push-notif').forEach(n => n.remove());
                 this.refresh();
+                this.goPhoneHome();
             }
         });
         Game.on('stat-change', () => this.updateRelationBar());
@@ -101,10 +111,150 @@ const Phone = {
         this.renderUrgenti();
         this.renderArchivio();
         this.renderPhoneTerritory();
+        if (typeof Factions !== 'undefined' && Factions.renderPhoneCommittee) Factions.renderPhoneCommittee();
         this.updateBadge();
         this.updatePhoneAPDots();
         Desk.renderCorkBoard();
         if (activeTab && typeof activeTab.scrollTop === 'number') requestAnimationFrame(() => { activeTab.scrollTop = scrollPos; });
+    },
+
+    initAppLauncher() {
+        document.querySelectorAll('.phone-app-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const app = btn.dataset.app;
+                if (app === 'more') {
+                    const main = document.getElementById('phone-app-grid-main');
+                    const more = document.getElementById('phone-app-grid-more');
+                    if (main) main.classList.add('hidden');
+                    if (more) more.classList.remove('hidden');
+                    this.replayHomeAnimation();
+                    return;
+                }
+                if (app === 'home') {
+                    this.goPhoneHome();
+                    return;
+                }
+                this.openApp(app);
+            });
+        });
+    },
+
+    _activateTab(tabId) {
+        this.closeContactsOverlay && this.closeContactsOverlay();
+        document.querySelectorAll('.phone-tab').forEach(t => {
+            if (t && t.classList) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            }
+        });
+        document.querySelectorAll('.phone-tab-content').forEach(c => c && c.classList && c.classList.remove('active'));
+        const tabBtn = document.querySelector(`.phone-tab[data-tab="${tabId}"]`);
+        if (tabBtn && tabBtn.classList) {
+            tabBtn.classList.add('active');
+            tabBtn.setAttribute('aria-selected', 'true');
+        }
+        const content = document.getElementById(`tab-${tabId}`);
+        if (content && content.classList) content.classList.add('active');
+
+        if (tabId === 'mondo' && this.initTerritorioSubTabs) this.initTerritorioSubTabs();
+        if (tabId === 'attivita' && this.initWorkSubTabs) this.initWorkSubTabs();
+        if (tabId === 'profilo' && typeof Stats !== 'undefined') Stats.renderPhoneProfile();
+        if (tabId === 'politica') this.renderPolitica();
+        if (tabId === 'comitato' && typeof Factions !== 'undefined' && Factions.renderPhoneCommittee) Factions.renderPhoneCommittee();
+        if (tabId === 'favori') {
+            this.renderFavori && this.renderFavori();
+            if (window.SR) SR.announce('Tab Favori attivata. Elenco favori e crediti disponibile.', 'polite');
+        } else if (window.SR && tabBtn) {
+            SR.announce(`Tab attiva: ${tabBtn.textContent.trim()}`, 'polite');
+        }
+    },
+
+    openApp(tabId) {
+        const home = document.getElementById('phone-home');
+        const content = document.querySelector('#panel-phone .phone-content');
+        const appBack = document.getElementById('phone-app-back');
+        const title = document.querySelector('#panel-phone .phone-title');
+        const reduceMotion = document.documentElement.classList.contains('reduce-motion');
+
+        this.clearNavTransitionTimer();
+        this.clearNavTransitionClasses();
+
+        if (home) home.classList.remove('entering');
+        if (content) content.classList.remove('hidden');
+        if (appBack) appBack.classList.remove('hidden');
+        if (title) {
+            const labelMap = {
+                friends: 'Contatti',
+                social: 'Social',
+                attivita: 'Attivita',
+                mondo: 'Mondo',
+                politica: 'Politica',
+                comitato: 'Comitato',
+                finanza: 'Finanza',
+                partner: 'Vita',
+            };
+            title.textContent = labelMap[tabId] || 'SmartPolitica';
+        }
+        this._activeApp = tabId;
+        this._activateTab(tabId);
+
+        if (!home || !content || reduceMotion || home.classList.contains('hidden')) {
+            if (home) home.classList.add('hidden');
+            if (content) content.classList.remove('hidden');
+            return;
+        }
+
+        home.classList.add('phone-slide-out-left');
+        this._navTransitionTimer = setTimeout(() => {
+            home.classList.add('hidden');
+            home.classList.remove('phone-slide-out-left');
+            content.classList.remove('hidden');
+            content.classList.add('phone-slide-in-right');
+            this._navTransitionTimer = setTimeout(() => {
+                content.classList.remove('phone-slide-in-right');
+                this._navTransitionTimer = null;
+            }, 220);
+        }, 180);
+    },
+
+    goPhoneHome() {
+        const home = document.getElementById('phone-home');
+        const content = document.querySelector('#panel-phone .phone-content');
+        const appBack = document.getElementById('phone-app-back');
+        const title = document.querySelector('#panel-phone .phone-title');
+        const main = document.getElementById('phone-app-grid-main');
+        const more = document.getElementById('phone-app-grid-more');
+        const reduceMotion = document.documentElement.classList.contains('reduce-motion');
+
+        this.clearNavTransitionTimer();
+        this.clearNavTransitionClasses();
+
+        if (appBack) appBack.classList.add('hidden');
+        if (title) title.textContent = 'SmartPolitica';
+        if (main) main.classList.remove('hidden');
+        if (more) more.classList.add('hidden');
+
+        this._activeApp = null;
+
+        if (!home || !content || reduceMotion || content.classList.contains('hidden')) {
+            if (home) home.classList.remove('hidden');
+            if (content) content.classList.add('hidden');
+            this.replayHomeAnimation();
+            return;
+        }
+
+        content.classList.add('phone-slide-out-right');
+        this._navTransitionTimer = setTimeout(() => {
+            content.classList.add('hidden');
+            content.classList.remove('phone-slide-out-right');
+            home.classList.remove('hidden');
+            home.classList.add('phone-slide-in-left');
+            this.replayHomeAnimation();
+            this._navTransitionTimer = setTimeout(() => {
+                home.classList.remove('phone-slide-in-left');
+                this._navTransitionTimer = null;
+            }, 220);
+        }, 180);
     },
 
     normalizeContacts() {

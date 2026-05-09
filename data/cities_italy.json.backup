@@ -16,7 +16,7 @@
     },
     "rentMultiplier": 1.5,
     "salaryMultiplier": 1.4,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 1
   },
   "milano": {
@@ -37,7 +37,7 @@
     },
     "rentMultiplier": 1.6,
     "salaryMultiplier": 1.5,
-    "startingMoney": 400,
+    "startingMoney": 120,
     "tier": 1
   },
   "napoli": {
@@ -57,7 +57,7 @@
     },
     "rentMultiplier": 0.8,
     "salaryMultiplier": 0.85,
-    "startingMoney": 400,
+    "startingMoney": 80,
     "tier": 1
   },
   "torino": {
@@ -77,7 +77,7 @@
     },
     "rentMultiplier": 1,
     "salaryMultiplier": 1,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 2
   },
   "firenze": {
@@ -98,7 +98,7 @@
     },
     "rentMultiplier": 1.2,
     "salaryMultiplier": 1.15,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 2
   },
   "bologna": {
@@ -118,7 +118,7 @@
     },
     "rentMultiplier": 1.1,
     "salaryMultiplier": 1.05,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 2
   },
   "palermo": {
@@ -138,7 +138,7 @@
     },
     "rentMultiplier": 0.7,
     "salaryMultiplier": 0.75,
-    "startingMoney": 400,
+    "startingMoney": 70,
     "tier": 2
   },
   "genova": {
@@ -159,7 +159,7 @@
     },
     "rentMultiplier": 1,
     "salaryMultiplier": 1,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 2
   },
   "venezia": {
@@ -180,7 +180,7 @@
     },
     "rentMultiplier": 1.3,
     "salaryMultiplier": 1.2,
-    "startingMoney": 400,
+    "startingMoney": 90,
     "tier": 2
   },
   "bari": {
@@ -200,7 +200,7 @@
     },
     "rentMultiplier": 0.75,
     "salaryMultiplier": 0.8,
-    "startingMoney": 400,
+    "startingMoney": 80,
     "tier": 3
   },
   "catania": {
@@ -220,7 +220,7 @@
     },
     "rentMultiplier": 0.65,
     "salaryMultiplier": 0.7,
-    "startingMoney": 400,
+    "startingMoney": 70,
     "tier": 3
   },
   "cagliari": {
@@ -240,7 +240,7 @@
     },
     "rentMultiplier": 0.8,
     "salaryMultiplier": 0.85,
-    "startingMoney": 400,
+    "startingMoney": 85,
     "tier": 3
   },
   "trieste": {
@@ -261,7 +261,7 @@
     },
     "rentMultiplier": 0.9,
     "salaryMultiplier": 0.9,
-    "startingMoney": 400,
+    "startingMoney": 95,
     "tier": 3
   },
   "perugia": {
@@ -282,7 +282,7 @@
     },
     "rentMultiplier": 0.75,
     "salaryMultiplier": 0.8,
-    "startingMoney": 400,
+    "startingMoney": 90,
     "tier": 3
   },
   "ancona": {
@@ -302,7 +302,7 @@
     },
     "rentMultiplier": 0.8,
     "salaryMultiplier": 0.85,
-    "startingMoney": 400,
+    "startingMoney": 95,
     "tier": 3
   },
   "potenza": {
@@ -322,7 +322,7 @@
     },
     "rentMultiplier": 0.55,
     "salaryMultiplier": 0.6,
-    "startingMoney": 400,
+    "startingMoney": 75,
     "tier": 3
   },
   "campobasso": {
@@ -342,7 +342,7 @@
     },
     "rentMultiplier": 0.5,
     "salaryMultiplier": 0.55,
-    "startingMoney": 400,
+    "startingMoney": 70,
     "tier": 3
   },
   "aosta": {
@@ -362,7 +362,7 @@
     },
     "rentMultiplier": 0.9,
     "salaryMultiplier": 0.85,
-    "startingMoney": 400,
+    "startingMoney": 90,
     "tier": 3
   },
   "laquila": {
@@ -383,7 +383,7 @@
     },
     "rentMultiplier": 0.65,
     "salaryMultiplier": 0.7,
-    "startingMoney": 400,
+    "startingMoney": 80,
     "tier": 3
   },
   "trento": {
@@ -404,7 +404,7 @@
     },
     "rentMultiplier": 1.1,
     "salaryMultiplier": 1.05,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 3
   },
   "bergamo": {
@@ -426,7 +426,7 @@
     },
     "rentMultiplier": 0.9,
     "salaryMultiplier": 0.9,
-    "startingMoney": 400,
+    "startingMoney": 85,
     "tier": 3
   },
   "brescia": {
@@ -449,7 +449,7 @@
     },
     "rentMultiplier": 0.88,
     "salaryMultiplier": 0.92,
-    "startingMoney": 400,
+    "startingMoney": 88,
     "tier": 3
   },
   "monza": {
@@ -471,7 +471,7 @@
     },
     "rentMultiplier": 0.95,
     "salaryMultiplier": 0.94,
-    "startingMoney": 400,
+    "startingMoney": 90,
     "tier": 3
   },
   "prato": {
@@ -493,7 +493,7 @@
     },
     "rentMultiplier": 0.85,
     "salaryMultiplier": 0.86,
-    "startingMoney": 400,
+    "startingMoney": 84,
     "tier": 3
   },
   "modena": {
@@ -516,7 +516,7 @@
     },
     "rentMultiplier": 0.92,
     "salaryMultiplier": 0.92,
-    "startingMoney": 400,
+    "startingMoney": 90,
     "tier": 3
   },
   "parma": {
@@ -539,7 +539,7 @@
     },
     "rentMultiplier": 0.9,
     "salaryMultiplier": 0.9,
-    "startingMoney": 400,
+    "startingMoney": 88,
     "tier": 3
   },
   "salerno": {
@@ -561,7 +561,7 @@
     },
     "rentMultiplier": 0.78,
     "salaryMultiplier": 0.8,
-    "startingMoney": 400,
+    "startingMoney": 82,
     "tier": 3
   },
   "taranto": {
@@ -583,7 +583,7 @@
     },
     "rentMultiplier": 0.72,
     "salaryMultiplier": 0.76,
-    "startingMoney": 400,
+    "startingMoney": 80,
     "tier": 3
   },
   "giugliano": {
@@ -605,7 +605,7 @@
     },
     "rentMultiplier": 0.75,
     "salaryMultiplier": 0.78,
-    "startingMoney": 400,
+    "startingMoney": 78,
     "tier": 3
   },
   "pomezia": {
@@ -627,7 +627,7 @@
     },
     "rentMultiplier": 0.72,
     "salaryMultiplier": 0.75,
-    "startingMoney": 400,
+    "startingMoney": 80,
     "tier": 3
   },
   "guidonia": {
@@ -649,7 +649,7 @@
     },
     "rentMultiplier": 0.7,
     "salaryMultiplier": 0.74,
-    "startingMoney": 400,
+    "startingMoney": 78,
     "tier": 3
   },
   "cesena": {
@@ -672,7 +672,7 @@
     },
     "rentMultiplier": 0.76,
     "salaryMultiplier": 0.78,
-    "startingMoney": 400,
+    "startingMoney": 82,
     "tier": 3
   },
   "paris": {
@@ -694,7 +694,7 @@
     },
     "rentMultiplier": 1.7,
     "salaryMultiplier": 1.5,
-    "startingMoney": 400,
+    "startingMoney": 120,
     "tier": 1
   },
   "berlin": {
@@ -716,7 +716,7 @@
     },
     "rentMultiplier": 1.35,
     "salaryMultiplier": 1.55,
-    "startingMoney": 400,
+    "startingMoney": 140,
     "tier": 1
   },
   "london": {
@@ -738,7 +738,7 @@
     },
     "rentMultiplier": 1.8,
     "salaryMultiplier": 1.6,
-    "startingMoney": 400,
+    "startingMoney": 130,
     "tier": 1
   },
   "lyon": {
@@ -760,7 +760,7 @@
     },
     "rentMultiplier": 1.25,
     "salaryMultiplier": 1.22,
-    "startingMoney": 400,
+    "startingMoney": 110,
     "tier": 2
   },
   "marseille": {
@@ -781,7 +781,7 @@
     },
     "rentMultiplier": 1.12,
     "salaryMultiplier": 1.08,
-    "startingMoney": 400,
+    "startingMoney": 100,
     "tier": 2
   },
   "munich": {
@@ -803,7 +803,7 @@
     },
     "rentMultiplier": 1.45,
     "salaryMultiplier": 1.45,
-    "startingMoney": 400,
+    "startingMoney": 135,
     "tier": 2
   },
   "hamburg": {
@@ -825,7 +825,7 @@
     },
     "rentMultiplier": 1.28,
     "salaryMultiplier": 1.32,
-    "startingMoney": 400,
+    "startingMoney": 125,
     "tier": 2
   },
   "manchester": {
@@ -846,7 +846,7 @@
     },
     "rentMultiplier": 1.05,
     "salaryMultiplier": 1.12,
-    "startingMoney": 400,
+    "startingMoney": 110,
     "tier": 2
   },
   "birmingham": {
@@ -868,8 +868,7 @@
     },
     "rentMultiplier": 1,
     "salaryMultiplier": 1.08,
-    "startingMoney": 400,
+    "startingMoney": 108,
     "tier": 2
   }
 }
-
