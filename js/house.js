@@ -37,6 +37,8 @@ const House = {
         this.renderDebtSummary();
         this.renderUpgrades();
         this.renderImprovements();
+        this.renderRooms();
+        this.renderHomeStaff();
         if (typeof Bank !== 'undefined') Bank.renderBankPanel();
     },
 
@@ -688,5 +690,97 @@ const House = {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    },
+
+    // ====== STANZE DI CASA ======
+    renderRooms() {
+        const container = document.getElementById('home-rooms-container');
+        if (!container) return;
+        if (!Game.ROOM_CATALOG) { container.innerHTML = '<p>Catalogo stanze non disponibile.</p>'; return; }
+
+        const rooms = Game.state.homeRooms || {};
+        const money = Game.state.money;
+
+        let html = '<div class="improvements-grid">';
+        Object.entries(Game.ROOM_CATALOG).forEach(([id, cat]) => {
+            const level = rooms[id] || 1;
+            const isMax = level >= cat.maxLevel;
+            const upgradeCost = isMax ? 0 : cat.baseCost * level;
+            const canAfford = !isMax && money >= upgradeCost;
+            const pct = Math.round((level / cat.maxLevel) * 100);
+
+            html += `
+                <div class="improvement-card ${isMax ? 'improvement-owned' : ''}">
+                    <div class="improvement-header">
+                        <span class="improvement-icon">${cat.name.split(' ')[0]}</span>
+                        <span class="improvement-name">${cat.name.split(' ').slice(1).join(' ')}</span>
+                    </div>
+                    <div class="improvement-desc">${this.escapeHtml(cat.desc)}</div>
+                    <div class="hud-bar-track" style="margin:6px 0 4px;height:8px;">
+                        <div class="hud-bar-fill" style="width:${pct}%;background:var(--gold);"></div>
+                    </div>
+                    <div style="font-size:0.75em;color:#aaa;margin-bottom:6px;">Livello ${level}/${cat.maxLevel}</div>
+                    ${isMax
+                        ? '<span class="improvement-owned-label">🌟 Massimo</span>'
+                        : `<button class="improvement-buy-btn" data-room="${id}" ${canAfford ? '' : 'disabled'}>
+                                Migliora €${upgradeCost}
+                           </button>`
+                    }
+                </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+
+        container.querySelectorAll('.improvement-buy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (Game.upgradeRoom(btn.dataset.room)) this.renderRooms();
+            });
+        });
+    },
+
+    // ====== STAFF DOMESTICO ======
+    renderHomeStaff() {
+        const container = document.getElementById('home-staff-container');
+        if (!container) return;
+        if (!Game.DOMESTIC_STAFF_CATALOG) { container.innerHTML = '<p>Catalogo staff non disponibile.</p>'; return; }
+
+        const staff = Game.state.homeStaff || {};
+        const money = Game.state.money;
+
+        let html = '<div class="improvements-grid">';
+        Object.entries(Game.DOMESTIC_STAFF_CATALOG).forEach(([id, cat]) => {
+            const hired = !!staff[id];
+            const canAfford = !hired && money >= cat.hireCost;
+
+            html += `
+                <div class="improvement-card ${hired ? 'improvement-owned' : ''}">
+                    <div class="improvement-header">
+                        <span class="improvement-icon">${cat.name.split(' ')[0]}</span>
+                        <span class="improvement-name">${cat.name.split(' ').slice(1).join(' ')}</span>
+                    </div>
+                    <div class="improvement-desc">${this.escapeHtml(cat.desc)}</div>
+                    <div style="font-size:0.75em;color:#aaa;margin-bottom:6px;">Stipendio: €${cat.weeklySalary}/sett.</div>
+                    ${hired
+                        ? `<span class="improvement-owned-label">✅ Assunto</span>
+                           <button class="staff-fire-btn" data-staff="${id}" style="margin-top:4px;background:#6b1a1a;">🔴 Licenzia</button>`
+                        : `<button class="staff-hire-btn" data-staff="${id}" ${canAfford ? '' : 'disabled'}>
+                                Assumi €${cat.hireCost}
+                           </button>`
+                    }
+                </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+
+        container.querySelectorAll('.staff-hire-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (Game.hireHomeStaff(btn.dataset.staff)) this.renderHomeStaff();
+            });
+        });
+        container.querySelectorAll('.staff-fire-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (Game.fireHomeStaff(btn.dataset.staff)) this.renderHomeStaff();
+            });
+        });
     },
 };

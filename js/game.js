@@ -52,6 +52,7 @@ const Game = {
         reputazione: 39,          // alias per reputazioneLocale (retrocompatibilità)
         reputazioneLocale: 39,    // fama nella città attuale
         reputazioneNazionale: 5,  // fama nazionale (TV, articoli)
+        notorieta: 0,             // 0-100 fama pubblica (paparazzi, talk show)
         money: 150,
         coherence: 100,
 
@@ -93,6 +94,22 @@ const Game = {
 
         // 🏠 Home Improvements
         homeImprovements: [],   // e.g. ['scrivania', 'isolamento', ...]
+
+        // 🏠 Stanze di Casa (livello 1-5)
+        homeRooms: {
+            studio: 1,
+            camera: 1,
+            soggiorno: 1,
+            cucina: 1,
+            bagno: 1,
+        },
+
+        // 👔 Staff Domestico
+        homeStaff: {
+            segretario: false,
+            addetto_stampa: false,
+            governante: false,
+        },
 
         // 📓 Diario dei Ricordi
         diary: [],  // { id, title, icon, day, coherenceRecover }
@@ -373,6 +390,22 @@ const Game = {
         { id: 'casa-blindata', name: '🛡️ Casa Blindata', desc: 'Riduce il rischio indagini mafiose del 50% (metropoli)', cost: 900, effect: 'shieldMafia', allowedSettlement: ['metropolis'] },
         { id: 'sala-riunioni', name: '🗂️ Sala Riunioni', desc: '+15 relazione con un contatto influente al giorno (capitali regionali)', cost: 700, effect: 'bonusMeeting', allowedSettlement: ['capital'] },
     ],
+
+    // === ROOM CATALOG — upgradeable rooms (levels 1-5) ===
+    ROOM_CATALOG: {
+        studio: { name: '📚 Studio', maxLevel: 5, baseCost: 200, desc: '+Intelligenza a settimana (per livello)' },
+        camera: { name: '🛏️ Camera da Letto', maxLevel: 5, baseCost: 150, desc: '-Stress a settimana (per livello)' },
+        soggiorno: { name: '🛋️ Soggiorno', maxLevel: 5, baseCost: 180, desc: '+Morale a settimana (per livello)' },
+        cucina: { name: '🍳 Cucina', maxLevel: 5, baseCost: 120, desc: '+Salute a settimana (per livello)' },
+        bagno: { name: '🚿 Bagno', maxLevel: 5, baseCost: 100, desc: '-Stanchezza a settimana (per livello)' },
+    },
+
+    // === DOMESTIC STAFF CATALOG ===
+    DOMESTIC_STAFF_CATALOG: {
+        segretario: { name: '📋 Segretario', hireCost: 500, weeklySalary: 80, desc: '-5 Stanchezza ogni giorno' },
+        addetto_stampa: { name: '📸 Addetto Stampa', hireCost: 600, weeklySalary: 100, desc: '+2 Estetica ogni settimana' },
+        governante: { name: '🧹 Governante', hireCost: 400, weeklySalary: 60, desc: '+2 Salute ogni giorno' },
+    },
 
     getIdeologyClass() {
         return this.IDEOLOGY_CLASSES[this.state.character.ideology] || this.IDEOLOGY_CLASSES['centro'];
@@ -1237,6 +1270,48 @@ const Game = {
         return true;
     },
 
+    // === NOTORIETÀ ===
+    changeNotorieta(delta) {
+        const old = this.state.notorieta || 0;
+        this.state.notorieta = Math.max(0, Math.min(100, old + delta));
+        this.emit('notorieta-change', { old, value: this.state.notorieta, delta });
+    },
+
+    // === HOME ROOMS ===
+    upgradeRoom(roomId) {
+        if (!this.state.homeRooms) this.state.homeRooms = { studio: 1, camera: 1, soggiorno: 1, cucina: 1, bagno: 1 };
+        const catalog = this.ROOM_CATALOG[roomId];
+        if (!catalog) return false;
+        const currentLevel = this.state.homeRooms[roomId] || 1;
+        if (currentLevel >= catalog.maxLevel) return false;
+        const cost = catalog.baseCost * currentLevel;
+        if (this.state.money < cost) return false;
+        this.changeMoney(-cost);
+        this.state.homeRooms[roomId] = currentLevel + 1;
+        this.addWorkNotif(`🏠 ${catalog.name}`, `Migliorata al livello ${currentLevel + 1}. (-€${cost})`, `Giorno ${this.state.day}`);
+        this.emit('room-upgraded', { roomId, level: currentLevel + 1 });
+        return true;
+    },
+
+    // === DOMESTIC STAFF ===
+    hireHomeStaff(role) {
+        if (!this.state.homeStaff) this.state.homeStaff = { segretario: false, addetto_stampa: false, governante: false };
+        const catalog = this.DOMESTIC_STAFF_CATALOG[role];
+        if (!catalog || this.state.homeStaff[role] || this.state.money < catalog.hireCost) return false;
+        this.changeMoney(-catalog.hireCost);
+        this.state.homeStaff[role] = true;
+        this.addWorkNotif(`👔 ${catalog.name} Assunto`, `${catalog.desc} (-€${catalog.hireCost})`, `Giorno ${this.state.day}`);
+        this.emit('homestaff-hired', { role });
+        return true;
+    },
+
+    fireHomeStaff(role) {
+        if (!this.state.homeStaff || !this.state.homeStaff[role]) return false;
+        this.state.homeStaff[role] = false;
+        this.emit('homestaff-fired', { role });
+        return true;
+    },
+
     addDiaryEntry(title, icon) {
         const entry = {
             id: `diary_${this.state.day}_${Date.now()}`,
@@ -1367,12 +1442,16 @@ const Game = {
             const old = this.state.reputazioneNazionale;
             this.state.reputazioneNazionale = Math.max(0, Math.min(100, old + delta));
             this.emit('stat-change', { stat: 'reputazioneNazionale', old, value: this.state.reputazioneNazionale, delta });
+            // Gain notorietà from national exposure
+            if (delta > 0) this.changeNotorieta(Math.ceil(delta * 0.3));
         } else {
             // Default: locale (also updates reputazione alias)
             const old = this.state.reputazioneLocale;
             this.state.reputazioneLocale = Math.max(floor, Math.min(100, old + delta));
             this.state.reputazione = this.state.reputazioneLocale; // keep alias in sync
             this.emit('stat-change', { stat: 'reputazione', old, value: this.state.reputazioneLocale, delta });
+            // Gain small notorietà from local reputation gains
+            if (delta > 0) this.changeNotorieta(Math.ceil(delta * 0.1));
         }
     },
 
@@ -1830,6 +1909,43 @@ const Game = {
             ? this.state.contacts.reduce((s, c) => s + c.relation, 0) / this.state.contacts.length : 50;
         if (avgRel < 30) this.changeStat('morale', -3);
         if (this.state.attributes.muscoli < 20) this.changeStat('salute', -2);
+
+        // === 🏠 STANZE DI CASA — effetti passivi settimanali ===
+        if (this.state.homeRooms && this.state.day % 7 === 0) {
+            const rooms = this.state.homeRooms;
+            if ((rooms.studio || 1) > 1) this.changeAttribute('intelligenza', rooms.studio - 1);
+            if ((rooms.camera || 1) > 1) this.changeStat('stress', -((rooms.camera - 1) * 2));
+            if ((rooms.soggiorno || 1) > 1) this.changeStat('morale', (rooms.soggiorno - 1) * 2);
+            if ((rooms.cucina || 1) > 1) this.changeStat('salute', rooms.cucina - 1);
+            if ((rooms.bagno || 1) > 1) this.changeStat('stanchezza', -((rooms.bagno - 1)));
+        }
+
+        // === 👔 STAFF DOMESTICO — stipendi settimanali + effetti passivi ===
+        if (this.state.homeStaff) {
+            const staff = this.state.homeStaff;
+            // Salary deductions every 7 days
+            if (this.state.day % 7 === 0) {
+                if (staff.segretario) this.changeMoney(-Game.DOMESTIC_STAFF_CATALOG.segretario.weeklySalary);
+                if (staff.addetto_stampa) {
+                    this.changeMoney(-Game.DOMESTIC_STAFF_CATALOG.addetto_stampa.weeklySalary);
+                    this.changeAttribute('estetica', 2);
+                }
+                if (staff.governante) this.changeMoney(-Game.DOMESTIC_STAFF_CATALOG.governante.weeklySalary);
+            }
+            // Daily passive effects
+            if (staff.segretario) this.changeStat('stanchezza', -5);
+            if (staff.governante) this.changeStat('salute', 2);
+        }
+
+        // === ⭐ NOTORIETÀ — eventi casuali ===
+        const notorieta = this.state.notorieta || 0;
+        if (notorieta >= 80 && Math.random() < 0.08) {
+            this.addWorkNotif('📺 Talk Show', `Sei invitato in un programma televisivo! Reputazione nazionale +5.`, `Giorno ${this.state.day}`);
+            this.changeReputazione(5, 'nazionale');
+        } else if (notorieta >= 60 && Math.random() < 0.06) {
+            this.changeStat('stress', 8);
+            this.addUrgentMessage('Paparazzo', 'Un fotografo ti ha sorpreso in una situazione imbarazzante. Stress +8.', 'enemy');
+        }
 
         this.evolveContactsDaily();
 

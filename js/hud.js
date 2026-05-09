@@ -34,6 +34,7 @@ const HUD = {
         Game.on('stat-change', (data) => {
             if (data.stat === 'reputazioneNazionale') this.updateRepNazionale();
         });
+        Game.on('notorieta-change', () => this.updateNotorieta());
         Game.on('time-advance', (data) => this.showTurnSummary(data));
 
         // Day/night color cycle disabled
@@ -457,6 +458,17 @@ const HUD = {
         if (fill) fill.style.width = Game.state.reputazioneNazionale + '%';
     },
 
+    /** Update notorietà bar fill */
+    updateNotorieta() {
+        const fill = document.getElementById('hud-notorieta');
+        if (fill) {
+            const val = Game.state.notorieta || 0;
+            fill.style.width = val + '%';
+            const track = fill.closest('[role="progressbar"]');
+            if (track) track.setAttribute('aria-valuenow', val);
+        }
+    },
+
     refreshAll() {
         const s = Game.state.stats;
         this.updateStat({ stat: 'stanchezza', value: s.stanchezza });
@@ -474,6 +486,7 @@ const HUD = {
         this.updateAdvanceInfo();
         this.updateCityDisplay();
         this.updateRepNazionale();
+        this.updateNotorieta();
     },
 
     /** Coffee cup visually depletes as AP is consumed during the day */

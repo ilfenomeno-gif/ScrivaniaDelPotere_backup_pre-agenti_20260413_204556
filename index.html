@@ -249,6 +249,12 @@
                     <div class="hud-bar-fill rep-nazionale-fill" id="hud-rep-nazionale" style="width: 5%"></div>
                 </div>
             </div>
+            <div class="hud-bar hud-notorieta" title="Notorietà (fama pubblica)">
+                <span class="hud-icon">⭐</span>
+                <div class="hud-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Notorietà">
+                    <div class="hud-bar-fill notorieta-fill" id="hud-notorieta" style="width:0%"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Visual Effects Layer -->
@@ -568,6 +574,8 @@
                     <button class="house-tab active" data-tab="property">Proprietà</button>
                     <button class="house-tab" data-tab="migliorie">Migliorie</button>
                     <button class="house-tab" data-tab="economia">Economia</button>
+                    <button class="house-tab" data-tab="stanze">🏠 Stanze</button>
+                    <button class="house-tab" data-tab="staff">👔 Staff</button>
                 </div>
                 <div class="house-content">
                     <div class="house-tab-content active" id="tab-property">
@@ -582,6 +590,12 @@
                         <div id="mortgage-options"></div>
                         <div id="debt-summary"></div>
                         <div id="bank-panel"></div>
+                    </div>
+                    <div class="house-tab-content" id="tab-stanze">
+                        <div id="home-rooms-container"></div>
+                    </div>
+                    <div class="house-tab-content" id="tab-staff">
+                        <div id="home-staff-container"></div>
                     </div>
                 </div>
             </div>
