@@ -444,6 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof Tutorial !== 'undefined' && Tutorial.init) Tutorial.init();
     if (typeof Investments !== 'undefined') Investments.init();
     if (typeof DlcCore !== 'undefined' && DlcCore.init) DlcCore.init();
+    if (typeof ChainEvents !== 'undefined' && ChainEvents.init) ChainEvents.init();
     if (typeof DeepState !== 'undefined' && DeepState.init) DeepState.init();
     if (typeof SocialCrisis !== 'undefined' && SocialCrisis.init) SocialCrisis.init();
 

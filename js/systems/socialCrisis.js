@@ -108,6 +108,9 @@ const SocialCrisis = {
 
         if (s.insurgenceStep === 0) {
             s.insurgenceStep = 1;
+            if (typeof ChainEvents !== 'undefined' && ChainEvents.triggerMovementChain) {
+                ChainEvents.triggerMovementChain(movement.id);
+            }
             Game.addWorkNotif('Movimento insorgente', `Il gruppo ${movement.id} avvia mobilitazioni coordinate.`, `Giorno ${Game.state.day}`);
             return;
         }
