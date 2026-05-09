@@ -88,7 +88,11 @@ const Calendar = {
     },
 
     save() {
-        localStorage.setItem('scrivaniaDelPotere_calendar', JSON.stringify(this.appointments));
+        try {
+            localStorage.setItem('scrivaniaDelPotere_calendar', JSON.stringify(this.appointments));
+        } catch (e) {
+            console.warn('[Calendar] Impossibile salvare gli appuntamenti:', e);
+        }
     },
 
     render() {

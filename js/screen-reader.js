@@ -31,6 +31,49 @@ const SR = (() => {
     let _prevMoney = null, _prevAP = null;
     let _prevCity = null, _prevDay = null, _prevTimeOfDay = null;
 
+    /* ── Priority announcement queue ──────────────────────── */
+    const _queue = [];
+    let _queueTimer = null;
+    const SR_PRIORITY = { LOW: 0, NORMAL: 1, HIGH: 2, CRITICAL: 3 };
+
+    function _flushQueue() {
+        _queueTimer = null;
+        if (_queue.length === 0) return;
+        // Sort descending by priority; take highest
+        _queue.sort((a, b) => b.priority - a.priority);
+        const item = _queue.shift();
+        if (_silenced && item.urgency !== 'assertive') {
+            // Drop polite announcements while silenced but keep queue draining
+            if (_queue.length > 0) _queueTimer = setTimeout(_flushQueue, 600);
+            return;
+        }
+        _ensureLiveRegions();
+        const el = document.getElementById(item.urgency === 'assertive' ? 'sr-assertive' : 'sr-polite');
+        if (el) {
+            el.textContent = '';
+            requestAnimationFrame(() => requestAnimationFrame(() => { el.textContent = item.message; }));
+        }
+        if (_queue.length > 0) {
+            // Space out announcements: critical/high = 600ms, normal = 900ms, low = 1200ms
+            const delay = item.priority >= SR_PRIORITY.HIGH ? 600 : item.priority === SR_PRIORITY.NORMAL ? 900 : 1200;
+            _queueTimer = setTimeout(_flushQueue, delay);
+        }
+    }
+
+    function enqueue(message, urgency, priority) {
+        const p = priority !== undefined ? priority : (urgency === 'assertive' ? SR_PRIORITY.HIGH : SR_PRIORITY.NORMAL);
+        // Deduplicate: drop if identical message already queued at same or higher priority
+        if (_queue.some(q => q.message === message)) return;
+        // Cap queue size to prevent flooding
+        if (_queue.length >= 8) {
+            // Drop lowest priority item
+            _queue.sort((a, b) => a.priority - b.priority);
+            _queue.shift();
+        }
+        _queue.push({ message, urgency: urgency || 'polite', priority: p });
+        if (!_queueTimer) _queueTimer = setTimeout(_flushQueue, 50);
+    }
+
     /* ── Live regions ──────────────────────────────────────── */
     function _ensureLiveRegions() {
         [
@@ -52,13 +95,7 @@ const SR = (() => {
     /* ── Annuncio principale ───────────────────────────────── */
     function announce(message, urgency = 'polite') {
         if (_silenced && urgency !== 'assertive') return;
-        _ensureLiveRegions();
-        const el = document.getElementById(
-            urgency === 'assertive' ? 'sr-assertive' : 'sr-polite');
-        if (!el) return;
-        el.textContent = '';
-        requestAnimationFrame(() =>
-            requestAnimationFrame(() => { el.textContent = message; }));
+        enqueue(message, urgency);
     }
 
     function log(message) {
@@ -566,13 +603,49 @@ const SR = (() => {
         }
 
         console.info('[SR] ✅ Screen Reader module inizializzato (WCAG 2.1 AA)');
+
+        // === Hook into UiEvents (new decoupled layer) ===
+        if (typeof UiEvents !== 'undefined') {
+            UiEvents.on('VIEW_CHANGED', ({ viewId, previousView }) => {
+                const labels = {
+                    DESK: 'Scrivania', MAP: 'Mappa', PHONE: 'Telefono',
+                    STATS: 'Statistiche', TASKS: 'Compiti', HOUSE: 'Casa',
+                    BUDGET: 'Budget', CHARACTER: 'Creazione Personaggio',
+                };
+                const label = labels[viewId] || viewId;
+                announce(`Vista cambiata: ${label}.`, 'polite');
+            });
+
+            UiEvents.on('MODAL_OPENED', ({ modalId }) => {
+                announce(`Finestra aperta: ${modalId || 'dialogo'}.`, 'assertive');
+            });
+
+            UiEvents.on('MODAL_CLOSED', ({ modalId }) => {
+                announce(`Finestra chiusa.`, 'polite');
+            });
+
+            UiEvents.on('PHONE_TAB_CHANGED', ({ tabId }) => {
+                const tabLabels = {
+                    POLITICA: 'Politica', LAVORO: 'Lavoro',
+                    RELAZIONI: 'Relazioni', MESSAGGI: 'Messaggi',
+                    SOCIAL: 'Social', NOTIFICHE: 'Notifiche',
+                };
+                announce(`Tab telefono: ${tabLabels[tabId] || tabId}.`, 'polite');
+            });
+
+            UiEvents.on('GAME_EVENT', ({ type }) => {
+                if (type === 'OUTCOME_APPLIED') {
+                    // Silent — individual stat changes already announced via Game events
+                }
+            });
+        }
     }
 
     // Auto-init
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else { const w = () => typeof Game !== 'undefined' ? init() : setTimeout(w, 400); w(); }
 
-    return { init, announce, log, silence, trapFocus, releaseFocus, updateHUD,
+    return { init, announce, enqueue, SR_PRIORITY, log, silence, trapFocus, releaseFocus, updateHUD,
              moveFocus, openModal, closeModal, openPanel, closePanel,
              sectionHeading, labelList };
 })();

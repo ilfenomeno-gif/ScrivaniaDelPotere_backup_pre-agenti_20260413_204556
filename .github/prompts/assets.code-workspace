@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": "../../assets"
+		},
+		{
+			"path": "../../data"
+		},
+		{
+			"path": "../../css"
+		},
+		{
+			"path": "../../js"
+		},
+		{
+			"path": "../../node_modules"
+		},
+		{
+			"path": "../../scripts"
+		},
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../.vscode"
+		}
+	]
+}

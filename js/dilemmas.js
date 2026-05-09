@@ -29,7 +29,7 @@ const Dilemmas = {
                 {
                     label: '📞 Chiami un vigile amico',
                     effects: { reputazione: 5 },
-                    delayed: { chance: 1.0, text: 'Il vigile ti chiede un favore: "Ricordati di me quando serve..."', stress: 8 },
+                    delayed: { chance: 0.6, text: 'Il vigile ti chiede un favore: "Ricordati di me quando serve..."', stress: 4 },
                     debtFlag: 'vigile_favor',
                     outcome: 'Arrivi in tempo, nessuna multa. Ma ora devi un favore.',
                 },
@@ -76,19 +76,19 @@ const Dilemmas = {
             choices: [
                 {
                     label: '💰 Tieni i soldi',
-                    effects: { money: 500, coherence: -10, stress: 5 },
-                    outcome: '+€500. -10 Coerenza. Stress +5 (paranoia).',
+                    effects: { money: 500, coherence: -10, stress: 3 },
+                    outcome: '+€500. -10 Coerenza. Stress +3 (paranoia).',
                 },
                 {
                     label: '🚔 Denunci alla polizia',
                     effects: { reputazione: 8 },
-                    delayed: { chance: 0.5, text: 'L\'imprenditore che ti ha mandato la busta ora ti ostacola.', reputazione: -3, stress: 5 },
+                    delayed: { chance: 0.5, text: 'L\'imprenditore che ti ha mandato la busta ora ti ostacola.', reputazione: -3, stress: 2 },
                     outcome: '+8 Reputazione (onestà). Ma il mittente si offenderà...',
                 },
                 {
                     label: '🎗️ Beneficenza pubblica',
                     effects: { reputazione: 12, coherence: 5 },
-                    delayed: { chance: 0.7, text: '"Quei soldi erano per un favore. Ora me lo devi." — l\'imprenditore si fa vivo.', stress: 15 },
+                    delayed: { chance: 0.7, text: '"Quei soldi erano per un favore. Ora me lo devi." — l\'imprenditore si fa vivo.', stress: 7 },
                     debtFlag: 'imprenditore_favor',
                     outcome: '+12 Reputazione, +5 Coerenza. Ma qualcuno si farà vivo...',
                 },
@@ -114,7 +114,7 @@ const Dilemmas = {
                     effects: {},
                     randomOutcome: [
                         { chance: 0.5, text: 'Il vicino abbassa la musica. Dormita tranquilla.', stanchezza: -5, morale: 5 },
-                        { chance: 0.5, text: 'Ti mandano a quel paese. Notte rovinata.', stress: 10, morale: -5 },
+                        { chance: 0.5, text: 'Ti mandano a quel paese. Notte rovinata.', stress: 5, morale: -5 },
                     ],
                     outcome: '50% funziona, 50% no.',
                 },

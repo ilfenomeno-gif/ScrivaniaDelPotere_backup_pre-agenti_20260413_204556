@@ -111,7 +111,14 @@ const Game = {
             governante: false,
         },
 
-        // 📓 Diario dei Ricordi
+        // � Investimenti
+        investments: [],     // { id, type, name, amount, purchaseDay, returnRate, riskLevel }
+
+        // 🎮 Modalità di gioco
+        gameMode: 'sandbox',         // 'sandbox' | 'campaign'
+        campaignObjective: null,     // { type, deadline, label, achieved }
+
+        // �📓 Diario dei Ricordi
         diary: [],  // { id, title, icon, day, coherenceRecover }
 
         // 📩 Urgent Messages
@@ -361,10 +368,10 @@ const Game = {
     },
 
     CAREER_LEVELS: [
-        { label: 'Impiegato', salary: 80, polTimeMalus: 0 },
-        { label: 'Capo Reparto', salary: 150, polTimeMalus: -1 },
-        { label: 'Dirigente', salary: 220, polTimeMalus: -2 },
-        { label: 'Direttore', salary: 340, polTimeMalus: -3 },
+        { label: 'Impiegato', salary: 200, polTimeMalus: 0 },  // Aumentato da 80 per evitare deficit economia
+        { label: 'Capo Reparto', salary: 280, polTimeMalus: -1 },
+        { label: 'Dirigente', salary: 360, polTimeMalus: -2 },
+        { label: 'Direttore', salary: 480, polTimeMalus: -3 },
     ],
 
     POLITICAL_LEVELS: [
@@ -405,6 +412,14 @@ const Game = {
         segretario: { name: '📋 Segretario', hireCost: 500, weeklySalary: 80, desc: '-5 Stanchezza ogni giorno' },
         addetto_stampa: { name: '📸 Addetto Stampa', hireCost: 600, weeklySalary: 100, desc: '+2 Estetica ogni settimana' },
         governante: { name: '🧹 Governante', hireCost: 400, weeklySalary: 60, desc: '+2 Salute ogni giorno' },
+    },
+
+    // === INVESTMENT CATALOG ===
+    INVESTMENT_CATALOG: {
+        azioni_tech:   { name: '📈 Azioni Tech',          returnRate: 0.15, riskLevel: 'high',   minAmount: 100, desc: '+15%/anno, alto rischio' },
+        fondi_stabili: { name: '📊 Fondi Stabili',         returnRate: 0.04, riskLevel: 'low',    minAmount: 50,  desc: '+4%/anno, basso rischio' },
+        immobiliare:   { name: '🏢 Immobiliare',           returnRate: 0.08, riskLevel: 'medium', minAmount: 500, desc: '+8%/anno, rischio medio' },
+        obbligazioni:  { name: '🏦 Obbligazioni Stato',    returnRate: 0.02, riskLevel: 'none',   minAmount: 50,  desc: '+2%/anno, nessun rischio' },
     },
 
     getIdeologyClass() {
@@ -1312,6 +1327,54 @@ const Game = {
         return true;
     },
 
+    // === INVESTIMENTI ===
+    investMoney(type, amount) {
+        const catalog = this.INVESTMENT_CATALOG[type];
+        if (!catalog || amount < catalog.minAmount || this.state.money < amount) return false;
+        this.changeMoney(-amount);
+        const id = 'inv_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        this.state.investments.push({
+            id, type, name: catalog.name, amount,
+            purchaseDay: this.state.day,
+            returnRate: catalog.returnRate,
+            riskLevel: catalog.riskLevel,
+        });
+        this.addWorkNotif('💰 Investimento', `€${amount} investiti in ${catalog.name}.`, `Giorno ${this.state.day}`);
+        this.emit('investment-change', {});
+        return true;
+    },
+
+    liquidateInvestment(id) {
+        const idx = this.state.investments.findIndex(i => i.id === id);
+        if (idx === -1) return false;
+        const inv = this.state.investments[idx];
+        const daysHeld = Math.max(1, this.state.day - inv.purchaseDay);
+        const returnFactor = 1 + (inv.returnRate * daysHeld / 365);
+        let rf = 1;
+        if (inv.riskLevel === 'high')   rf = 0.6 + Math.random() * 0.9;
+        else if (inv.riskLevel === 'medium') rf = 0.85 + Math.random() * 0.3;
+        else if (inv.riskLevel === 'low')    rf = 0.95 + Math.random() * 0.1;
+        const returnAmount = Math.max(0, Math.round(inv.amount * returnFactor * rf));
+        this.changeMoney(returnAmount);
+        this.state.investments.splice(idx, 1);
+        const gain = returnAmount - inv.amount;
+        this.addWorkNotif('💰 Liquidato', `${inv.name}: +€${returnAmount} (${gain >= 0 ? '+' : ''}${gain}€).`, `Giorno ${this.state.day}`);
+        this.emit('investment-change', {});
+        return { original: inv.amount, returned: returnAmount };
+    },
+
+    // === CAMPAGNA ===
+    checkCampaignObjective() {
+        const obj = this.state.campaignObjective;
+        if (!obj || obj.achieved) return false;
+        switch (obj.type) {
+            case 'sindaco': return (this.state.politicalCareer && this.state.politicalCareer.level >= 4);
+            case 'famoso':  return ((this.state.notorieta || 0) >= 90 && (this.state.reputazioneNazionale || 0) >= 80);
+            case 'ricco':   return (this.state.money || 0) >= 5000;
+            default: return false;
+        }
+    },
+
     addDiaryEntry(title, icon) {
         const entry = {
             id: `diary_${this.state.day}_${Date.now()}`,
@@ -1413,6 +1476,14 @@ const Game = {
         if (this.state.stats[stat] !== undefined) {
             const old = this.state.stats[stat];
             this.state.stats[stat] = Math.max(0, Math.min(100, old + delta));
+            
+            // Check for salute=0 game over
+            if (stat === 'salute' && this.state.stats[stat] <= 0) {
+                this.state.stats.salute = 0;
+                this.emit('gameover', { reason: 'La tua salute è crollata. Non ce la fai più.' });
+                return;
+            }
+            
             this.emit('stat-change', { stat, old, value: this.state.stats[stat], delta });
         } else if (stat === 'coherence') {
             const old = this.state.coherence;
@@ -1529,13 +1600,13 @@ const Game = {
     getActionPointCap() {
         const st = this.state.stats || {};
         const habitTraits = (this.state.lifestyle && this.state.lifestyle.habitTraits) || {};
-        let cap = 3;
+        let cap = 2;  // Base cap is 2 to match HUD display (/2)
         if (this.state.flags && this.state.flags.healthPenalty) cap -= 1;
         if ((st.stanchezza || 0) >= 78) cap -= 1;
         if ((st.stress || 0) >= 80) cap -= 1;
         if ((st.morale || 0) >= 78) cap += 1;
         if (habitTraits.disciplina && habitTraits.disciplina.active) cap += 1;
-        return Math.max(1, Math.min(4, cap));
+        return Math.max(1, Math.min(3, cap));  // Max cap is 3 (was 4)
     },
 
     getPhoneActionCap() {
@@ -1947,6 +2018,30 @@ const Game = {
             this.addUrgentMessage('Paparazzo', 'Un fotografo ti ha sorpreso in una situazione imbarazzante. Stress +8.', 'enemy');
         }
 
+        // === 💰 INVESTIMENTI — reddito passivo settimanale ===
+        if (this.state.day % 7 === 0 && this.state.investments && this.state.investments.length > 0) {
+            let weeklyIncome = 0;
+            this.state.investments.forEach(inv => {
+                const weeklyRate = inv.returnRate / 52;
+                const fluctuation = inv.riskLevel === 'high' ? (0.8 + Math.random() * 0.4) : 1;
+                weeklyIncome += Math.round(inv.amount * weeklyRate * fluctuation);
+            });
+            if (weeklyIncome > 0) {
+                this.changeMoney(weeklyIncome);
+                this.addWorkNotif('📈 Reddito Passivo', `Investimenti: +€${weeklyIncome} questa settimana.`, `Giorno ${this.state.day}`);
+            }
+        }
+
+        // === 🎮 CAMPAGNA — verifica obiettivo ===
+        if (this.state.gameMode === 'campaign' && this.state.campaignObjective && !this.state.campaignObjective.achieved) {
+            if (this.checkCampaignObjective()) {
+                this.state.campaignObjective.achieved = true;
+                this.emit('campaign-won', { objective: this.state.campaignObjective });
+            } else if (this.state.day >= this.state.campaignObjective.deadline) {
+                this.emit('campaign-lost', { objective: this.state.campaignObjective });
+            }
+        }
+
         this.evolveContactsDaily();
 
         // Emit new-day for daily summary
@@ -2253,7 +2348,7 @@ const Game = {
 
     async loadMentorsForNation() {
         try {
-            const resp = await fetch('data/mentors.json');
+            const resp = await fetch('data/mentors.json?v=' + Date.now());
             const allMentors = await resp.json();
             const nationId = (this.state.nation && this.state.nation.id) || 'italy';
             this.state.mentorsDB = allMentors[nationId] || allMentors.italy || null;

@@ -443,12 +443,39 @@ const Character = {
     },
 
     init() {
+        // Tab navigation logic
+        const tabButtons = document.querySelectorAll('.char-tab');
+        const tabContents = document.querySelectorAll('.character-tab-content');
+        const nextBtns = document.querySelectorAll('.tab-next');
+        const prevBtns = document.querySelectorAll('.tab-prev');
+
+        function showTab(step) {
+            tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.step == step));
+            tabContents.forEach(tab => tab.classList.toggle('hidden', tab.id !== `character-step-${step}`));
+        }
+
+        nextBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const next = btn.dataset.next;
+                showTab(next);
+            });
+        });
+        prevBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const prev = btn.dataset.prev;
+                showTab(prev);
+            });
+        });
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                showTab(btn.dataset.step);
+            });
+        });
+        showTab(1);
+
+        // Step 1: Anagrafica
         const nameInput = document.getElementById('char-name');
         const genderBtns = document.querySelectorAll('.stamp-btn[data-group="gender"]');
-        const ideologyCards = document.querySelectorAll('.ideology-card');
-        const nationBtns = document.querySelectorAll('.stamp-btn[data-group="nation"]');
-        const approveBtn = document.getElementById('btn-approve');
-
         nameInput.addEventListener('input', () => {
             const clean = this.sanitizeName(nameInput.value);
             if (clean !== nameInput.value) nameInput.value = clean;
@@ -456,7 +483,6 @@ const Character = {
             this.updatePreview();
             this.resetIdleTimer();
         });
-
         genderBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 genderBtns.forEach(b => b.classList.remove('selected'));
@@ -470,6 +496,8 @@ const Character = {
             });
         });
 
+        // Step 2: Ideologia
+        const ideologyCards = document.querySelectorAll('.ideology-card');
         ideologyCards.forEach(card => {
             card.addEventListener('click', () => {
                 ideologyCards.forEach(c => c.classList.remove('selected'));
@@ -482,6 +510,8 @@ const Character = {
             });
         });
 
+        // Step 3: Nazione
+        const nationBtns = document.querySelectorAll('.stamp-btn[data-group="nation"]');
         nationBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 nationBtns.forEach(b => b.classList.remove('selected'));
@@ -494,11 +524,24 @@ const Character = {
             });
         });
 
+        // Step 4: Avatar (logic unchanged, handled by showAvatarSelection)
+
+        // Step 5: Modalità di gioco
+        const gamemodeBtns = document.querySelectorAll('.stamp-btn[data-group="gamemode"]');
+        gamemodeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                gamemodeBtns.forEach(b => { b.classList.remove('selected', 'active'); b.setAttribute('aria-pressed', 'false'); });
+                btn.classList.add('selected', 'active');
+                btn.setAttribute('aria-pressed', 'true');
+            });
+        });
+
+        // Approve button (final step)
+        const approveBtn = document.getElementById('btn-approve');
         approveBtn.addEventListener('click', () => this.approve());
 
         // I. Start idle timer for "burocrate impaziente"
         this.startIdleTimer();
-
         // B. Coffee stain after 45 seconds of inactivity
         this._coffeeTimer = Scheduler.timeout(() => this.showCoffeeStain(), 45000, { group: 'character', label: 'coffee' });
 
@@ -508,9 +551,7 @@ const Character = {
             const defaultNationBtn = document.querySelector('.stamp-btn[data-group="nation"][data-value="italy"]');
             if (defaultNationBtn) defaultNationBtn.classList.add('selected');
         }
-
         this.updateIdeologyDisplay(Game.state.nation.id);
-
         Game.on('new-day', ({ day }) => this.handleMentorProgression(day));
     },
 
@@ -703,12 +744,54 @@ const Character = {
         if (typeof Audio !== 'undefined' && Audio.playStamp) Audio.playStamp();
 
         Game.state.character.name = name;
-        
+
+        // --- HARD RESET: valori base deterministici ---
+        Game.state.attributes = {
+            intelligenza: 10,
+            estetica: 50,
+            autenticita: 50,
+            muscoli: 50,
+            carisma: 10,
+        };
+        Game.state.stats = {
+            stanchezza: 0,
+            stress: 10,
+            morale: 60,
+            salute: 100,
+        };
+        Game.state.reputazione = 39;
+        Game.state.reputazioneLocale = 39;
+        Game.state.reputazioneNazionale = 5;
+        Game.state.notorieta = 0;
+        Game.state.money = 250;  // Increased from 150 to provide early-game economic buffer
+        Game.state.coherence = 100;
+        Game.state.city = null;
+        Game.state.visitedCities = [];
+        Game.state.housing = { rent: 200, bonuses: [], maluses: [] };  // Set rent to 200 (balanced)
+        Game.state.contacts = [];
+        Game.state.flags = {};
+
+        // 🎮 Read selected game mode
+        const selectedMode = document.querySelector('.stamp-btn[data-group="gamemode"].selected');
+        const modeValue = (selectedMode && selectedMode.dataset.value) || 'sandbox';
+        if (modeValue === 'sandbox') {
+            Game.state.gameMode = 'sandbox';
+            Game.state.campaignObjective = null;
+        } else {
+            const campaignMap = {
+                campaign_sindaco: { type: 'sindaco', deadline: 365, label: 'Diventa Sindaco entro 365 giorni' },
+                campaign_famoso:  { type: 'famoso',  deadline: 300, label: 'Raggiungi Notorietà 90+ entro 300 giorni' },
+                campaign_ricco:   { type: 'ricco',   deadline: 365, label: 'Accumula €5000 entro 365 giorni' },
+            };
+            Game.state.gameMode = 'campaign';
+            Game.state.campaignObjective = Object.assign({ achieved: false }, campaignMap[modeValue] || campaignMap.campaign_sindaco);
+        }
+
         // 🌍 Load nation and apply its modifiers
         if (typeof Game.loadNation === 'function') {
             Game.loadNation(Game.state.nation.id).catch(err => console.error('Failed to load nation:', err));
         }
-        
+
         // D. Silent tutorial — ideology adjusts starting stats
         this.applyIdeologyBonuses(Game.state.character.ideology);
         this.generateContacts();
@@ -767,13 +850,24 @@ const Character = {
         });
 
         const continueBtn = document.getElementById('letter-continue');
+        if (!continueBtn) {
+            // Fallback: if button doesn't exist, advance to mentor screen immediately
+            setTimeout(() => this.showMentorScreen(), 100);
+            return;
+        }
+        
+        // Add event listener BEFORE animation starts
+        continueBtn.addEventListener('click', () => this.showMentorScreen(), { once: true });
+        
+        // Ensure button is always clickable
+        continueBtn.style.pointerEvents = 'auto';
+        continueBtn.style.cursor = 'pointer';
         continueBtn.style.opacity = '0';
+        
         setTimeout(() => {
             continueBtn.style.transition = 'opacity 0.5s';
             continueBtn.style.opacity = '1';
         }, 300 + paragraphs.length * 500);
-
-        continueBtn.addEventListener('click', () => this.showMentorScreen(), { once: true });
     },
 
     // === J. SCELTA DEL MENTORE ===

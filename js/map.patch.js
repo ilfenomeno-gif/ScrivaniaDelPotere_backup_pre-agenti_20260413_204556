@@ -12,6 +12,7 @@
     }
 
     // ── BUG #1 + loading overlay ──────────────────────────────
+    if (typeof GameMap.executeTransfer !== 'function') return;
     const _origExecuteTransfer = GameMap.executeTransfer.bind(GameMap);
     GameMap.executeTransfer = async function(cityId) {
         this._showTransferLoading(true);

@@ -11,7 +11,7 @@
       "networking": 15
     },
     "malus": {
-      "stress": 2,
+      "stress": 0,
       "concorrenza": 0.85
     },
     "rentMultiplier": 1.5,
@@ -32,7 +32,7 @@
       "money": 15
     },
     "malus": {
-      "stress": 3,
+      "stress": 0,
       "concorrenza": 0.9
     },
     "rentMultiplier": 1.6,
@@ -52,7 +52,7 @@
       "networking": 20
     },
     "malus": {
-      "stress": 4,
+      "stress": 0,
       "concorrenza": 0.8
     },
     "rentMultiplier": 0.8,
@@ -72,7 +72,7 @@
       "networking": 8
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.9
     },
     "rentMultiplier": 1,
@@ -133,7 +133,7 @@
       "networking": 18
     },
     "malus": {
-      "stress": 2,
+      "stress": 0,
       "concorrenza": 0.75
     },
     "rentMultiplier": 0.7,
@@ -154,7 +154,7 @@
       "money": 5
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.92
     },
     "rentMultiplier": 1,
@@ -175,7 +175,7 @@
       "carisma": 1
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.95
     },
     "rentMultiplier": 1.3,
@@ -195,7 +195,7 @@
       "networking": 14
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.82
     },
     "rentMultiplier": 0.75,
@@ -215,7 +215,7 @@
       "networking": 16
     },
     "malus": {
-      "stress": 2,
+      "stress": 0,
       "concorrenza": 0.78
     },
     "rentMultiplier": 0.65,
@@ -399,7 +399,7 @@
       "intelligenza": 1
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.95
     },
     "rentMultiplier": 1.1,
@@ -466,7 +466,7 @@
       "networking": 7
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.93
     },
     "rentMultiplier": 0.95,
@@ -556,7 +556,7 @@
       "networking": 10
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.88
     },
     "rentMultiplier": 0.78,
@@ -578,7 +578,7 @@
       "networking": 9
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.87
     },
     "rentMultiplier": 0.72,
@@ -600,7 +600,7 @@
       "networking": 8
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.9
     },
     "rentMultiplier": 0.75,
@@ -689,7 +689,7 @@
       "intelligenza": 1
     },
     "malus": {
-      "stress": 3,
+      "stress": 0,
       "concorrenza": 0.88
     },
     "rentMultiplier": 1.7,
@@ -711,7 +711,7 @@
       "intelligenza": 2
     },
     "malus": {
-      "stress": 2,
+      "stress": 0,
       "concorrenza": 0.9
     },
     "rentMultiplier": 1.35,
@@ -733,7 +733,7 @@
       "money": 12
     },
     "malus": {
-      "stress": 3,
+      "stress": 0,
       "concorrenza": 0.89
     },
     "rentMultiplier": 1.8,
@@ -755,7 +755,7 @@
       "money": 6
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.91
     },
     "rentMultiplier": 1.25,
@@ -776,7 +776,7 @@
       "networking": 14
     },
     "malus": {
-      "stress": 2,
+      "stress": 0,
       "concorrenza": 0.87
     },
     "rentMultiplier": 1.12,
@@ -798,7 +798,7 @@
       "money": 10
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.92
     },
     "rentMultiplier": 1.45,
@@ -820,7 +820,7 @@
       "intelligenza": 1
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.9
     },
     "rentMultiplier": 1.28,
@@ -841,7 +841,7 @@
       "networking": 12
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.9
     },
     "rentMultiplier": 1.05,
@@ -863,7 +863,7 @@
       "money": 5
     },
     "malus": {
-      "stress": 1,
+      "stress": 0,
       "concorrenza": 0.91
     },
     "rentMultiplier": 1,

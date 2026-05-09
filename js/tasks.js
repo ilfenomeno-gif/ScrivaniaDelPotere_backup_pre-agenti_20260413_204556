@@ -335,6 +335,24 @@ const Tasks = {
             mentor.relationship = Math.max(0, (mentor.relationship || 65) - 5);
         }
 
+        // D.2 — Mentor stat reactions: carisma alto = più facile convincere; coerenza bassa = diffidenza
+        if (Game.state.flags && Game.state.flags.mentor) {
+            const mentor = Game.state.flags.mentor;
+            const carisma = (Game.state.attributes && Game.state.attributes.carisma) || 50;
+            const coherence = Game.state.coherence || 50;
+            // High charisma: slightly boost mentor relationship on every task
+            if (carisma >= 70 && typeof mentor.relationship === 'number') {
+                mentor.relationship = Math.min(100, mentor.relationship + 1);
+            }
+            // Low coherence: mentor grows suspicious (-2 per task if coherence < 30)
+            if (coherence < 30 && typeof mentor.relationship === 'number') {
+                mentor.relationship = Math.max(0, mentor.relationship - 2);
+                if (mentor.relationship < 20 && Math.random() < 0.15) {
+                    Game.addWorkNotif('😤 Mentore Diffidente', `${mentor.name || 'Il tuo mentore'} è sempre più freddo: la tua incoerenza lo preoccupa.`, `Giorno ${Game.state.day}`);
+                }
+            }
+        }
+
         // Political multipliers from factions/city competition
         if (category === 'political' && effective.reputazione) {
             // Political tasks were overperforming on raw reputation compared to work tasks.
@@ -604,8 +622,8 @@ const Tasks = {
         ];
 
         if (lowMoney) {
-            all.push({ title: 'Consulenza Lampo', desc: 'Supporto urgente a un ufficio esterno.', reward: { money: 70, stanchezza: 10, stress: 4 }, apCost: 1 });
-            all.push({ title: 'Turno Straordinario', desc: 'Copri il turno di un collega assente.', reward: { money: 62, stanchezza: 14, stress: 6 }, apCost: 1 });
+            all.push({ title: 'Consulenza Lampo', desc: 'Supporto urgente a un ufficio esterno.', reward: { money: 100, stanchezza: 10, stress: 4 }, apCost: 1 });
+            all.push({ title: 'Turno Straordinario', desc: 'Copri il turno di un collega assente.', reward: { money: 75, stanchezza: 14, stress: 6 }, apCost: 1 });
         }
 
         if (st.stanchezza > 70) {

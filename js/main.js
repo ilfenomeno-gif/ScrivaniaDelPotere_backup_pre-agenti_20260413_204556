@@ -238,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Budget.init();
     Agents.init();
     Factions.init();
+    if (typeof Politics !== 'undefined') Politics.init();
     if (typeof Parties !== 'undefined') Parties.init();
     Intel.init();
     Favors.init();
@@ -254,6 +255,27 @@ document.addEventListener('DOMContentLoaded', function () {
     Memento.init();
     if (typeof WorkTasks !== 'undefined') WorkTasks.init();
     if (typeof Tutorial !== 'undefined' && Tutorial.init) Tutorial.init();
+    if (typeof Investments !== 'undefined') Investments.init();
+
+    /* ----- Campaign Win/Loss ----- */
+    Game.on('campaign-won', (d) => {
+        if (typeof Scheduler !== 'undefined') Scheduler.clearAll();
+        document.getElementById('gameover-title').textContent = '🏆 OBIETTIVO RAGGIUNTO!';
+        document.getElementById('gameover-reason').textContent =
+            `Hai completato la campagna "${(d.objective && d.objective.label) || ''}" con successo!`;
+        const epitaphEl = document.getElementById('gameover-epitaph');
+        if (epitaphEl) epitaphEl.textContent = 'La storia ricorderà il tuo successo.';
+        showGameOver();
+    });
+    Game.on('campaign-lost', (d) => {
+        if (typeof Scheduler !== 'undefined') Scheduler.clearAll();
+        document.getElementById('gameover-title').textContent = '⏱ TEMPO SCADUTO';
+        document.getElementById('gameover-reason').textContent =
+            `Non hai completato l'obiettivo "${(d.objective && d.objective.label) || ''}" in tempo.`;
+        const epitaphEl = document.getElementById('gameover-epitaph');
+        if (epitaphEl) epitaphEl.textContent = 'La storia non dimentica i fallimenti.';
+        showGameOver();
+    });
 
     /* ----- Diary entries for achievements ----- */
     Game.on('career-promotion', (d) => {

@@ -56,26 +56,75 @@ const Options = {
             Game.state.options = {
                 advisorEnabled: true,
                 tickerEnabled: true,
+                colorblind: false,
+                reduceMotion: false,
+                fontScale: 'normal',
             };
         }
+        // Backfill missing keys for saved games
+        const opts = Game.state.options;
+        if (opts.colorblind === undefined) opts.colorblind = false;
+        if (opts.reduceMotion === undefined) opts.reduceMotion = false;
+        if (opts.fontScale === undefined) opts.fontScale = 'normal';
 
         const advisorToggle = document.getElementById('toggle-advisor');
         const tickerToggle = document.getElementById('toggle-ticker');
+        const colorblindToggle = document.getElementById('toggle-colorblind');
+        const reduceMotionToggle = document.getElementById('toggle-reduce-motion');
+        const fontSizeSelect = document.getElementById('select-font-size');
 
         if (advisorToggle) {
-            advisorToggle.checked = Game.state.options.advisorEnabled !== false;
+            advisorToggle.checked = opts.advisorEnabled !== false;
             advisorToggle.addEventListener('change', (e) => {
-                Game.state.options.advisorEnabled = e.target.checked;
+                opts.advisorEnabled = e.target.checked;
                 if (typeof Advisor !== 'undefined') Advisor.toggle(e.target.checked);
             });
         }
         if (tickerToggle) {
-            tickerToggle.checked = Game.state.options.tickerEnabled !== false;
+            tickerToggle.checked = opts.tickerEnabled !== false;
             tickerToggle.addEventListener('change', (e) => {
-                Game.state.options.tickerEnabled = e.target.checked;
+                opts.tickerEnabled = e.target.checked;
                 if (typeof Ticker !== 'undefined') Ticker.toggle(e.target.checked);
             });
         }
+        if (colorblindToggle) {
+            colorblindToggle.checked = !!opts.colorblind;
+            this._applyColorblind(opts.colorblind);
+            colorblindToggle.addEventListener('change', (e) => {
+                opts.colorblind = e.target.checked;
+                this._applyColorblind(e.target.checked);
+            });
+        }
+        if (reduceMotionToggle) {
+            reduceMotionToggle.checked = !!opts.reduceMotion;
+            this._applyReduceMotion(opts.reduceMotion);
+            reduceMotionToggle.addEventListener('change', (e) => {
+                opts.reduceMotion = e.target.checked;
+                this._applyReduceMotion(e.target.checked);
+            });
+        }
+        if (fontSizeSelect) {
+            fontSizeSelect.value = opts.fontScale || 'normal';
+            this._applyFontScale(opts.fontScale || 'normal');
+            fontSizeSelect.addEventListener('change', (e) => {
+                opts.fontScale = e.target.value;
+                this._applyFontScale(e.target.value);
+            });
+        }
+    },
+
+    _applyColorblind(enabled) {
+        document.documentElement.classList.toggle('colorblind-mode', !!enabled);
+    },
+
+    _applyReduceMotion(enabled) {
+        document.documentElement.classList.toggle('reduce-motion', !!enabled);
+    },
+
+    _applyFontScale(scale) {
+        document.documentElement.classList.remove('font-large', 'font-xlarge');
+        if (scale === 'large') document.documentElement.classList.add('font-large');
+        else if (scale === 'xlarge') document.documentElement.classList.add('font-xlarge');
     },
 
     show() {
@@ -83,10 +132,17 @@ const Options = {
         if (!overlay) return;
 
         // Sync toggles with current state
+        const opts = Game.state.options || {};
         const advisorToggle = document.getElementById('toggle-advisor');
         const tickerToggle = document.getElementById('toggle-ticker');
-        if (advisorToggle) advisorToggle.checked = Game.state.options.advisorEnabled !== false;
-        if (tickerToggle) tickerToggle.checked = Game.state.options.tickerEnabled !== false;
+        const colorblindToggle = document.getElementById('toggle-colorblind');
+        const reduceMotionToggle = document.getElementById('toggle-reduce-motion');
+        const fontSizeSelect = document.getElementById('select-font-size');
+        if (advisorToggle) advisorToggle.checked = opts.advisorEnabled !== false;
+        if (tickerToggle) tickerToggle.checked = opts.tickerEnabled !== false;
+        if (colorblindToggle) colorblindToggle.checked = !!opts.colorblind;
+        if (reduceMotionToggle) reduceMotionToggle.checked = !!opts.reduceMotion;
+        if (fontSizeSelect) fontSizeSelect.value = opts.fontScale || 'normal';
 
         overlay.classList.remove('hidden');
         this._visible = true;

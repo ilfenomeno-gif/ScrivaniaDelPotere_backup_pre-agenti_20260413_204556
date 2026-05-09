@@ -61,6 +61,8 @@ const WorkTasks = (() => {
             if (t.partyAffinities?.length && partyId && !t.partyAffinities.includes(partyId)) return false;
             // Non duplicare task già attivi
             if (state.active.some(a => a.templateId === t.id)) return false;
+            // Controllo requisiti politici (Politics.isJobAvailable)
+            if (typeof Politics !== 'undefined' && Politics.isJobAvailable && !Politics.isJobAvailable(t)) return false;
             return true;
         });
 

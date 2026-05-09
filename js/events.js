@@ -6,7 +6,17 @@ const Events = {
     init() {
         Game.on('random-event', () => this.triggerRandomEvent());
         document.getElementById('bn-dismiss').addEventListener('click', () => this.dismissNews());
+
+        // Global events — triggered every 20+ days with 6% chance
+        Game.on('new-day', () => {
+            const daysSinceLast = (Game.state.day || 0) - (this._lastGlobalEventDay || -30);
+            if (daysSinceLast >= 20 && Math.random() < 0.06) {
+                this.triggerGlobalEvent();
+            }
+        });
     },
+
+    _lastGlobalEventDay: -30,
 
     eventPool: [
         // Breaking News - negative
@@ -317,6 +327,88 @@ const Events = {
     getNationEvents() {
         const nationId = Game.state.nation?.id || 'italy';
         return this.NATION_EVENTS[nationId] || [];
+    },
+
+    // ========== EVENTI GLOBALI (K.3) ==========
+    GLOBAL_EVENTS: [
+        {
+            type: 'news',
+            title: '🦠 Pandemia Globale',
+            body: 'Un nuovo virus si diffonde rapidamente. I governi adottano misure straordinarie. Stress +20, Salute -15, Reputazione -8.',
+            effects: { stress: 20, salute: -15, reputazione: -8 },
+        },
+        {
+            type: 'news',
+            title: '🌊 Catastrofe Naturale Vicina',
+            body: 'Un grave disastro colpisce una regione confinante. L\'opinione pubblica guarda come reagisce la politica. Stanchezza +12, Morale -8.',
+            effects: { stanchezza: 12, morale: -8 },
+        },
+        {
+            type: 'news',
+            title: '📉 Recessione Globale',
+            body: 'I mercati internazionali crollano. Tagli al bilancio pubblico inevitabili. Money -150, Stress +15, Morale -10.',
+            effects: { money: -150, stress: 15, morale: -10 },
+        },
+        {
+            type: 'news',
+            title: '⚽ Grande Trionfo Sportivo Nazionale',
+            body: 'La nazionale vince! L\'euforia collettiva travolge tutto. Morale +20, Stress -10.',
+            effects: { morale: 20, stress: -10 },
+        },
+        {
+            type: 'news',
+            title: '🌐 Crisi Diplomatica Internazionale',
+            body: 'Tensioni internazionali creano instabilità politica interna. Stress +12, Reputazione Nazionale -8.',
+            effects: { stress: 12, reputazioneNazionale: -8 },
+        },
+        {
+            type: 'news',
+            title: '🏭 Grande Accordo Economico',
+            body: 'Un accordo commerciale porta fiducia e ottimismo nel paese. Money +100, Morale +8, Reputazione Nazionale +3.',
+            effects: { money: 100, morale: 8, reputazioneNazionale: 3 },
+        },
+        {
+            type: 'news',
+            title: '🔥 Crisi Energetica Europea',
+            body: 'I prezzi dell\'energia esplodono. I cittadini sono esasperati e cercano responsabili. Stress +18, Reputazione -10.',
+            effects: { stress: 18, reputazione: -10, money: -80 },
+        },
+        {
+            type: 'urgent',
+            title: '🆘 Emergenza Umanitaria',
+            body: 'Una crisi umanitaria vicino ai confini richiede una presa di posizione pubblica.',
+            from: 'ONG Internazionale',
+            urgentType: 'info',
+            effects: {},
+            choices: {
+                accept: { label: '🤝 Solidarietà pubblica', effects: { reputazione: 10, reputazioneNazionale: 8, stress: 8 } },
+                refuse: { label: '🚫 Nessun commento', effects: { reputazione: -5, coherence: -5 } },
+            },
+        },
+        {
+            type: 'urgent',
+            title: '📊 Sondaggio Nazionale Shock',
+            body: 'Un sondaggio rivela crollo di fiducia nelle istituzioni. Cavalchi l\'onda o difendi il sistema?',
+            from: 'Istituto Sondaggi',
+            urgentType: 'info',
+            effects: {},
+            choices: {
+                accept: { label: '🔥 Cavalca l\'onda populista', effects: { reputazione: 12, coherence: -8, notorieta: 10 } },
+                refuse: { label: '🏛️ Difendi le istituzioni', effects: { reputazioneNazionale: 8, coherence: 5, stress: 5 } },
+            },
+        },
+    ],
+
+    triggerGlobalEvent() {
+        if (!this.GLOBAL_EVENTS.length) return;
+        const event = this.GLOBAL_EVENTS[Math.floor(Math.random() * this.GLOBAL_EVENTS.length)];
+        this._lastGlobalEventDay = Game.state.day;
+        if (event.choices) {
+            this.showUrgentChoice(event);
+        } else {
+            this.applyGenericEffects(event.effects || {});
+            this.showBreakingNews(event.title, event.body);
+        }
     },
 
     // ========== EVENTI CITTADINI (specifici per citta/comune) ==========

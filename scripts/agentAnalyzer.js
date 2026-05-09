@@ -606,13 +606,13 @@ function buildPatchCandidates(regression) {
     const nationsPath = path.join(DATA_DIR, 'nations.json');
     const citiesItalyPath = path.join(DATA_DIR, 'cities_italy.json');
 
-    if (autoBalance || regression.metrics.avgStress > 65) {
+    if (regression.metrics.avgStress > 40) {
         patches.push(textPatch(
             'stress-fire-post',
             'Riduci stress da post incendiari',
-            phonePath,
-            'GameConstants.BALANCE.FIRE_POST_STRESS_MULTIPLIER\n                : 0.85;',
-            'GameConstants.BALANCE.FIRE_POST_STRESS_MULTIPLIER\n                : 0.75;',
+            path.join(JS_DIR, 'constants.js'),
+            'FIRE_POST_STRESS_MULTIPLIER: 0.45,',
+            'FIRE_POST_STRESS_MULTIPLIER: 0.35,',
             'Stress troppo alto nei run: abbasso moltiplicatore stress post fire.',
             'high'
         ));
@@ -635,14 +635,14 @@ function buildPatchCandidates(regression) {
         ));
     }
 
-    if (autoBalance || regression.metrics.avgMoneyDayN < 0) {
+    if (regression.metrics.avgMoneyDayN < 200) {
         patches.push(textPatch(
             'work-money-boost',
-            'Aumenta reward task lavoro',
+            'Aumenta reward turno straordinario',
             tasksPath,
-            "all.push({ title: 'Consulenza Lampo', desc: 'Supporto urgente a un ufficio esterno.', reward: { money: 55, stanchezza: 10, stress: 4 }, apCost: 1 });",
-            "all.push({ title: 'Consulenza Lampo', desc: 'Supporto urgente a un ufficio esterno.', reward: { money: 70, stanchezza: 10, stress: 4 }, apCost: 1 });",
-            'Se i soldi medi vanno sotto zero, aumento reward lavoro base.',
+            "all.push({ title: 'Turno Straordinario', desc: 'Copri il turno di un collega assente.', reward: { money: 62, stanchezza: 14, stress: 6 }, apCost: 1 });",
+            "all.push({ title: 'Turno Straordinario', desc: 'Copri il turno di un collega assente.', reward: { money: 75, stanchezza: 14, stress: 6 }, apCost: 1 });",
+            'Se i soldi medi vanno sotto zero, aumento reward turno straordinario.',
             'high'
         ));
 
@@ -664,12 +664,12 @@ function buildPatchCandidates(regression) {
     }
 
     patches.push(textPatch(
-        'stable-agent-bio',
-        'Rendi stabile la bio agenti',
+        'agent-relation-floor',
+        'Soglia minima relation agenti in sync',
         agentsPath,
-        '            bio: this.generateBio(a),',
-        '            bio: a.bio || this.generateBio(a),',
-        'Evita bio diverse ad ogni sync contatti.',
+        'relation: Math.max(0, Math.min(100, Math.round(a.relationship || 0))),',
+        'relation: Math.max(10, Math.min(100, Math.round(a.relationship || 0))),',
+        'Impedisce che la relation scenda sotto 10 al sync contatti: riduce churn agenti.',
         'medium'
     ));
 

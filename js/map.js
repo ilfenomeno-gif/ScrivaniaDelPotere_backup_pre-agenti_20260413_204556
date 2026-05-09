@@ -398,6 +398,16 @@ const GameMap = {
         return city && (city.country || city.nationId || 'italy');
     },
 
+    /** C.3 — politicalWeight = population * levelMultiplier (per city tier) */
+    _getCityPoliticalWeight(city) {
+        if (!city) return 0;
+        const pop = getCityInhabitants(city) || 50000;
+        const LEVEL_MULT = { 1: 3.0, 2: 1.8, 3: 1.0 };
+        const mult = LEVEL_MULT[city.tier] || 1.0;
+        const w = Math.round(pop * mult / 1000); // in thousands, readable
+        return w >= 1000 ? `${(w/1000).toFixed(1)}M` : `${w}k`;
+    },
+
     _filterCities(cities, onlyCapoluoghi, settlementFilter, nationId) {
         const filtered = {};
         Object.values(cities || {}).forEach(city => {
@@ -866,7 +876,7 @@ const GameMap = {
                 iconSize: [style.size + 4, style.size + 4],
                 iconAnchor: [style.size / 2 + 2, style.size / 2 + 2],
             });
-            const tooltipHtml = `<strong>${escapeHtml(city.name || 'Citta')}</strong><br>${escapeHtml(typeText)} - ${escapeHtml(rangeText)}`;
+            const tooltipHtml = `<strong>${escapeHtml(city.name || 'Citta')}</strong><br>${escapeHtml(typeText)} - ${escapeHtml(rangeText)}<br>⚖️ Peso pol.: ${this._getCityPoliticalWeight(city)}`;
             const marker = L.marker([city.lat, city.lng], { icon })
                 .bindTooltip(tooltipHtml, {
                     permanent: false,
@@ -1293,13 +1303,27 @@ const GameMap = {
 
         // Show info
         this._showCityInfo(realCity);
-        document.getElementById('csi-confirm').onclick = () => {
-            if (city._nation && city._nation !== (Game.state.nation && Game.state.nation.id)) {
-                Game.loadNation(city._nation).then(() => onSelect(realCity.id));
-            } else {
-                onSelect(realCity.id);
-            }
-        };
+        const confirmBtn = document.getElementById('csi-confirm');
+        // Città non selezionabili: es. Nîmes o altre con flag specifico
+        if (realCity.disabled || realCity.unavailable || realCity.blocked) {
+            confirmBtn.disabled = true;
+            confirmBtn.setAttribute('aria-disabled', 'true');
+            confirmBtn.textContent = 'Non disponibile';
+            confirmBtn.classList.add('disabled');
+            if (window.SR) SR.announce('Questa città non è selezionabile.', 'assertive');
+        } else {
+            confirmBtn.disabled = false;
+            confirmBtn.removeAttribute('aria-disabled');
+            confirmBtn.textContent = 'INIZIA QUI →';
+            confirmBtn.classList.remove('disabled');
+            confirmBtn.onclick = () => {
+                if (city._nation && city._nation !== (Game.state.nation && Game.state.nation.id)) {
+                    Game.loadNation(city._nation).then(() => onSelect(realCity.id));
+                } else {
+                    onSelect(realCity.id);
+                }
+            };
+        }
     },
 
     _showCityInfo(city) {
@@ -1940,6 +1964,37 @@ const GameMap = {
                 CitySearch.initZoomLevels();
             });
         }
+
+        // Navigazione mappa da tastiera (H — accessibilità)
+        this._initMapKeyboard();
+    },
+
+    _initMapKeyboard() {
+        const PAN_STEP = 80; // px
+        document.addEventListener('keydown', (e) => {
+            const map = this.mapInstance;
+            if (!map) return;
+            // Only active when no modal/overlay is open and phone is not focused
+            const activeEl = document.activeElement;
+            const tag = activeEl ? activeEl.tagName : '';
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+            // Check if map panel is visible
+            const mapContainer = document.getElementById('territory-map-container') || document.getElementById('map-container');
+            if (!mapContainer || mapContainer.offsetParent === null) return;
+
+            let handled = true;
+            switch (e.key) {
+                case 'ArrowLeft':  map.panBy([-PAN_STEP, 0]); break;
+                case 'ArrowRight': map.panBy([PAN_STEP,  0]); break;
+                case 'ArrowUp':    map.panBy([0, -PAN_STEP]); break;
+                case 'ArrowDown':  map.panBy([0,  PAN_STEP]); break;
+                case '+':
+                case '=':          map.zoomIn(); break;
+                case '-':          map.zoomOut(); break;
+                default:           handled = false;
+            }
+            if (handled) e.preventDefault();
+        });
     },
 };
 

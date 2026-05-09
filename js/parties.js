@@ -42,7 +42,7 @@ const Parties = (() => {
         });
 
         // Resetta partito e mentori quando il giocatore cambia nazione
-        function _onNationChange() {
+        async function _onNationChange() {
             Game.state.party = {
                 id: null, name: null, nationId: null, currentId: null,
                 joinedDay: 0,
@@ -53,6 +53,12 @@ const Parties = (() => {
                 _partyData: null,
             };
             Game.state.partyMentors = [];
+            // Carica partiti e mentori aggiornati per la nuova nazione
+            const nationId = Game.state.nation?.id || 'italy';
+            await loadPartiesForNation(nationId);
+            if (typeof Game.loadMentorsForNation === 'function') {
+                await Game.loadMentorsForNation();
+            }
             _injectPartyUI();
             Game.addWorkNotif('🏛️ Partito', 'Sei in un nuovo paese. Scegli un nuovo partito politico.', `Giorno ${Game.state.day}`);
             if (window.SR) SR.announce('Cambiato paese. Seleziona un nuovo partito politico nel pannello statistiche.', 'polite');
@@ -218,7 +224,7 @@ const Parties = (() => {
     /* ── Genera mentori per il partito scelto ── */
     async function _assignMentorsForParty(party, nationId) {
         try {
-            const res = await fetch('data/mentors.json');
+            const res = await fetch('data/mentors.json?v=' + Date.now());
             const allMentors = await res.json();
             const pool = allMentors[nationId] || {};
             // Cerca mentori allineati all'ideologia

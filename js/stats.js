@@ -25,6 +25,7 @@ const Stats = {
     _prevRepNaz: null,
     _prevCoherence: null,
     _prevMoney: null,
+    _prevNotorieta: null,
 
     init() {
         Game.on('panel-open', (data) => {
@@ -54,6 +55,7 @@ const Stats = {
         this._prevRepNaz = s.reputazioneNazionale;
         this._prevCoherence = s.coherence;
         this._prevMoney = s.money;
+        this._prevNotorieta = s.notorieta || 0;
     },
 
     renderFull() {
@@ -87,12 +89,23 @@ const Stats = {
             </div>`;
         }
 
-        // Career
+        // Career badge
         html += `<div class="stats-career-badge">
             <span>💼 ${career.label}</span>
             <span class="career-salary-badge">Stipendio: €${career.salary}</span>
             ${Game.state.career.corrupted ? '<span class="career-corrupt-badge">⚠️ Corrotto</span>' : ''}
         </div>`;
+
+        // Campaign mode badge
+        if (Game.state.gameMode === 'campaign' && Game.state.campaignObjective) {
+            const obj = Game.state.campaignObjective;
+            const daysLeft = Math.max(0, (obj.deadline || 365) - (Game.state.day || 0));
+            html += `<div class="stats-career-badge" style="background:rgba(60,20,80,0.6);border-color:#a855f7">
+                🎯 Campagna: ${this.esc(obj.label || obj.type)}
+                <span style="color:${daysLeft < 30 ? '#ff4444' : '#ffd700'};margin-left:8px">⏱ ${daysLeft} giorni</span>
+                ${obj.achieved ? '<span style="color:#00ff88;margin-left:8px">✅ OBIETTIVO RAGGIUNTO!</span>' : ''}
+            </div>`;
+        }
 
         // === Obiettivi di Progressione ===
         const workProgress = Math.max(0, Math.min(100, Math.round(Game.state.career.promotionProgress || 0)));
@@ -153,6 +166,9 @@ const Stats = {
         const cohDanger = coherence < 30;
         html += this.barRow('⭐', 'Reputazione Locale', rep, 100, 'Consenso nella tua città.', this.attrColor(rep), repDelta, repDanger, repDanger ? '🚫 Isolato dal partito' : '');
         html += this.barRow('🌐', 'Reputazione Nazionale', repNaz, 100, 'Fama politica a livello nazionale.', this.attrColor(repNaz), repNazDelta);
+        const notorieta = Game.state.notorieta || 0;
+        const notorietaDelta = notorieta - (this._prevNotorieta ?? notorieta);
+        html += this.barRow('⭐', 'Notorietà Pubblica', notorieta, 100, 'Fama mediatica — paparazzi e talk show si attivano a 60+.', '#d4af37', notorietaDelta);
         html += this.barRow('🧩', 'Coerenza', coherence, 100, 'Agisci in linea con la tua ideologia.', this.attrColor(coherence), cohDelta, cohDanger, cohDanger ? '🧩 Crisi d\'identità (+10 stress/giorno)' : '');
         html += `
             <div class="stats-row">
@@ -174,6 +190,47 @@ const Stats = {
             improvements.forEach(id => {
                 const item = Game.HOME_IMPROVEMENTS_CATALOG.find(i => i.id === id);
                 if (item) html += `<div class="stats-improvement">${item.name} — ${item.desc}</div>`;
+            });
+            html += `</div>`;
+        }
+
+        // === Statistiche Avanzate (Politics module) ===
+        if (typeof Politics !== 'undefined' && Politics.getAdvancedStats) {
+            html += this.buildAdvancedStatsHTML();
+        }
+
+        // === Fascicolo Casa (stanze + staff) ===
+        const homeRooms = Game.state.homeRooms;
+        const homeStaff = Game.state.homeStaff;
+        const hasUpgradedRooms = homeRooms && Object.values(homeRooms).some(v => v > 1);
+        const hasHiredStaff = homeStaff && Object.values(homeStaff).some(Boolean);
+        if (hasUpgradedRooms || hasHiredStaff) {
+            html += `<div class="stats-section"><div class="stats-section-title">🏠 Fascicolo Casa</div>`;
+            if (hasUpgradedRooms && Game.ROOM_CATALOG) {
+                Object.entries(homeRooms).forEach(([id, level]) => {
+                    const cat = Game.ROOM_CATALOG[id];
+                    if (cat && level > 1) {
+                        html += this.barRow(cat.name.split(' ')[0], cat.name.split(' ').slice(1).join(' '), level, cat.maxLevel, cat.desc, '#8b6914', 0);
+                    }
+                });
+            }
+            if (hasHiredStaff && Game.DOMESTIC_STAFF_CATALOG) {
+                Object.entries(homeStaff).filter(([, hired]) => hired).forEach(([id]) => {
+                    const cat = Game.DOMESTIC_STAFF_CATALOG[id];
+                    if (cat) html += `<div class="stats-improvement">${cat.name} — ${cat.desc}</div>`;
+                });
+            }
+            html += `</div>`;
+        }
+
+        // === Portafoglio Investimenti ===
+        const investments = Game.state.investments;
+        if (investments && investments.length > 0) {
+            html += `<div class="stats-section"><div class="stats-section-title">💰 Portafoglio Investimenti</div>`;
+            investments.forEach(inv => {
+                const daysHeld = Math.max(0, (Game.state.day || 0) - inv.purchaseDay);
+                const estReturn = Math.round(inv.amount * (1 + inv.returnRate * daysHeld / 365));
+                html += `<div class="stats-improvement">${inv.name} — €${inv.amount} investiti, valore stimato ~€${estReturn} (${daysHeld} giorni)</div>`;
             });
             html += `</div>`;
         }
@@ -288,4 +345,74 @@ const Stats = {
         d.textContent = str;
         return d.innerHTML;
     },
+
+    /** Qualitative label for 0-1 values */
+    _qualLabel(val) {
+        if (val >= 0.8) return { text: 'Dominante', cls: 'stat-qual-high' };
+        if (val >= 0.5) return { text: 'Alta', cls: 'stat-qual-mid-high' };
+        if (val >= 0.25) return { text: 'Media', cls: 'stat-qual-mid' };
+        if (val > 0) return { text: 'Bassa', cls: 'stat-qual-low' };
+        return { text: 'Nulla', cls: 'stat-qual-none' };
+    },
+
+    _qualRow(icon, label, val, desc) {
+        const q = this._qualLabel(val);
+        const pct = Math.round(val * 100);
+        return `
+            <div class="stats-row">
+                <span class="stats-row-icon">${icon}</span>
+                <div class="stats-row-info">
+                    <div class="stats-row-header">
+                        <span class="stats-row-label">${label}</span>
+                        <span class="stats-row-num ${q.cls}">${q.text}</span>
+                    </div>
+                    <div class="stats-bar-track">
+                        <div class="stats-bar-fill" style="width:${pct}%; background:${this.attrColor(pct)}"></div>
+                    </div>
+                    <div class="stats-row-desc">${desc}</div>
+                </div>
+            </div>
+        `;
+    },
+
+    buildAdvancedStatsHTML() {
+        const adv = Politics.getAdvancedStats();
+        let html = '';
+
+        // Political
+        html += `<div class="stats-section"><div class="stats-section-title">🏛️ Profilo Politico</div>`;
+        html += this._qualRow('🎯', 'Influenza nel Partito', adv.political.partyInfluence, 'Quanto conti nelle decisioni interne.');
+        html += this._qualRow('📊', 'Supporto Pubblico', adv.political.publicSupport, 'Consenso percepito tra i cittadini.');
+        html += this._qualRow('🌍', 'Reputazione Internazionale', adv.political.internationalReputation, 'Visibilità oltre confine.');
+        html += this._qualRow('📜', 'Abilità Legislativa', adv.political.legislativeSkill, 'Capacità di far passare leggi e proposte.');
+
+        // Conversion malus indicator
+        const trustPen = Politics.getCurrentTrustPenalty();
+        if (trustPen > 0) {
+            html += `<div class="stats-danger-item">🔄 Adattamento in corso: penalità fiducia -${Math.round(trustPen * 100)}%</div>`;
+        }
+        html += `</div>`;
+
+        // Social
+        html += `<div class="stats-section"><div class="stats-section-title">🤝 Rete Sociale</div>`;
+        html += this._qualRow('✨', 'Carisma Sociale', adv.social.charisma, 'Capacità di attirare persone e alleati.');
+        html += this._qualRow('🗣️', 'Negoziazione', adv.social.negotiation, 'Capacità di mediare e ottenere accordi.');
+        html += this._qualRow('🔗', 'Rete di Lealtà', adv.social.loyaltyNetwork, 'Solidità della tua cerchia di fiducia.');
+        html += `</div>`;
+
+        // Criminal (only if player has any criminal stat > 0)
+        const hasCriminal = adv.criminal.mafiaReputation > 0 ||
+            adv.criminal.policeSuspicion > 0 || adv.criminal.financialOpacity > 0;
+        if (hasCriminal) {
+            html += `<div class="stats-section"><div class="stats-section-title">🕵️ Zona Grigia</div>`;
+            html += this._qualRow('🔫', 'Reputazione Mafiosa', adv.criminal.mafiaReputation, 'Quanto sei conosciuto nel sottobosco.');
+            html += this._qualRow('🚔', 'Sospetto Polizia', adv.criminal.policeSuspicion, 'Quanto le forze dell\'ordine ti osservano.');
+            html += this._qualRow('💼', 'Opacità Finanziaria', adv.criminal.financialOpacity, 'Quanti dei tuoi soldi sono "sporchi".');
+            html += `</div>`;
+        }
+
+        return html;
+    },
+
+    // ...existing code...
 };

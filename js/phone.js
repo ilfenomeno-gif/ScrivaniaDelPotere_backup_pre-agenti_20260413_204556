@@ -28,6 +28,8 @@ const Phone = {
                 if (content && content.classList) content.classList.add('active');
                 if (tab.dataset.tab === 'mondo' && this.initTerritorioSubTabs) this.initTerritorioSubTabs();
                 if (tab.dataset.tab === 'attivita' && this.initWorkSubTabs) this.initWorkSubTabs();
+                if (tab.dataset.tab === 'profilo' && typeof Stats !== 'undefined') Stats.renderPhoneProfile();
+                if (tab.dataset.tab === 'politica') this.renderPolitica();
                 if (tab.dataset.tab === 'favori') {
                     this.renderFavori && this.renderFavori();
                     if (window.SR) SR.announce('Tab Favori attivata. Elenco favori e crediti disponibile.', 'polite');
@@ -2056,6 +2058,205 @@ const Phone = {
         }
         notif.addEventListener('click', () => notif.remove());
         Scheduler.timeout(() => { if (notif.parentNode) notif.remove(); }, 4000, { group: 'phone', label: 'notif-dismiss' });
+    },
+
+    // ====== TAB POLITICA — Centro Politico Avanzato ======
+    renderPolitica() {
+        const container = document.getElementById('politica-content');
+        if (!container) return;
+
+        const adv = (typeof Politics !== 'undefined' && Politics.getAdvancedStats)
+            ? Politics.getAdvancedStats()
+            : { political: {}, social: {}, criminal: {} };
+        const pol = adv.political || {};
+        const soc = adv.social || {};
+        const crim = adv.criminal || {};
+
+        const party = Game.state.party;
+        const partyName = party ? (party.name || party.id || '—') : '—';
+        const partyIcon = party ? (party.icon || '🏛️') : '🏛️';
+        const career = Game.state.politicalCareer || {};
+        const careerLevels = ['Militante', 'Capo Sezione', 'Consigliere', 'Assessore', 'Sindaco / Deputato'];
+        const careerLabel = careerLevels[career.level || 0] || 'Militante';
+        const progress = Math.round(career.progress || 0);
+
+        const trustPen = (typeof Politics !== 'undefined' && Politics.getCurrentTrustPenalty)
+            ? Math.round(Politics.getCurrentTrustPenalty() * 100) : 0;
+        const speedPen = (typeof Politics !== 'undefined' && Politics.getCurrentSpeedPenalty)
+            ? Math.round(Politics.getCurrentSpeedPenalty() * 100) : 0;
+
+        const noPA = !Game.hasPhoneActions(1);
+        const noAP = !Game.hasActionPoints(1);
+
+        const _pct = (v) => Math.round((v || 0) * 100);
+        const _bar = (icon, label, pct, color) => `
+            <div class="politica-stat-row">
+                <span class="politica-stat-icon">${icon}</span>
+                <div class="politica-stat-info">
+                    <div class="politica-stat-header">
+                        <span class="politica-stat-label">${label}</span>
+                        <span class="politica-stat-val">${pct}%</span>
+                    </div>
+                    <div class="stats-bar-track">
+                        <div class="stats-bar-fill" style="width:${pct}%;background:${color}"></div>
+                    </div>
+                </div>
+            </div>`;
+
+        let html = `
+        <div class="politica-section">
+            <div class="politica-section-title">🏛️ Carriera Politica</div>
+            <div class="politica-party-badge">
+                ${partyIcon} <strong>${this.esc(partyName)}</strong>
+                <span class="politica-career-level">${this.esc(careerLabel)}</span>
+            </div>
+            <div class="politica-progress-row">
+                <span>Avanzamento:</span>
+                <div class="stats-bar-track" style="flex:1;margin:0 8px">
+                    <div class="stats-bar-fill" style="width:${progress}%;background:#8b5cf6"></div>
+                </div>
+                <span>${progress}%</span>
+            </div>
+            ${trustPen > 0 ? `<div class="politica-malus-banner">🔄 Adattamento nazione: -${trustPen}% fiducia, -${speedPen}% velocità</div>` : ''}
+        </div>
+
+        <div class="politica-section">
+            <div class="politica-section-title">📊 Profilo Avanzato</div>
+            ${_bar('🎯', 'Influenza nel Partito', _pct(pol.partyInfluence), '#8b5cf6')}
+            ${_bar('📢', 'Supporto Pubblico', _pct(pol.publicSupport), '#3b82f6')}
+            ${_bar('🌍', 'Rep. Internazionale', _pct(pol.internationalReputation), '#06b6d4')}
+            ${_bar('📜', 'Abilità Legislativa', _pct(pol.legislativeSkill), '#10b981')}
+            ${_bar('✨', 'Carisma Sociale', _pct(soc.charisma), '#f59e0b')}
+            ${_bar('🗣️', 'Negoziazione', _pct(soc.negotiation), '#ef4444')}
+            ${_bar('🔗', 'Rete di Lealtà', _pct(soc.loyaltyNetwork), '#ec4899')}
+        </div>
+
+        <div class="politica-section">
+            <div class="politica-section-title">⚡ Azioni Politiche</div>
+            <div class="politica-actions-grid">
+                <button class="politica-action-btn" id="pol-act-meeting" ${noPA || noAP ? 'disabled' : ''}
+                    data-preview="1 📱 + 1 ⚡ | +4% Influenza | +2 Rep. locale">
+                    🤝 Riunione di Partito
+                    <span class="phone-cost-badge">1 📱</span><span class="task-ap-cost">1 ⚡</span>
+                </button>
+                <button class="politica-action-btn" id="pol-act-speech" ${noPA || noAP ? 'disabled' : ''}
+                    data-preview="1 📱 + 1 ⚡ | +6% Supporto Pubblico | ±Stress">
+                    🎤 Discorso Pubblico
+                    <span class="phone-cost-badge">1 📱</span><span class="task-ap-cost">1 ⚡</span>
+                </button>
+                <button class="politica-action-btn" id="pol-act-lobby" ${noPA ? 'disabled' : ''}
+                    data-preview="1 📱 | +3% Influenza | -€50">
+                    🏛️ Lobbying (€50)
+                    <span class="phone-cost-badge">1 📱</span>
+                </button>
+                <button class="politica-action-btn" id="pol-act-legislation" ${noPA || noAP || _pct(pol.partyInfluence) < 20 ? 'disabled' : ''}
+                    data-preview="Richiede ≥20% influenza | +5% Abilità Legis. | +3 Rep.">
+                    📜 Proponi Proposta
+                    <span class="phone-cost-badge">1 📱</span><span class="task-ap-cost">1 ⚡</span>
+                </button>
+                <button class="politica-action-btn" id="pol-act-intl" ${noPA || _pct(pol.internationalReputation) < 10 ? 'disabled' : ''}
+                    data-preview="Richiede ≥10% Rep. Intl | +4% Rep. Intl | +2 Rep. Naz.">
+                    🌍 Contatto Internazionale
+                    <span class="phone-cost-badge">1 📱</span>
+                </button>
+                <button class="politica-action-btn" id="pol-act-network" ${noPA ? 'disabled' : ''}
+                    data-preview="1 📱 | +4% Rete Lealtà | +5 Morale">
+                    🔗 Consolida Rete
+                    <span class="phone-cost-badge">1 📱</span>
+                </button>
+            </div>
+        </div>
+        ${crim.mafiaReputation > 0 || crim.policeSuspicion > 0 ? `
+        <div class="politica-section politica-section-criminal">
+            <div class="politica-section-title">🕵️ Zona Grigia</div>
+            ${_bar('🔫', 'Reputazione Mafiosa', _pct(crim.mafiaReputation), '#dc2626')}
+            ${_bar('🚔', 'Sospetto Polizia', _pct(crim.policeSuspicion), '#b45309')}
+            ${crim.financialOpacity > 0 ? _bar('💼', 'Opacità Finanziaria', _pct(crim.financialOpacity), '#7c3aed') : ''}
+        </div>` : ''}
+        `;
+
+        container.innerHTML = html;
+
+        // Wire action buttons
+        this._bindPoliticaActions();
+    },
+
+    _bindPoliticaActions() {
+        const _act = (id, cost, apCost, fn) => {
+            const btn = document.getElementById(id);
+            if (!btn || btn.disabled) return;
+            btn.addEventListener('click', () => {
+                if (apCost && !Game.hasActionPoints(apCost)) {
+                    if (window.SR) SR.announce('Azioni scrivania esaurite per questo turno.', 'assertive');
+                    return;
+                }
+                if (!Game.spendPhoneAction(cost)) {
+                    Game.emit('no-ap', { reason: 'Azioni telefono esaurite!' });
+                    return;
+                }
+                if (apCost) Game.spendActionPoints(apCost);
+                fn();
+                this.renderPolitica();
+            }, { once: true });
+        };
+
+        _act('pol-act-meeting', 1, 1, () => {
+            if (typeof Politics !== 'undefined') Politics.applyOutcome({ partyInfluence: 0.04, loyaltyNetwork: 0.02 });
+            Game.changeReputazione(2);
+            Game.changeStat('stress', 5);
+            Game.changeStat('stanchezza', 8);
+            Game.addWorkNotif('🤝 Riunione', 'Hai partecipato a una riunione di partito. +4% influenza.', `Giorno ${Game.state.day}`);
+            if (window.SR) SR.announce('Riunione di partito completata. Influenza aumentata.', 'polite');
+        });
+
+        _act('pol-act-speech', 1, 1, () => {
+            const success = Math.random() < 0.6 + (Game.state.attributes.carisma || 10) / 200;
+            if (typeof Politics !== 'undefined') Politics.applyOutcome({ publicSupport: success ? 0.06 : -0.02, charisma: 0.01 });
+            Game.changeStat('stress', success ? 5 : 10);
+            Game.changeStat('stanchezza', 12);
+            const msg = success ? 'Discorso ben accolto! +6% supporto pubblico.' : 'Il discorso non ha convinto. -2% supporto.';
+            Game.addWorkNotif('🎤 Discorso', msg, `Giorno ${Game.state.day}`);
+            if (window.SR) SR.announce(msg, 'polite');
+        });
+
+        _act('pol-act-lobby', 1, 0, () => {
+            if (Game.state.money < 50) {
+                Game.addWorkNotif('🏛️ Lobbying', 'Fondi insufficienti per fare lobbying (€50).', `Giorno ${Game.state.day}`);
+                if (window.SR) SR.announce('Fondi insufficienti per il lobbying.', 'assertive');
+                return;
+            }
+            Game.changeMoney(-50);
+            if (typeof Politics !== 'undefined') Politics.applyOutcome({ partyInfluence: 0.03, legislativeSkill: 0.02 });
+            Game.addWorkNotif('🏛️ Lobbying', 'Investimento in lobbying: +3% influenza. (-€50)', `Giorno ${Game.state.day}`);
+            if (window.SR) SR.announce('Lobbying effettuato. Influenza nel partito aumentata.', 'polite');
+        });
+
+        _act('pol-act-legislation', 1, 1, () => {
+            const skill = typeof Politics !== 'undefined' ? Politics.getStat('political', 'legislativeSkill') : 0;
+            const success = Math.random() < 0.4 + skill * 0.4;
+            if (typeof Politics !== 'undefined') Politics.applyOutcome({ legislativeSkill: 0.05, publicSupport: success ? 0.03 : -0.01 });
+            if (success) { Game.changeReputazione(3); Game.emit('stat-change', { stat: 'reputazioneNazionale', value: (Game.state.reputazioneNazionale || 0) + 2, old: Game.state.reputazioneNazionale }); Game.state.reputazioneNazionale = (Game.state.reputazioneNazionale || 0) + 2; }
+            const msg = success ? 'Proposta approvata! +3 Rep. +2 Rep. Naz.' : 'Proposta respinta. Buona esperienza però.';
+            Game.addWorkNotif('📜 Proposta', msg, `Giorno ${Game.state.day}`);
+            Game.changeStat('stress', 8);
+            Game.changeStat('stanchezza', 10);
+            if (window.SR) SR.announce(msg, 'polite');
+        });
+
+        _act('pol-act-intl', 1, 0, () => {
+            if (typeof Politics !== 'undefined') Politics.applyOutcome({ internationalReputation: 0.04 });
+            Game.state.reputazioneNazionale = Math.min(100, (Game.state.reputazioneNazionale || 0) + 2);
+            Game.emit('stat-change', { stat: 'reputazioneNazionale', value: Game.state.reputazioneNazionale, old: Game.state.reputazioneNazionale - 2 });
+            Game.addWorkNotif('🌍 Internazionale', 'Contatto stabilito. +4% Rep. Internazionale, +2 Rep. Naz.', `Giorno ${Game.state.day}`);
+            if (window.SR) SR.announce('Contatto internazionale stabilito.', 'polite');
+        });
+
+        _act('pol-act-network', 1, 0, () => {
+            if (typeof Politics !== 'undefined') Politics.applyOutcome({ loyaltyNetwork: 0.04 });
+            Game.changeStat('morale', 5);
+            Game.addWorkNotif('🔗 Rete', 'Rete di lealtà consolidata. +4% lealtà, +5 Morale.', `Giorno ${Game.state.day}`);
+            if (window.SR) SR.announce('Rete di lealtà consolidata.', 'polite');
+        });
     },
 
     esc(str) {

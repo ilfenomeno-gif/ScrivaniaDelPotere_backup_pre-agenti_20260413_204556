@@ -13,15 +13,18 @@
 </head>
 <body>
     <!-- ===== SCREEN: CHARACTER CREATION (L'Anagrafe — Colloquio con il Partito) ===== -->
+
     <div id="screen-character" class="screen active">
-        <!-- F. Background scrivania sfocata che "aspetta" -->
         <div class="anagrafe-desk-bg" id="anagrafe-desk-bg"></div>
-
         <div class="anagrafe-table">
-            <div class="document" id="document-main">
-                <!-- Timbro RISERVATO fisso -->
-                <div class="doc-riservato" id="doc-riservato">RISERVATO</div>
-
+            <div class="character-tabs" id="character-tabs">
+                <button class="char-tab active" data-step="1">1. Anagrafica</button>
+                <button class="char-tab" data-step="2">2. Ideologia</button>
+                <button class="char-tab" data-step="3">3. Nazione</button>
+                <button class="char-tab" data-step="4">4. Avatar</button>
+                <button class="char-tab" data-step="5">5. Modalità</button>
+            </div>
+            <div class="character-tab-content" id="character-step-1">
                 <div class="document-header">
                     <div class="doc-seal">★</div>
                     <h1>SCHEDA D'ISCRIZIONE</h1>
@@ -29,125 +32,147 @@
                     <p class="doc-protocol">Protocollo N° <span id="doc-protocol-num">PVQ-000000</span></p>
                     <div class="doc-line"></div>
                 </div>
-
-                <div class="document-body">
-                    <div class="form-row">
-                        <label>NOME E COGNOME</label>
-                        <div class="dotted-input">
-                            <input type="text" id="char-name" maxlength="30" placeholder="Scrivi qui..." autocomplete="off">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label>GENERE</label>
-                        <div class="stamp-choices">
-                            <button class="stamp-btn" data-value="M" data-group="gender">
-                                <span class="stamp-icon">♂</span>
-                                <span class="stamp-label">Maschio</span>
-                            </button>
-                            <button class="stamp-btn" data-value="F" data-group="gender">
-                                <span class="stamp-icon">♀</span>
-                                <span class="stamp-label">Femmina</span>
-                            </button>
-                            <button class="stamp-btn" data-value="X" data-group="gender">
-                                <span class="stamp-icon">⚧</span>
-                                <span class="stamp-label">Altro</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label>TRATTO IDEOLOGICO</label>
-                        <div class="ideology-cards">
-                            <button class="ideology-card" data-value="estrema-sinistra">
-                                <div class="card-icon">🚩</div>
-                                <div class="card-title">Sinistra Radicale</div>
-                                <div class="card-desc">Base fedele (min 20%). Stress da compromesso. Irrilevanza parlamentare (-50%).</div>
-                            </button>
-                            <button class="ideology-card" data-value="centro">
-                                <div class="card-icon">⚖️</div>
-                                <div class="card-title">Centro Liberale</div>
-                                <div class="card-desc">Ago della bilancia. Alleanze +30%, sconti cene. Rischio estinzione elettorale.</div>
-                            </button>
-                            <button class="ideology-card" data-value="populista">
-                                <div class="card-icon">📢</div>
-                                <div class="card-title">Populista</div>
-                                <div class="card-desc">Consenso social +80%. Coerenza in caduta libera con ogni compromesso.</div>
-                            </button>
-                            <button class="ideology-card" data-value="tecnocrate">
-                                <div class="card-icon">📊</div>
-                                <div class="card-title">Tecnocrate</div>
-                                <div class="card-desc">Stipendio +50%. Rispettato dalle istituzioni. Inviso ai populisti, distante dal "paese reale".</div>
-                            </button>
-                            <button class="ideology-card" data-value="estrema-destra">
-                                <div class="card-icon">🦅</div>
-                                <div class="card-title">Destra Sovranista</div>
-                                <div class="card-desc">Potere e controllo. Base fedele (min 20%). Coalizione ingovernabile (+Stress alleati).</div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label>NAZIONE</label>
-                        <p class="nation-instructions">Scegli la nazione dove iniziare la tua carriera politica.</p>
-                        <div class="stamp-choices nation-choices" id="nation-choices">
-                            <button class="stamp-btn" data-value="italy" data-group="nation">
-                                <span class="stamp-icon">🇮🇹</span>
-                                <span class="stamp-label">Italia</span>
-                            </button>
-                            <button class="stamp-btn" data-value="france" data-group="nation">
-                                <span class="stamp-icon">🇫🇷</span>
-                                <span class="stamp-label">Francia</span>
-                            </button>
-                            <button class="stamp-btn" data-value="germany" data-group="nation">
-                                <span class="stamp-icon">🇩🇪</span>
-                                <span class="stamp-label">Germania</span>
-                            </button>
-                            <button class="stamp-btn" data-value="uk" data-group="nation">
-                                <span class="stamp-icon">🇬🇧</span>
-                                <span class="stamp-label">Regno Unito</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-row avatar-row hidden" id="avatar-selection">
-                        <label>FOTO IDENTIFICATIVA — <span class="avatar-warning">NON SORRIDERE</span></label>
-                        <p class="avatar-instructions">Lo sguardo sarà utilizzato per la tessera del partito e per i manifesti elettorali. Scegli con cura.</p>
-                        <div class="stamp-choices avatar-stamps" id="avatar-stamps">
-                        </div>
-                    </div>
-
-                    <div class="form-row photo-row">
-                        <div class="photo-box">
-                            <div class="photo-placeholder" id="char-avatar">
-                                <span>FOTO</span>
-                            </div>
-                        </div>
-                        <!-- H. Tessera Anteprima in tempo reale -->
-                        <div class="preview-card" id="preview-card">
-                            <div class="preview-card-header">TESSERA PROVVISORIA</div>
-                            <div class="preview-card-avatar" id="preview-avatar">?</div>
-                            <div class="preview-card-name" id="preview-name">—</div>
-                            <div class="preview-card-ideology" id="preview-ideology">—</div>
-                            <div class="preview-card-number" id="preview-number">N° 000000</div>
-                        </div>
+                <div class="form-row">
+                    <label>NOME E COGNOME</label>
+                    <div class="dotted-input">
+                        <input type="text" id="char-name" maxlength="30" placeholder="Scrivi qui..." autocomplete="off">
                     </div>
                 </div>
-
-                <!-- B. Macchia di caffè dopo inattività -->
-                <div class="doc-coffee-stain hidden" id="doc-coffee-stain">☕</div>
-
-                <div class="document-footer">
-                    <!-- B/G. Timbro APPROVATO: grigio → rosso vivo quando valido, animazione sbatte -->
-                    <button id="btn-approve" class="approve-stamp" disabled>
-                        <span>APPROVATO</span>
-                    </button>
-                    <div class="error-msg" id="char-error"></div>
+                <div class="form-row">
+                    <label>GENERE</label>
+                    <div class="stamp-choices">
+                        <button class="stamp-btn" data-value="M" data-group="gender">
+                            <span class="stamp-icon">♂</span>
+                            <span class="stamp-label">Maschio</span>
+                        </button>
+                        <button class="stamp-btn" data-value="F" data-group="gender">
+                            <span class="stamp-icon">♀</span>
+                            <span class="stamp-label">Femmina</span>
+                        </button>
+                        <button class="stamp-btn" data-value="X" data-group="gender">
+                            <span class="stamp-icon">⚧</span>
+                            <span class="stamp-label">Altro</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-nav">
+                    <button class="tab-next" data-next="2">Avanti →</button>
                 </div>
             </div>
+            <div class="character-tab-content hidden" id="character-step-2">
+                <div class="form-row">
+                    <label>TRATTO IDEOLOGICO</label>
+                    <div class="ideology-cards">
+                        <button class="ideology-card" data-value="estrema-sinistra">
+                            <div class="card-icon">🚩</div>
+                            <div class="card-title">Sinistra Radicale</div>
+                            <div class="card-desc">Base fedele (min 20%). Stress da compromesso. Irrilevanza parlamentare (-50%).</div>
+                        </button>
+                        <button class="ideology-card" data-value="centro">
+                            <div class="card-icon">⚖️</div>
+                            <div class="card-title">Centro Liberale</div>
+                            <div class="card-desc">Ago della bilancia. Alleanze +30%, sconti cene. Rischio estinzione elettorale.</div>
+                        </button>
+                        <button class="ideology-card" data-value="populista">
+                            <div class="card-icon">📢</div>
+                            <div class="card-title">Populista</div>
+                            <div class="card-desc">Consenso social +80%. Coerenza in caduta libera con ogni compromesso.</div>
+                        </button>
+                        <button class="ideology-card" data-value="tecnocrate">
+                            <div class="card-icon">📊</div>
+                            <div class="card-title">Tecnocrate</div>
+                            <div class="card-desc">Stipendio +50%. Rispettato dalle istituzioni. Inviso ai populisti, distante dal "paese reale".</div>
+                        </button>
+                        <button class="ideology-card" data-value="estrema-destra">
+                            <div class="card-icon">🦅</div>
+                            <div class="card-title">Destra Sovranista</div>
+                            <div class="card-desc">Potere e controllo. Base fedele (min 20%). Coalizione ingovernabile (+Stress alleati).</div>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-nav">
+                    <button class="tab-prev" data-prev="1">← Indietro</button>
+                    <button class="tab-next" data-next="3">Avanti →</button>
+                </div>
+            </div>
+            <div class="character-tab-content hidden" id="character-step-3">
+                <div class="form-row">
+                    <label>NAZIONE</label>
+                    <p class="nation-instructions">Scegli la nazione dove iniziare la tua carriera politica.</p>
+                    <div class="stamp-choices nation-choices" id="nation-choices">
+                        <button class="stamp-btn" data-value="italy" data-group="nation">
+                            <span class="stamp-icon">🇮🇹</span>
+                            <span class="stamp-label">Italia</span>
+                        </button>
+                        <button class="stamp-btn" data-value="france" data-group="nation">
+                            <span class="stamp-icon">🇫🇷</span>
+                            <span class="stamp-label">Francia</span>
+                        </button>
+                        <button class="stamp-btn" data-value="germany" data-group="nation">
+                            <span class="stamp-icon">🇩🇪</span>
+                            <span class="stamp-label">Germania</span>
+                        </button>
+                        <button class="stamp-btn" data-value="uk" data-group="nation">
+                            <span class="stamp-icon">🇬🇧</span>
+                            <span class="stamp-label">Regno Unito</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-nav">
+                    <button class="tab-prev" data-prev="2">← Indietro</button>
+                    <button class="tab-next" data-next="4">Avanti →</button>
+                </div>
+            </div>
+            <div class="character-tab-content hidden" id="character-step-4">
+                <div class="form-row avatar-row" id="avatar-selection">
+                    <label>FOTO IDENTIFICATIVA — <span class="avatar-warning">NON SORRIDERE</span></label>
+                    <p class="avatar-instructions">Lo sguardo sarà utilizzato per la tessera del partito e per i manifesti elettorali. Scegli con cura.</p>
+                    <div class="stamp-choices avatar-stamps" id="avatar-stamps"></div>
+                </div>
+                <div class="form-row photo-row">
+                    <div class="photo-box">
+                        <div class="photo-placeholder" id="char-avatar">
+                            <span>FOTO</span>
+                        </div>
+                    </div>
+                    <div class="preview-card" id="preview-card">
+                        <div class="preview-card-header">TESSERA PROVVISORIA</div>
+                        <div class="preview-card-avatar" id="preview-avatar">?</div>
+                        <div class="preview-card-name" id="preview-name">—</div>
+                        <div class="preview-card-ideology" id="preview-ideology">—</div>
+                        <div class="preview-card-number" id="preview-number">N° 000000</div>
+                    </div>
+                </div>
+                <div class="tab-nav">
+                    <button class="tab-prev" data-prev="3">← Indietro</button>
+                    <button class="tab-next" data-next="5">Avanti →</button>
+                </div>
+            </div>
+            <div class="character-tab-content hidden" id="character-step-5">
+                <div class="form-row" style="margin-bottom:12px;">
+                    <label style="display:block;margin-bottom:6px;font-size:0.75em;letter-spacing:1px;">MODALITÀ DI GIOCO</label>
+                    <div class="stamp-choices" id="gamemode-choices" style="gap:12px;">
+                        <button class="stamp-btn active" data-value="sandbox" data-group="gamemode" aria-pressed="true" aria-label="Modalità Sandbox" tabindex="0">
+                            <span class="stamp-icon">∞</span>
+                            <span class="stamp-label">Sandbox</span>
+                            <span class="stamp-desc">Partita creativa senza limiti</span>
+                        </button>
+                        <button class="stamp-btn" data-value="campaign_sindaco" data-group="gamemode" aria-pressed="false" aria-label="Modalità Campagna" tabindex="0">
+                            <span class="stamp-icon">🏆</span>
+                            <span class="stamp-label">Campagna</span>
+                            <span class="stamp-desc">Obiettivi e sfide</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-nav">
+                    <button class="tab-prev" data-prev="4">← Indietro</button>
+                    <button id="btn-approve" class="approve-stamp" disabled><span>APPROVATO</span></button>
+                </div>
+                <div class="error-msg" id="char-error"></div>
+            </div>
+            <!-- B. Macchia di caffè dopo inattività -->
+            <div class="doc-coffee-stain hidden" id="doc-coffee-stain">☕</div>
         </div>
-
-        <!-- I. Burocrate impaziente -->
         <div class="burocrate-msg hidden" id="burocrate-msg"></div>
     </div>
 
@@ -371,6 +396,8 @@
                     <button class="phone-tab" data-tab="favori" role="tab" aria-selected="false" aria-controls="tab-favori" id="ptab-favori">🤝 Favori</button>
                     <button class="phone-tab" data-tab="mondo" role="tab" aria-selected="false" aria-controls="tab-mondo" id="ptab-mondo">🌍 Mondo</button>
                     <button class="phone-tab" data-tab="archivio" role="tab" aria-selected="false" aria-controls="tab-archivio" id="ptab-archivio">📦 Archivio</button>
+                    <button class="phone-tab" data-tab="finanza" role="tab" aria-selected="false" aria-controls="tab-finanza" id="ptab-finanza">💰 Finanza</button>
+                    <button class="phone-tab" data-tab="politica" role="tab" aria-selected="false" aria-controls="tab-politica" id="ptab-politica">🏛️ Politica</button>
                 </div>
                 <div class="phone-actions-bar">
                     <span>📱 Azioni:</span>
@@ -477,6 +504,18 @@
                     <div class="phone-tab-content" id="tab-archivio" role="tabpanel" aria-labelledby="ptab-archivio">
                         <h3>📭 Contatti Persi</h3>
                         <div id="archivio-list"></div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-finanza" role="tabpanel" aria-labelledby="ptab-finanza" aria-label="Portafoglio investimenti personali">
+                        <h3>💰 Portafoglio Investimenti</h3>
+                        <div id="investments-container"></div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-profilo" role="tabpanel" aria-labelledby="ptab-profilo" aria-label="Scheda Valutazione del personaggio">
+                        <div id="phone-profilo-container"></div>
+                    </div>
+                    <div class="phone-tab-content" id="tab-politica" role="tabpanel" aria-labelledby="ptab-politica" aria-label="Centro Politico — Partito, cariche e tattica">
+                        <div id="politica-content">
+                            <!-- Rendered by Phone.renderPolitica() -->
+                        </div>
                     </div>
                     <div class="phone-tab-content" id="tab-mondo" role="tabpanel" aria-labelledby="ptab-mondo">
                                             <!-- Patch: placeholder per tab-mondo richiesto dai test automatici -->
@@ -678,6 +717,23 @@
                     <label for="toggle-ticker">📻 Radio del Partito</label>
                     <input type="checkbox" id="toggle-ticker" checked>
                 </div>
+                <h3 style="margin-top:12px">♿ Accessibilità</h3>
+                <div class="options-toggle">
+                    <label for="toggle-colorblind">🎨 Modalità Daltonico</label>
+                    <input type="checkbox" id="toggle-colorblind">
+                </div>
+                <div class="options-toggle">
+                    <label for="toggle-reduce-motion">🛑 Riduci Animazioni</label>
+                    <input type="checkbox" id="toggle-reduce-motion">
+                </div>
+                <div class="options-toggle" style="flex-direction:column;align-items:flex-start;gap:4px">
+                    <label for="select-font-size">🔤 Dimensione Font</label>
+                    <select id="select-font-size" class="options-select" aria-label="Scegli dimensione testo">
+                        <option value="normal">Normale</option>
+                        <option value="large">Grande</option>
+                        <option value="xlarge">Molto Grande</option>
+                    </select>
+                </div>
             </div>
             <div class="options-footer">
                 <button class="options-btn opt-timeline" id="opt-timeline">📖 La Tua Storia</button>
@@ -685,49 +741,53 @@
         </div>
     </div>
 
-    <script src="js/nations.js"></script>
-    <script src="js/localization.js"></script>
-    <script src="js/constants.js"></script>
-    <script src="js/scheduler.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/debtmanager.js"></script>
-    <script src="js/confirm.js"></script>
-    <script src="js/balance.js"></script>
-    <script src="js/character.js"></script>
-        <script src="js/map.patch.js"></script>
-    <script src="js/desk.js"></script>
-    <script src="js/calendar.js"></script>
-    <script src="js/compass.js"></script>
-    <script src="js/ticker.js"></script>
-    <script src="js/advisor.js"></script>
-    <script src="js/timeline.js"></script>
-    <script src="js/options.js"></script>
-    <script src="js/deskdecor.js"></script>
-    <script src="js/memento.js"></script>
-    <script src="js/phone.js"></script>
-    <script src="js/tasks.js"></script>
-    <script src="js/house.js"></script>
-    <script src="js/bank.js"></script>
-    <script src="js/territory.js"></script>
-    <script src="js/stats.js"></script>
-    <script src="js/hud.js"></script>
-    <script src="js/screen-reader.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/events.js"></script>
-    <script src="js/mafia.js"></script>
-    <script src="js/agents.js"></script>
-    <script src="js/dilemmas.js"></script>
-    <script src="js/lifestyle.js"></script>
-    <script src="js/budget.js"></script>
-    <script src="js/factions.js"></script>
-    <script src="js/parties.js"></script>
-    <script src="js/intel.js"></script>
-    <script src="js/favors.js"></script>
-    <script src="js/diary.js"></script>
-    <script src="js/citySearch.js"></script>
-    <script src="js/map.js"></script>
-        <script src="js/game-agents.js"></script>
-    <script src="js/tutorial.js"></script>
+    <script src="js/nations.js?v=3"></script>
+    <script src="js/localization.js?v=3"></script>
+    <script src="js/constants.js?v=3"></script>
+    <script src="js/scheduler.js?v=3"></script>
+    <script src="js/ui-events.js?v=3"></script>
+    <script src="js/ui-state.js?v=3"></script>
+    <script src="js/game.js?v=3"></script>
+    <script src="js/debtmanager.js?v=3"></script>
+    <script src="js/confirm.js?v=3"></script>
+    <script src="js/balance.js?v=3"></script>
+    <script src="js/character.js?v=3"></script>
+        <script src="js/map.patch.js?v=3"></script>
+    <script src="js/desk.js?v=3"></script>
+    <script src="js/calendar.js?v=3"></script>
+    <script src="js/compass.js?v=3"></script>
+    <script src="js/ticker.js?v=3"></script>
+    <script src="js/advisor.js?v=3"></script>
+    <script src="js/timeline.js?v=3"></script>
+    <script src="js/options.js?v=3"></script>
+    <script src="js/deskdecor.js?v=3"></script>
+    <script src="js/memento.js?v=3"></script>
+    <script src="js/phone.js?v=3"></script>
+    <script src="js/tasks.js?v=3"></script>
+    <script src="js/house.js?v=3"></script>
+    <script src="js/bank.js?v=3"></script>
+    <script src="js/territory.js?v=3"></script>
+    <script src="js/stats.js?v=3"></script>
+    <script src="js/hud.js?v=3"></script>
+    <script src="js/screen-reader.js?v=3"></script>
+    <script src="js/audio.js?v=3"></script>
+    <script src="js/events.js?v=3"></script>
+    <script src="js/mafia.js?v=3"></script>
+    <script src="js/agents.js?v=3"></script>
+    <script src="js/dilemmas.js?v=3"></script>
+    <script src="js/lifestyle.js?v=3"></script>
+    <script src="js/budget.js?v=3"></script>
+    <script src="js/factions.js?v=3"></script>
+    <script src="js/politics.js?v=3"></script>
+    <script src="js/parties.js?v=3"></script>
+    <script src="js/intel.js?v=3"></script>
+    <script src="js/favors.js?v=3"></script>
+    <script src="js/diary.js?v=3"></script>
+    <script src="js/investments.js?v=3"></script>
+    <script src="js/citySearch.js?v=3"></script>
+    <script src="js/map.js?v=3"></script>
+        <script src="js/game-agents.js?v=3"></script>
+    <script src="js/tutorial.js?v=3"></script>
     <script src="js/workTasks.js"></script>
     <script src="js/main.js"></script>
 </body>

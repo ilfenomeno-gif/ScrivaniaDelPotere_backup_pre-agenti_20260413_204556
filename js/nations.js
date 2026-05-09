@@ -94,7 +94,16 @@ const Nations = {
                     estremistra: ['massimo_fdi', 'giorgia_lega']
                 },
                 startingCity: 'roma',
-                startingMoney: 100
+                startingMoney: 100,
+                stability: 0.55,
+                corruptionLevel: 0.65,
+                lawModifiers: {
+                    mafiaRepression: 0.45,
+                    taxEvasionTolerance: 0.60,
+                    mediaPressure: 0.70,
+                    politicalImmunity: 0.50,
+                    lobbyRegulation: 0.30,
+                },
             },
             france: {
                 id: 'france',
@@ -130,7 +139,16 @@ const Nations = {
                     estremistra: ['marion_marion']
                 },
                 startingCity: 'paris',
-                startingMoney: 120
+                startingMoney: 120,
+                stability: 0.60,
+                corruptionLevel: 0.40,
+                lawModifiers: {
+                    mafiaRepression: 0.65,
+                    taxEvasionTolerance: 0.35,
+                    mediaPressure: 0.80,
+                    politicalImmunity: 0.60,
+                    lobbyRegulation: 0.50,
+                },
             },
             germany: {
                 id: 'germany',
@@ -166,7 +184,16 @@ const Nations = {
                     estremistra: ['hoecke_afd']
                 },
                 startingCity: 'berlin',
-                startingMoney: 140
+                startingMoney: 140,
+                stability: 0.80,
+                corruptionLevel: 0.20,
+                lawModifiers: {
+                    mafiaRepression: 0.85,
+                    taxEvasionTolerance: 0.15,
+                    mediaPressure: 0.75,
+                    politicalImmunity: 0.35,
+                    lobbyRegulation: 0.70,
+                },
             },
             uk: {
                 id: 'uk',
@@ -202,7 +229,16 @@ const Nations = {
                     estremistra: ['braverman_hard']
                 },
                 startingCity: 'london',
-                startingMoney: 130
+                startingMoney: 130,
+                stability: 0.70,
+                corruptionLevel: 0.30,
+                lawModifiers: {
+                    mafiaRepression: 0.70,
+                    taxEvasionTolerance: 0.25,
+                    mediaPressure: 0.90,
+                    politicalImmunity: 0.45,
+                    lobbyRegulation: 0.65,
+                },
             }
         };
     },

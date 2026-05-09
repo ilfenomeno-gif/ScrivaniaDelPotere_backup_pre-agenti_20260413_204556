@@ -18,7 +18,7 @@
       "Ministro",
       "Presidente del Consiglio"
     ],
-    "salaryMultiplier": 1.04,
+    "salaryMultiplier": 1.541,
     "rentMultiplier": 1,
     "taxRate": 0.25,
     "description": "Sistema parlamentare proporzionale. Coalizioni quasi sempre necessarie. Governo spesso instabile.",
@@ -139,7 +139,7 @@
       "Premier Ministre",
       "Président de la République"
     ],
-    "salaryMultiplier": 1.144,
+    "salaryMultiplier": 1.696,
     "rentMultiplier": 1.05,
     "taxRate": 0.28,
     "description": "Semi-presidenziale con doppio turno. Presidente ha potere significativo. Manifestazioni frequenti.",
@@ -469,7 +469,7 @@
       "Bundeskanzler",
       "Kanzler"
     ],
-    "salaryMultiplier": 1.3,
+    "salaryMultiplier": 1.923,
     "rentMultiplier": 1.2,
     "taxRate": 0.32,
     "description": "Sistema proporzionale con soglia 5%. Coalizioni stabili ma complesse. Efficienza amministrativa.",
@@ -800,7 +800,7 @@
       "Shadow Secretary",
       "Prime Minister"
     ],
-    "salaryMultiplier": 1.248,
+    "salaryMultiplier": 1.847,
     "rentMultiplier": 1.2,
     "taxRate": 0.24,
     "description": "Maggioritario first-past-the-post. Bipartitismo prevalente. Coalizioni rare.",

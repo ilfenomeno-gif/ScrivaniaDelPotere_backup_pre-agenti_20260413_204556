@@ -157,6 +157,45 @@ const Mafia = {
     init() {
         Game.on('mafia-daily', (d) => this.onDaily(d));
         Game.on('time-advance', (d) => this.onTimeAdvance(d));
+
+        // Bridge to Politics advanced stats
+        Game.on('mafia-daily', () => this._syncPoliticsStats());
+    },
+
+    /** Sync mafia state into Politics advanced criminal stats */
+    _syncPoliticsStats() {
+        if (typeof Politics === 'undefined' || !Politics.applyOutcome) return;
+        const m = Game.state.mafia;
+        if (!m.active) return;
+
+        // Derive deltas from current mafia state
+        const targetMafiaRep = Math.min(1, m.rispettoCriminale / 100);
+        const targetSuspicion = Math.min(1, m.rischioIndagini / 100);
+        const adv = Politics.getAdvancedStats();
+
+        // Smooth convergence (don't slam values, converge 10% per day)
+        const mafiaRepDelta = (targetMafiaRep - adv.criminal.mafiaReputation) * 0.1;
+        const suspDelta = (targetSuspicion - adv.criminal.policeSuspicion) * 0.1;
+
+        if (Math.abs(mafiaRepDelta) > 0.001 || Math.abs(suspDelta) > 0.001) {
+            Politics.applyOutcome({
+                mafiaRep: mafiaRepDelta,
+                policeSuspicion: suspDelta,
+            });
+        }
+    },
+
+    /** Get effective investigation risk, scaled by national law */
+    _getEffectiveRiskGrowth(baseRisk) {
+        let repression = 0.5;
+        if (typeof Nations !== 'undefined' && Nations.getCurrentNation) {
+            const nation = Nations.getCurrentNation();
+            if (nation && nation.lawModifiers) {
+                repression = nation.lawModifiers.mafiaRepression || 0.5;
+            }
+        }
+        // Higher repression = faster risk growth
+        return baseRisk * (0.5 + repression);
     },
 
     // === DAILY PROCESSING ===
@@ -206,9 +245,11 @@ const Mafia = {
             Game.addWorkNotif('💰 Pizzo', `Hai riscosso €${m.pizzoWeekly} di pizzo questa settimana.`, `Giorno ${day}`);
         }
 
-        // Rischio indagini cresce lentamente
+        // Rischio indagini cresce — scalato da leggi nazionali
         if (m.rank >= 1) {
-            m.rischioIndagini = Math.min(100, m.rischioIndagini + (rankInfo.riskBase ? rankInfo.riskBase * 0.1 : 0));
+            const baseGrowth = rankInfo.riskBase ? rankInfo.riskBase * 0.1 : 0;
+            const effectiveGrowth = this._getEffectiveRiskGrowth(baseGrowth);
+            m.rischioIndagini = Math.min(100, m.rischioIndagini + effectiveGrowth);
         }
 
         // Conseguenze giornaliere reali del rischio indagini
