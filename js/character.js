@@ -552,6 +552,8 @@ const Character = {
             if (defaultNationBtn) defaultNationBtn.classList.add('selected');
         }
         this.updateIdeologyDisplay(Game.state.nation.id);
+        this.checkReady();
+        this.updatePreview();
         Game.on('new-day', ({ day }) => this.handleMentorProgression(day));
     },
 
@@ -690,6 +692,7 @@ const Character = {
                 Game.state.character.avatar = btn.dataset.value;
                 this.updateAvatar(btn.dataset.value);
                 this.updatePreview();
+                this.checkReady();
             });
         });
     },
@@ -706,7 +709,13 @@ const Character = {
         const ideology = Game.state.character.ideology;
         const btn = document.getElementById('btn-approve');
         const nation = Game.state.nation.id;
-        const allValid = !!(name && gender && ideology && nation);
+        const missing = [];
+        if (!name) missing.push('Nome');
+        if (!gender) missing.push('Genere');
+        if (!ideology) missing.push('Ideologia');
+        if (!nation) missing.push('Nazione');
+
+        const allValid = missing.length === 0;
         btn.disabled = !allValid;
 
         // B. Timbro APPROVATO: grigio sbiadito → rosso vivo
@@ -714,6 +723,14 @@ const Character = {
             btn.classList.add('stamp-ready');
         } else {
             btn.classList.remove('stamp-ready');
+        }
+
+        const errorEl = document.getElementById('char-error');
+        if (errorEl) {
+            errorEl.textContent = allValid
+                ? 'Modulo completo: puoi approvare e iniziare la partita.'
+                : `Completa questi campi: ${missing.join(', ')}.`;
+            errorEl.style.color = allValid ? '#1B5E20' : '';
         }
     },
 

@@ -112,11 +112,44 @@ html, body {
         repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(0,0,0,0.03) 49px, rgba(0,0,0,0.03) 50px),
         linear-gradient(180deg, #5D4037 0%, #4E342E 50%, #3E2723 100%);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     perspective: 1000px;
-    padding: 30px 0;
+    padding: 26px 18px 40px;
     overflow-y: auto;
+}
+
+.anagrafe-sheet {
+    width: min(980px, 96vw);
+    background: linear-gradient(165deg, rgba(245,240,225,0.98), rgba(236,228,207,0.98));
+    border: 2px solid #b8ad95;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35), inset 0 0 40px rgba(0,0,0,0.05);
+    padding: 18px 20px 16px;
+    position: relative;
+}
+
+.anagrafe-intro {
+    border: 1px solid rgba(40,40,40,0.18);
+    background: linear-gradient(90deg, rgba(255,255,255,0.52), rgba(255,255,255,0.2));
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.anagrafe-intro h2 {
+    font-family: var(--font-typewriter);
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: #2f1f1a;
+    margin-bottom: 4px;
+}
+
+.anagrafe-intro p {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #4f4a3f;
+    line-height: 1.45;
 }
 
 #screen-character {
@@ -153,6 +186,19 @@ html, body {
     flex-wrap: wrap;
     position: relative;
     z-index: 5;
+    background: rgba(255,255,255,0.35);
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.character-tab-content {
+    min-height: 330px;
+    padding: 8px 6px;
+}
+
+.character-tab-content.hidden {
+    display: none;
 }
 .char-tab {
     background: transparent;
@@ -234,7 +280,7 @@ html, body {
 
 /* Stamp Choices */
 .stamp-choices {
-    display: flex; gap: 15px; justify-content: center;
+    display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
 }
 .stamp-btn {
     width: 100px; height: 90px;
@@ -280,6 +326,30 @@ html, body {
     transition: all var(--transition-speed);
     font-family: var(--font-typewriter);
     box-sizing: border-box;
+}
+
+.tab-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.tab-next,
+.tab-prev {
+    border: 1px solid #4f4237;
+    background: #f8f3e8;
+    color: #2c2621;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: var(--font-typewriter);
+    cursor: pointer;
+}
+
+.tab-next:hover,
+.tab-prev:hover {
+    background: #fffaf0;
 }
 .ideology-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .ideology-card.selected {
@@ -328,13 +398,58 @@ html, body {
     opacity: 0.4;
     position: relative;
 }
-.approve-stamp:not(:disabled) { opacity: 0.6; }
+.approve-stamp:not(:disabled) {
+    opacity: 1;
+    border-color: #b71c1c;
+    background: linear-gradient(135deg, #d32f2f, #a51414);
+}
 .approve-stamp:not(:disabled):hover:not(.stamp-ready) {
     transform: rotate(0deg) scale(1.05);
 }
 .approve-stamp:disabled { cursor: not-allowed; }
 .approve-stamp.restart { transform: rotate(0); background: var(--stamp-green); border-color: #1B5E20; opacity: 1; }
 .error-msg { color: var(--ink-red); font-size: 12px; margin-top: 8px; min-height: 16px; }
+
+@media (max-width: 900px) {
+    .anagrafe-sheet {
+        width: min(720px, 96vw);
+        padding: 14px;
+    }
+
+    .ideology-card {
+        flex: 0 1 calc(50% - 10px);
+    }
+}
+
+@media (max-width: 620px) {
+    .anagrafe-table {
+        padding: 12px 8px 18px;
+    }
+
+    .anagrafe-intro h2 {
+        font-size: 17px;
+    }
+
+    .anagrafe-intro p,
+    .error-msg {
+        font-size: 11px;
+    }
+
+    .ideology-card {
+        flex: 1 1 100%;
+    }
+
+    .tab-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .approve-stamp {
+        width: 100%;
+        letter-spacing: 4px;
+        font-size: 17px;
+    }
+}
 
 /* ============================================
    2. THE DESK — MAIN INTERFACE 
