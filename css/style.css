@@ -335,6 +335,21 @@ html, body {
 }
 
 /* Stamp Choices */
+/* Remove default fieldset borders for stamp-fieldset (visual stays unchanged) */
+.stamp-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+.stamp-fieldset legend {
+    font-family: var(--font-typewriter);
+    font-size: 0.75em;
+    letter-spacing: 2px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    padding: 0;
+}
 .stamp-choices {
     display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
 }

@@ -22,101 +22,110 @@
                     <h2>Inizia La Tua Carriera</h2>
                     <p>Compila i 6 passaggi in ordine. Quando tutto e completo, il timbro APPROVATO si accende in rosso.</p>
                 </div>
-            <div class="character-tabs" id="character-tabs">
-                <button class="char-tab active" data-step="1">1. Anagrafica</button>
-                <button class="char-tab" data-step="2">2. Ideologia</button>
-                <button class="char-tab" data-step="3">3. Mentori</button>
-                <button class="char-tab" data-step="4">4. Avatar</button>
-                <button class="char-tab" data-step="5">5. Modalità</button>
-                <button class="char-tab" data-step="6">6. Mappa</button>
+            <div class="character-tabs" id="character-tabs" role="tablist" aria-label="Passaggi creazione personaggio">
+                <button class="char-tab active" data-step="1" role="tab" aria-selected="true" aria-controls="character-step-1" id="ctab-1">1. Anagrafica</button>
+                <button class="char-tab" data-step="2" role="tab" aria-selected="false" aria-controls="character-step-2" id="ctab-2">2. Ideologia</button>
+                <button class="char-tab" data-step="3" role="tab" aria-selected="false" aria-controls="character-step-3" id="ctab-3">3. Mentori</button>
+                <button class="char-tab" data-step="4" role="tab" aria-selected="false" aria-controls="character-step-4" id="ctab-4">4. Avatar</button>
+                <button class="char-tab" data-step="5" role="tab" aria-selected="false" aria-controls="character-step-5" id="ctab-5">5. Modalità</button>
+                <button class="char-tab" data-step="6" role="tab" aria-selected="false" aria-controls="character-step-6" id="ctab-6">6. Mappa</button>
             </div>
-            <div class="character-tab-content" id="character-step-1">
+            <div class="character-tab-content" id="character-step-1" role="tabpanel" aria-labelledby="ctab-1">
                 <div class="document-header">
                     <div class="doc-seal">★</div>
-                    <h1>SCHEDA D'ISCRIZIONE</h1>
+                    <h2>SCHEDA D'ISCRIZIONE</h2>
                     <p class="doc-subtitle">Partito della Vita Quotidiana — Sezione Anagrafe</p>
                     <p class="doc-protocol">Protocollo N° <span id="doc-protocol-num">PVQ-000000</span></p>
                     <div class="doc-line"></div>
                 </div>
                 <div class="form-row">
-                    <label>NOME E COGNOME</label>
+                    <label for="char-name">NOME E COGNOME</label>
                     <div class="dotted-input">
                         <input type="text" id="char-name" maxlength="30" placeholder="Scrivi qui..." autocomplete="off">
                     </div>
                 </div>
                 <div class="form-row">
-                    <label>GENERE</label>
-                    <div class="stamp-choices">
-                        <button class="stamp-btn" data-value="M" data-group="gender">
-                            <span class="stamp-icon">♂</span>
+                    <fieldset class="stamp-fieldset">
+                    <legend>GENERE</legend>
+                    <div class="stamp-choices" role="group" aria-label="Seleziona il genere">
+                        <button class="stamp-btn" data-value="M" data-group="gender" aria-pressed="false">
+                            <span class="stamp-icon" aria-hidden="true">♂</span>
                             <span class="stamp-label">Maschio</span>
                         </button>
-                        <button class="stamp-btn" data-value="F" data-group="gender">
-                            <span class="stamp-icon">♀</span>
+                        <button class="stamp-btn" data-value="F" data-group="gender" aria-pressed="false">
+                            <span class="stamp-icon" aria-hidden="true">♀</span>
                             <span class="stamp-label">Femmina</span>
                         </button>
-                        <button class="stamp-btn" data-value="X" data-group="gender">
-                            <span class="stamp-icon">⚧</span>
+                        <button class="stamp-btn" data-value="X" data-group="gender" aria-pressed="false">
+                            <span class="stamp-icon" aria-hidden="true">⚧</span>
                             <span class="stamp-label">Altro</span>
                         </button>
                     </div>
+                    </fieldset>
                 </div>
                 <div class="tab-nav">
                     <button class="tab-next" data-next="2">Avanti →</button>
                 </div>
             </div>
-            <div class="character-tab-content hidden" id="character-step-2">
+            <div class="character-tab-content hidden" id="character-step-2" role="tabpanel" aria-labelledby="ctab-2">
                 <div class="form-row">
-                    <label>TRATTO IDEOLOGICO</label>
-                    <div class="ideology-cards">
-                        <button class="ideology-card" data-value="estrema-sinistra">
-                            <div class="card-icon">🚩</div>
+                    <fieldset class="stamp-fieldset">
+                    <legend>TRATTO IDEOLOGICO</legend>
+                    <p class="form-row-desc visually-hidden">Scegli l'orientamento politico del tuo personaggio. Questa scelta influenza bonus, malus e stile di gioco.</p>
+                    <div class="ideology-cards" role="group" aria-label="Tratto ideologico">
+                        <button class="ideology-card" data-value="estrema-sinistra" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">🚩</div>
                             <div class="card-title">Sinistra Radicale</div>
                             <div class="card-desc">Base fedele (min 20%). Stress da compromesso. Irrilevanza parlamentare (-50%).</div>
                         </button>
-                        <button class="ideology-card" data-value="centro">
-                            <div class="card-icon">⚖️</div>
+                        <button class="ideology-card" data-value="centro" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">⚖️</div>
                             <div class="card-title">Centro Liberale</div>
                             <div class="card-desc">Ago della bilancia. Alleanze +30%, sconti cene. Rischio estinzione elettorale.</div>
                         </button>
-                        <button class="ideology-card" data-value="populista">
-                            <div class="card-icon">📢</div>
+                        <button class="ideology-card" data-value="populista" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">📢</div>
                             <div class="card-title">Populista</div>
                             <div class="card-desc">Consenso social +80%. Coerenza in caduta libera con ogni compromesso.</div>
                         </button>
-                        <button class="ideology-card" data-value="tecnocrate">
-                            <div class="card-icon">📊</div>
+                        <button class="ideology-card" data-value="tecnocrate" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">📊</div>
                             <div class="card-title">Tecnocrate</div>
                             <div class="card-desc">Stipendio +50%. Rispettato dalle istituzioni. Inviso ai populisti, distante dal "paese reale".</div>
                         </button>
-                        <button class="ideology-card" data-value="estrema-destra">
-                            <div class="card-icon">🦅</div>
+                        <button class="ideology-card" data-value="estrema-destra" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">🦅</div>
                             <div class="card-title">Destra Sovranista</div>
                             <div class="card-desc">Potere e controllo. Base fedele (min 20%). Coalizione ingovernabile (+Stress alleati).</div>
                         </button>
                     </div>
+                    </fieldset>
                 </div>
                 <div class="tab-nav">
                     <button class="tab-prev" data-prev="1">← Indietro</button>
                     <button class="tab-next" data-next="3">Avanti →</button>
                 </div>
             </div>
-            <div class="character-tab-content hidden" id="character-step-3">
+            <div class="character-tab-content hidden" id="character-step-3" role="tabpanel" aria-labelledby="ctab-3">
                 <div class="form-row">
-                    <label>MENTORE POLITICO</label>
-                    <p class="nation-instructions">Scegli chi ti guidera all'inizio del percorso.</p>
-                    <div class="mentor-quick-grid" id="onboarding-mentor-choices"></div>
+                    <fieldset class="stamp-fieldset">
+                    <legend>MENTORE POLITICO</legend>
+                    <p class="nation-instructions">Scegli chi ti guiderà all'inizio del percorso. Ogni mentore offre bonus iniziali diversi.</p>
+                    <div class="mentor-quick-grid" id="onboarding-mentor-choices" role="group" aria-label="Scegli il tuo mentore politico"></div>
+                    </fieldset>
                 </div>
                 <div class="tab-nav">
                     <button class="tab-prev" data-prev="2">← Indietro</button>
                     <button class="tab-next" data-next="4">Avanti →</button>
                 </div>
             </div>
-            <div class="character-tab-content hidden" id="character-step-4">
+            <div class="character-tab-content hidden" id="character-step-4" role="tabpanel" aria-labelledby="ctab-4">
                 <div class="form-row avatar-row" id="avatar-selection">
-                    <label>FOTO IDENTIFICATIVA — <span class="avatar-warning">NON SORRIDERE</span></label>
+                    <fieldset class="stamp-fieldset">
+                    <legend id="avatar-legend">FOTO IDENTIFICATIVA — <span class="avatar-warning" aria-label="Nota">NON SORRIDERE</span></legend>
                     <p class="avatar-instructions">Lo sguardo sarà utilizzato per la tessera del partito e per i manifesti elettorali. Scegli con cura.</p>
-                    <div class="stamp-choices avatar-stamps" id="avatar-stamps"></div>
+                    <div class="stamp-choices avatar-stamps" id="avatar-stamps" role="group" aria-labelledby="avatar-legend"></div>
+                    </fieldset>
                 </div>
                 <div class="form-row photo-row">
                     <div class="photo-box">
@@ -137,7 +146,7 @@
                     <button class="tab-next" data-next="5">Avanti →</button>
                 </div>
             </div>
-            <div class="character-tab-content hidden" id="character-step-5">
+            <div class="character-tab-content hidden" id="character-step-5" role="tabpanel" aria-labelledby="ctab-5">
                 <div class="form-row" style="margin-bottom:12px;">
                     <label style="display:block;margin-bottom:6px;font-size:0.75em;letter-spacing:1px;">MODALITÀ DI GIOCO</label>
                     <div class="stamp-choices" id="gamemode-choices" style="gap:12px;">
@@ -158,7 +167,7 @@
                     <button class="tab-next" data-next="6">Avanti →</button>
                 </div>
             </div>
-            <div class="character-tab-content hidden" id="character-step-6">
+            <div class="character-tab-content hidden" id="character-step-6" role="tabpanel" aria-labelledby="ctab-6">
                 <div class="form-row">
                     <label>MAPPA DI PARTENZA</label>
                     <p class="nation-instructions">Seleziona la citta da cui iniziare la campagna.</p>
@@ -168,7 +177,7 @@
                     <button class="tab-prev" data-prev="5">← Indietro</button>
                     <button id="btn-approve" class="approve-stamp" disabled><span>APPROVATO</span></button>
                 </div>
-                <div class="error-msg" id="char-error"></div>
+                <div class="error-msg" id="char-error" role="alert" aria-live="assertive" aria-atomic="true"></div>
             </div>
             <!-- B. Macchia di caffè dopo inattività -->
             <div class="doc-coffee-stain hidden" id="doc-coffee-stain">☕</div>
@@ -698,7 +707,7 @@
                 <button id="btn-restart" class="approve-stamp restart">RICOMINCIA</button>
                 <button id="btn-export-save" class="approve-stamp">💾 Esporta Salvataggio</button>
                 <button id="btn-import-save" class="approve-stamp">📂 Importa Salvataggio</button>
-                <input type="file" id="import-save-file" accept="application/json" style="display:none" />
+                <input type="file" id="import-save-file" accept="application/json" style="display:none" aria-label="Carica file di salvataggio JSON" />
             </div>
         </div>
     </div>
@@ -729,7 +738,7 @@
                 <button class="options-btn opt-save" id="opt-save">💾 Salva Partita</button>
                 <button class="options-btn opt-export" id="opt-export">💾 Esporta Salvataggio</button>
                 <button class="options-btn opt-import" id="opt-import">📂 Importa Salvataggio</button>
-                <input type="file" id="opt-import-file" accept="application/json" style="display:none" />
+                <input type="file" id="opt-import-file" accept="application/json" style="display:none" aria-label="Carica file di salvataggio JSON dalle opzioni" />
                 <button class="options-btn opt-restart" id="opt-restart">🔄 Ricomincia</button>
                 <button class="options-btn opt-exit" id="opt-exit">↩️ Torna al Gioco</button>
             </div>

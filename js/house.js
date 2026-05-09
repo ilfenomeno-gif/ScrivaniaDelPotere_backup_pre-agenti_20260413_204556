@@ -3,6 +3,8 @@
    ============================================ */
 
 const House = {
+    _pendingFocusSelector: null,
+
     init() {
         // Tab switching
         document.querySelectorAll('.house-tab').forEach(tab => {
@@ -40,6 +42,17 @@ const House = {
         this.renderRooms();
         this.renderHomeStaff();
         if (typeof Bank !== 'undefined') Bank.renderBankPanel();
+
+        if (this._pendingFocusSelector && window.SR && SR.afterActionFocus) {
+            const selector = this._pendingFocusSelector;
+            this._pendingFocusSelector = null;
+            setTimeout(() => {
+                const el = document.querySelector(selector)
+                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn')
+                    || document.querySelector('.house-tab.active,.house-tab,#payments-list .payments-header,#panel-house h2');
+                if (el) SR.afterActionFocus(el);
+            }, 700);
+        }
     },
 
     renderProperty() {
@@ -460,48 +473,90 @@ const House = {
     },
 
     bindPaymentButtons() {
+        const _restoreFocus = (selector, announcement, urgency) => {
+            if (!window.SR || !SR.afterActionFocus) return;
+            setTimeout(() => {
+                const el = document.querySelector(selector)
+                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn')
+                    || document.querySelector('.house-tab.active,.house-tab,#payments-list .payments-header,#panel-house h2');
+                if (el) SR.afterActionFocus(el, announcement, urgency || 'polite');
+            }, 650);
+        };
+
         document.querySelectorAll('.pay-now').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                const billId = btn.dataset.id;
+                this._pendingFocusSelector = `.pay-now[data-id="${billId}"]`;
                 const success = Game.payBill(btn.dataset.id);
                 if (!success) {
                     btn.style.background = '#E53935';
                     btn.textContent = 'No fondi!';
+                    if (window.SR) SR.announce('Fondi insufficienti per pagare la bolletta.', 'assertive');
                     Scheduler.timeout(() => {
                         btn.style.background = '';
                         btn.textContent = '💰 Paga subito';
                     }, 1200, { group: 'house', label: 'btn-reset' });
                 }
                 this.refresh();
+                _restoreFocus(`.pay-now[data-id="${billId}"]`, success ? 'Pagamento registrato.' : 'Pagamento non riuscito.');
             });
         });
 
         document.querySelectorAll('.inst-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const months = parseInt(btn.dataset.months, 10);
-                this.createInstallmentPlan(btn.dataset.id, months);
+                const billId = btn.dataset.id;
+                this._pendingFocusSelector = `.inst-btn[data-id="${billId}"][data-months="${months}"]`;
+                const ok = this.createInstallmentPlan(btn.dataset.id, months);
+                _restoreFocus(`.inst-btn[data-id="${billId}"][data-months="${months}"]`, ok ? `Piano rate ${months} mesi creato.` : 'Impossibile creare il piano rate.', ok ? 'polite' : 'assertive');
             });
         });
 
         document.querySelectorAll('.pay-installment').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.payInstallment(btn.dataset.id);
+                const planId = btn.dataset.id;
+                this._pendingFocusSelector = `.pay-installment[data-id="${planId}"]`;
+                const ok = this.payInstallment(btn.dataset.id);
+                _restoreFocus(`.pay-installment[data-id="${planId}"]`, ok ? 'Rata pagata.' : 'Impossibile pagare la rata.', ok ? 'polite' : 'assertive');
             });
         });
     },
 
     bindMortgageButtons() {
+        const _restoreFocus = (selector, announcement, urgency) => {
+            if (!window.SR || !SR.afterActionFocus) return;
+            setTimeout(() => {
+                const el = document.querySelector(selector)
+                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn')
+                    || document.querySelector('.house-tab.active,.house-tab,#payments-list .payments-header,#panel-house h2');
+                if (el) SR.afterActionFocus(el, announcement, urgency || 'polite');
+            }, 650);
+        };
+
         const reqBtn = document.querySelector('.mortgage-btn');
         if (reqBtn) {
-            reqBtn.addEventListener('click', () => this.requestMortgage(reqBtn.dataset.type));
+            reqBtn.addEventListener('click', () => {
+                this._pendingFocusSelector = '.mortgage-btn';
+                const ok = this.requestMortgage(reqBtn.dataset.type);
+                _restoreFocus('.mortgage-btn', ok ? 'Mutuo richiesto.' : 'Richiesta mutuo non disponibile.', ok ? 'polite' : 'assertive');
+            });
         }
         const payBtn = document.querySelector('.mortgage-pay-btn');
         if (payBtn) {
-            payBtn.addEventListener('click', () => this.payMortgageInstallment());
+            payBtn.addEventListener('click', () => {
+                this._pendingFocusSelector = '.mortgage-pay-btn';
+                const ok = this.payMortgageInstallment();
+                _restoreFocus('.mortgage-pay-btn', ok ? 'Rata mutuo pagata.' : 'Impossibile pagare la rata del mutuo.', ok ? 'polite' : 'assertive');
+            });
         }
         const closeBtn = document.querySelector('.mortgage-extinguish-btn');
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.extinguishMortgage());
+            closeBtn.addEventListener('click', () => {
+                this._pendingFocusSelector = '.mortgage-extinguish-btn';
+                const ok = this.extinguishMortgage();
+                _restoreFocus('.mortgage-extinguish-btn', ok ? 'Mutuo estinto.' : 'Impossibile estinguere il mutuo.', ok ? 'polite' : 'assertive');
+            });
         }
     },
 

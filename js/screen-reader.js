@@ -590,9 +590,11 @@ const SR = (() => {
             _prevDay       = Game.state.day;
             _prevTimeOfDay = Game.state.calendar?.timeOfDay;
             announce('Partita caricata. Benvenuto ne La Scrivania del Potere.', 'polite');
+            // Patch phone tab focus after game loaded
+            setTimeout(_patchPhoneTabFocus, 500);
         });
 
-        requestAnimationFrame(() => { _applyPanelARIA(); updateHUD(); });
+        requestAnimationFrame(() => { _applyPanelARIA(); updateHUD(); _patchPhoneTabFocus(); });
 
         if (Game.state) {
             _prevMoney     = Game.state.money;
@@ -631,11 +633,16 @@ const SR = (() => {
                     SOCIAL: 'Social', NOTIFICHE: 'Notifiche',
                 };
                 announce(`Tab telefono: ${tabLabels[tabId] || tabId}.`, 'polite');
+                // Move focus to panel content for SR navigation
+                focusPhoneTabPanel((tabId || '').toLowerCase());
             });
 
             UiEvents.on('GAME_EVENT', ({ type }) => {
                 if (type === 'OUTCOME_APPLIED') {
                     // Silent — individual stat changes already announced via Game events
+                }
+                if (type === 'POLITICA_RENDERED') {
+                    setTimeout(_applyPoliticaARIA, 100);
                 }
             });
         }
@@ -645,9 +652,176 @@ const SR = (() => {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else { const w = () => typeof Game !== 'undefined' ? init() : setTimeout(w, 400); w(); }
 
+    /* ── NVDA-safe assertive announcement ─────────────────── */
+    // NVDA requires content to be cleared between updates to re-announce.
+    // Double RAF + delay ensures the DOM mutation is detected.
+    function announceNVDA(message) {
+        _ensureLiveRegions();
+        const el = document.getElementById('sr-assertive');
+        if (!el) return;
+        // Clear first
+        el.textContent = '';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            el.textContent = message;
+        }));
+    }
+
+    /* ── Phone tab focus management ───────────────────────── */
+    // Call after activating a phone tab to move focus to panel heading or first button.
+    const _PHONE_TAB_DESCRIPTIONS = {
+        friends:  'Sezione Contatti. Visualizza e interagisci con i tuoi contatti politici.',
+        partner:  'Sezione Vita Sentimentale. Gestisci le tue relazioni personali.',
+        social:   'Sezione Social Buzz. Pubblica post, gestisci l\'immagine pubblica e i trend.',
+        attivita: 'Sezione Attività. Compiti urgenti, lavoro e favori da gestire.',
+        favori:   'Sezione Favori. Crediti e favori politici in sospeso.',
+        mondo:    'Sezione Mondo. Esplora luoghi, territorio e mappa.',
+        archivio: 'Sezione Archivio. Contatti perduti nel tempo.',
+        finanza:  'Sezione Finanza. Portafoglio investimenti personali.',
+        politica: 'Sezione Politica. Azioni di partito, influenza e carriera politica.',
+        comitato: 'Sezione Comitato Centrale. Gestione fazioni e coalizioni.',
+    };
+
+    function _applyPhoneTabDescription(tabId) {
+        const panel = document.getElementById(`tab-${tabId}`);
+        if (!panel) return;
+        // Check if description already added
+        if (panel.querySelector('[data-sr-tab-desc]')) return;
+        const desc = _PHONE_TAB_DESCRIPTIONS[tabId];
+        if (!desc) return;
+        const p = document.createElement('p');
+        p.setAttribute('data-sr-tab-desc', '1');
+        p.className = 'visually-hidden';
+        p.textContent = desc;
+        panel.insertBefore(p, panel.firstChild);
+        // Ensure panel has aria-describedby linking to desc
+        if (!p.id) p.id = `sr-tab-desc-${tabId}`;
+        const existing = panel.getAttribute('aria-describedby');
+        if (!existing) panel.setAttribute('aria-describedby', p.id);
+    }
+
+    function focusPhoneTabPanel(tabId) {
+        _applyPhoneTabDescription(tabId);
+        const panel = document.getElementById(`tab-${tabId}`);
+        if (!panel) return;
+        // Find heading or first focusable button in panel
+        requestAnimationFrame(() => {
+            const heading = panel.querySelector('h1,h2,h3,h4,[data-sr-heading]');
+            const firstBtn = panel.querySelector('button:not([disabled]):not(.phone-back):not(#phone-close)');
+            const target = heading || firstBtn;
+            if (target) {
+                if (!target.getAttribute('tabindex') && target.tagName !== 'BUTTON' && target.tagName !== 'A') {
+                    target.setAttribute('tabindex', '-1');
+                }
+                target.focus({ preventScroll: false });
+            }
+        });
+    }
+
+    /* ── Action outcome focus return ──────────────────────── */
+    // After a phone action completes, return focus to the button that triggered it
+    // or to a meaningful fallback. Call this from phone action handlers.
+    function afterActionFocus(triggerEl, announcement, urgency) {
+        if (announcement) announce(announcement, urgency || 'polite');
+        if (triggerEl && triggerEl.isConnected) {
+            requestAnimationFrame(() => {
+                const tag = (triggerEl.tagName || '').toUpperCase();
+                const naturallyFocusable = ['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'].includes(tag);
+                if (!naturallyFocusable && !triggerEl.getAttribute('tabindex')) {
+                    triggerEl.setAttribute('tabindex', '-1');
+                }
+                triggerEl.focus({ preventScroll: false });
+            });
+        } else {
+            // Fall back to phone close button
+            const closeBtn = document.getElementById('phone-close');
+            if (closeBtn) requestAnimationFrame(() => closeBtn.focus());
+        }
+    }
+
+    /* ── Section heading helper with focus-able target ─────── */
+    // Adds an h3 + description to a dynamic section container, then moves focus there.
+    function announceSectionEntry(containerEl, heading, description) {
+        if (!containerEl) return;
+        let h = containerEl.querySelector('[data-sr-section-live]');
+        if (!h) {
+            h = document.createElement('h3');
+            h.setAttribute('data-sr-section-live', '1');
+            h.className = 'visually-hidden';
+            h.setAttribute('tabindex', '-1');
+            containerEl.insertBefore(h, containerEl.firstChild);
+        }
+        h.textContent = heading;
+        if (description) {
+            let p = containerEl.querySelector('[data-sr-section-live-desc]');
+            if (!p) {
+                p = document.createElement('p');
+                p.setAttribute('data-sr-section-live-desc', '1');
+                p.className = 'visually-hidden';
+                containerEl.insertBefore(p, h.nextSibling);
+            }
+            p.textContent = description;
+        }
+        announce(`${heading}. ${description || ''}`, 'polite');
+        requestAnimationFrame(() => h.focus({ preventScroll: false }));
+    }
+
+    /* ── Patch phone._activateTab for focus management ─────── */
+    function _patchPhoneTabFocus() {
+        if (typeof Phone === 'undefined' || !Phone._activateTab || Phone._activateTab._srPatched) return;
+        const _orig = Phone._activateTab.bind(Phone);
+        Phone._activateTab = function(tabId) {
+            _orig(tabId);
+            // Move focus to panel after a short delay (let render complete)
+            setTimeout(() => focusPhoneTabPanel(tabId), 150);
+        };
+        Phone._activateTab._srPatched = true;
+    }
+
+    /* ── Politica section: add ARIA descriptions on render ─── */
+    function _applyPoliticaARIA() {
+        const politicaContent = document.getElementById('politica-content');
+        if (!politicaContent) return;
+        if (politicaContent.querySelector('[data-sr-politica-done]')) return;
+        // Ensure heading for politica content
+        const titleEl = politicaContent.querySelector('.politica-section-title');
+        if (titleEl && !titleEl.getAttribute('role')) {
+            const h = document.createElement('h3');
+            h.setAttribute('data-sr-politica-done', '1');
+            h.className = 'visually-hidden';
+            h.textContent = 'Sezione Politica — Azioni di partito, influenza e carriera.';
+            politicaContent.insertBefore(h, politicaContent.firstChild);
+        }
+        // Add descriptions to action buttons that only show cost badge
+        politicaContent.querySelectorAll('button:not([aria-describedby])').forEach(btn => {
+            const costBadges = btn.querySelectorAll('.phone-cost-badge, .task-ap-cost');
+            if (costBadges.length === 0) return;
+            const costs = Array.from(costBadges).map(b => b.textContent.trim()).join(', ');
+            const existing = btn.getAttribute('aria-label') || btn.textContent.trim();
+            btn.setAttribute('aria-label', `${existing.replace(/\s+/g, ' ').trim()} — Costo: ${costs}`);
+        });
+    }
+
+    /* ── Add "al posto di X c'è Y" output checking ─────────── */
+    // After game state changes, validate that HUD elements match state
+    function _validateHUDConsistency() {
+        if (typeof Game === 'undefined' || !Game.state) return;
+        const s = Game.state;
+        // Check money display vs state
+        const moneyEl = document.getElementById('hud-money');
+        if (moneyEl) {
+            const displayed = parseInt((moneyEl.textContent || '').replace(/[^0-9-]/g, ''), 10);
+            if (!isNaN(displayed) && displayed !== s.money) {
+                // HUD is stale — re-trigger update
+                Game.emit('money-change');
+            }
+        }
+    }
+
     return { init, announce, enqueue, SR_PRIORITY, log, silence, trapFocus, releaseFocus, updateHUD,
              moveFocus, openModal, closeModal, openPanel, closePanel,
-             sectionHeading, labelList };
+             sectionHeading, labelList,
+             announceNVDA, focusPhoneTabPanel, afterActionFocus, announceSectionEntry,
+             _applyPoliticaARIA, _validateHUDConsistency, _patchPhoneTabFocus };
 })();
 
 if (typeof window !== 'undefined') window.SR = window.SR || SR;

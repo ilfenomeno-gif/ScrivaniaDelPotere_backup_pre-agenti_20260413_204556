@@ -159,7 +159,10 @@ const Phone = {
         if (tabId === 'mondo' && this.initTerritorioSubTabs) this.initTerritorioSubTabs();
         if (tabId === 'attivita' && this.initWorkSubTabs) this.initWorkSubTabs();
         if (tabId === 'profilo' && typeof Stats !== 'undefined') Stats.renderPhoneProfile();
-        if (tabId === 'politica') this.renderPolitica();
+        if (tabId === 'politica') {
+            this.renderPolitica();
+            setTimeout(() => { if (window.SR) SR._applyPoliticaARIA && SR._applyPoliticaARIA(); }, 200);
+        }
         if (tabId === 'comitato' && typeof Factions !== 'undefined' && Factions.renderPhoneCommittee) Factions.renderPhoneCommittee();
         if (tabId === 'favori') {
             this.renderFavori && this.renderFavori();
@@ -167,6 +170,8 @@ const Phone = {
         } else if (window.SR && tabBtn) {
             SR.announce(`Tab attiva: ${tabBtn.textContent.trim()}`, 'polite');
         }
+        // Move SR focus to tab panel for screen readers (NVDA/JAWS)
+        if (window.SR && SR.focusPhoneTabPanel) setTimeout(() => SR.focusPhoneTabPanel(tabId), 200);
     },
 
     openApp(tabId) {
@@ -885,6 +890,7 @@ const Phone = {
                 Game.changeAttribute('estetica', 2);
                 Game.addWorkNotif('Vita privata', `Appuntamento con ${p.name}. Tensione ridotta.`, `Giorno ${Game.state.day}`);
                 this.renderPartner();
+                if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById('partner-date')));
             });
 
             document.getElementById('partner-talk').addEventListener('click', () => {
@@ -895,6 +901,7 @@ const Phone = {
                 Game.changeStat('morale', 5);
                 Game.addWorkNotif('Vita privata', `Chiacchierata con ${p.name}.`, `Giorno ${Game.state.day}`);
                 this.renderPartner();
+                if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById('partner-talk')));
             });
 
             const giftBtn = document.getElementById('partner-gift');
@@ -907,6 +914,7 @@ const Phone = {
                     p.tension = Math.max(0, p.tension - 15);
                     Game.addWorkNotif('💕 Regalo', `Hai fatto un regalo a ${p.name}.`, `Giorno ${Game.state.day}`);
                     this.renderPartner();
+                    if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById('partner-gift')));
                 });
             }
 
@@ -922,6 +930,7 @@ const Phone = {
                     Game.changeStat('stanchezza', 5);
                     Game.addWorkNotif('🏠 Cena a casa', `${p.name} apprezza il tempo insieme.`, `Giorno ${Game.state.day}`);
                     this.renderPartner();
+                    if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById('partner-home-dinner')));
                 });
             }
 
@@ -935,6 +944,7 @@ const Phone = {
                     p.promised = true;
                     Game.addWorkNotif('💍 Promessa', `Hai fatto una promessa importante a ${p.name}.`, `Giorno ${Game.state.day}`);
                     this.renderPartner();
+                    if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById('partner-promise')));
                 });
             }
 
@@ -949,6 +959,7 @@ const Phone = {
                     p.support = Math.max(0, p.support - 10);
                     Game.addWorkNotif('😤 Discussione', `Hai litigato con ${p.name}.`, `Giorno ${Game.state.day}`);
                     this.renderPartner();
+                    if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById('partner-fight')));
                 });
             }
         }
@@ -2344,9 +2355,10 @@ const Phone = {
                     Game.emit('no-ap', { reason: 'Azioni telefono esaurite!' });
                     return;
                 }
-                if (apCost) Game.spendActionPoints(apCost);
+                if (apCost) Game.spendActionPoint(apCost);
                 fn();
                 this.renderPolitica();
+                if (window.SR && SR.afterActionFocus) requestAnimationFrame(() => SR.afterActionFocus(document.getElementById(id)));
             }, { once: true });
         };
 

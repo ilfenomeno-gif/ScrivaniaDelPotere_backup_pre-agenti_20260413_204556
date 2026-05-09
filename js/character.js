@@ -273,25 +273,25 @@ const Character = {
 
     AVATARS: {
         M: [
-            { value: '👨‍🏭' },
-            { value: '👨‍🏫' },
-            { value: '👨‍⚖️' },
-            { value: '🕺' },
-            { value: '🕵️‍♂️' },
+            { value: '👨‍🏭', label: 'Operaio' },
+            { value: '👨‍🏫', label: 'Insegnante' },
+            { value: '👨‍⚖️', label: 'Giudice' },
+            { value: '🕺', label: 'Ballerino' },
+            { value: '🕵️‍♂️', label: 'Detective' },
         ],
         F: [
-            { value: '👩‍💼' },
-            { value: '👩‍🏫' },
-            { value: '👩‍⚖️' },
-            { value: '💃' },
-            { value: '🕵️‍♀️' },
+            { value: '👩‍💼', label: 'Manager' },
+            { value: '👩‍🏫', label: 'Insegnante' },
+            { value: '👩‍⚖️', label: 'Giudice' },
+            { value: '💃', label: 'Ballerina' },
+            { value: '🕵️‍♀️', label: 'Detective' },
         ],
         X: [
-            { value: '🧑‍💼' },
-            { value: '🧑‍🏫' },
-            { value: '🧑‍⚖️' },
-            { value: '🧑‍🎤' },
-            { value: '🕵️' },
+            { value: '🧑‍💼', label: 'Manager' },
+            { value: '🧑‍🏫', label: 'Insegnante' },
+            { value: '🧑‍⚖️', label: 'Giudice' },
+            { value: '🧑‍🎤', label: 'Artista' },
+            { value: '🕵️', label: 'Detective' },
         ],
     },
 
@@ -452,11 +452,33 @@ const Character = {
         const prevBtns = document.querySelectorAll('.tab-prev');
         const self = this;
 
+        const STEP_LABELS = {
+            '1': 'Passaggio 1 di 6: Anagrafica. Inserisci nome e genere.',
+            '2': 'Passaggio 2 di 6: Ideologia. Scegli il tuo tratto ideologico.',
+            '3': 'Passaggio 3 di 6: Mentori. Scegli il tuo mentore politico.',
+            '4': 'Passaggio 4 di 6: Avatar. Scegli la foto identificativa.',
+            '5': 'Passaggio 5 di 6: Modalità di gioco. Scegli sandbox o campagna.',
+            '6': 'Passaggio 6 di 6: Mappa. Seleziona la città di partenza.',
+        };
+
         function showTab(step) {
-            tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.step == step));
+            tabButtons.forEach(btn => {
+                const isActive = btn.dataset.step == step;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
             tabContents.forEach(tab => tab.classList.toggle('hidden', tab.id !== `character-step-${step}`));
             if (String(step) === '3') self.renderMentorSelectionStep();
             if (String(step) === '6') self.renderOnboardingCityStep();
+            // SR: announce step and move focus to panel heading or first input
+            if (window.SR) SR.announce(STEP_LABELS[String(step)] || `Passaggio ${step}`, 'assertive');
+            requestAnimationFrame(() => {
+                const panel = document.getElementById(`character-step-${step}`);
+                if (panel) {
+                    const firstFocusable = panel.querySelector('input:not([disabled]), button:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])');
+                    if (firstFocusable) firstFocusable.focus();
+                }
+            });
         }
 
         nextBtns.forEach(btn => {
@@ -490,8 +512,9 @@ const Character = {
         });
         genderBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                genderBtns.forEach(b => b.classList.remove('selected'));
+                genderBtns.forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
                 btn.classList.add('selected');
+                btn.setAttribute('aria-pressed', 'true');
                 Game.state.character.gender = btn.dataset.value;
                 this.showAvatarSelection(btn.dataset.value);
                 this.checkReady();
@@ -505,8 +528,9 @@ const Character = {
         const ideologyCards = document.querySelectorAll('.ideology-card');
         ideologyCards.forEach(card => {
             card.addEventListener('click', () => {
-                ideologyCards.forEach(c => c.classList.remove('selected'));
+                ideologyCards.forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-pressed', 'false'); });
                 card.classList.add('selected');
+                card.setAttribute('aria-pressed', 'true');
                 Game.state.character.ideology = card.dataset.value;
                 this._selectedMentorId = null;
                 this.renderMentorSelectionStep();
@@ -579,7 +603,9 @@ const Character = {
         this._currentMentorPool = mentors;
 
         container.innerHTML = mentors.map((mentor) => `
-            <button class="mentor-quick-card ${this._selectedMentorId === mentor.id ? 'selected' : ''}" data-mentor-id="${mentor.id}">
+            <button class="mentor-quick-card ${this._selectedMentorId === mentor.id ? 'selected' : ''}" data-mentor-id="${mentor.id}"
+                aria-pressed="${this._selectedMentorId === mentor.id ? 'true' : 'false'}"
+                aria-label="${Game.esc((mentor.shortName || mentor.name) + ': ' + (mentor.bonusText || this.getMentorBonusText(mentor.id)))}">
                 <div class="mentor-quick-head">
                     <span class="mentor-quick-icon">${mentor.icon}</span>
                     <span class="mentor-quick-name">${Game.esc(mentor.shortName || mentor.name)}</span>
@@ -590,8 +616,12 @@ const Character = {
 
         container.querySelectorAll('.mentor-quick-card').forEach((card) => {
             card.addEventListener('click', () => {
-                container.querySelectorAll('.mentor-quick-card').forEach(c => c.classList.remove('selected'));
+                container.querySelectorAll('.mentor-quick-card').forEach((c) => {
+                    c.classList.remove('selected');
+                    c.setAttribute('aria-pressed', 'false');
+                });
                 card.classList.add('selected');
+                card.setAttribute('aria-pressed', 'true');
                 this._selectedMentorId = card.dataset.mentorId;
                 this.checkReady();
             });
@@ -735,8 +765,8 @@ const Character = {
 
         const avatars = this.AVATARS[gender] || this.AVATARS['X'];
         container.innerHTML = avatars.map((a, i) => `
-            <button class="stamp-btn avatar-stamp" data-group="avatar" data-value="${a.value}">
-                <span class="stamp-icon">${a.value}</span>
+            <button class="stamp-btn avatar-stamp" data-group="avatar" data-value="${a.value}" aria-label="${a.label || 'Avatar ' + (i + 1)}" aria-pressed="false">
+                <span class="stamp-icon" aria-hidden="true">${a.value}</span>
             </button>
         `).join('');
 
@@ -746,6 +776,7 @@ const Character = {
         const firstBtn = container.querySelector('.avatar-stamp');
         if (firstBtn) {
             firstBtn.classList.add('selected');
+            firstBtn.setAttribute('aria-pressed', 'true');
             Game.state.character.avatar = firstBtn.dataset.value;
             this.updateAvatar(firstBtn.dataset.value);
         }
@@ -753,8 +784,9 @@ const Character = {
         // Bind avatar stamp clicks
         container.querySelectorAll('.avatar-stamp').forEach(btn => {
             btn.addEventListener('click', () => {
-                container.querySelectorAll('.avatar-stamp').forEach(b => b.classList.remove('selected'));
+                container.querySelectorAll('.avatar-stamp').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
                 btn.classList.add('selected');
+                btn.setAttribute('aria-pressed', 'true');
                 Game.state.character.avatar = btn.dataset.value;
                 this.updateAvatar(btn.dataset.value);
                 this.updatePreview();
