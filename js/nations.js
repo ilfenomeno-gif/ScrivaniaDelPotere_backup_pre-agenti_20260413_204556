@@ -193,7 +193,10 @@ const Nations = {
     },
 
     getDualNationalityDailyCosts() {
-        return { coherence: 20, money: 5000 };
+        const day = Number((Game && Game.state && Game.state.day) || 1);
+        if (day <= 10) return { coherence: 5, money: 250 };
+        if (day <= 30) return { coherence: 8, money: 500 };
+        return { coherence: 12, money: 900 };
     },
 
     async loadNations() {

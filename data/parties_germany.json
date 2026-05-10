@@ -118,5 +118,97 @@
       { "stat": "heavyIndustryRelations", "value": -0.12, "condition": "always", "label": "-12% produttività zone industriali" }
     ],
     "startingBonus": { "reputazione": 3, "morale": 12 }
+  },
+  {
+    "id": "de_fdp",
+    "name": "FDP",
+    "shortName": "FDP",
+    "icon": "🟡",
+    "color": "#ffbe0b",
+    "ideology": "center",
+    "country": "germany",
+    "ideologyMatrix": { "tasse": -3, "immigrazione": 1, "ambiente": 2, "difesa": 2, "diritti": 4 },
+    "currents": [
+      {
+        "id": "curr_de_fdp_lib",
+        "name": "Liberali Economici",
+        "icon": "📈",
+        "leader": "Christian Lindner",
+        "influence": 57,
+        "ideologyMatrix": { "tasse": -3, "immigrazione": 1, "ambiente": 2, "difesa": 2, "diritti": 4 },
+        "bonus": "+10 networking business",
+        "malus": "Consenso popolare instabile"
+      }
+    ],
+    "startingBonus": { "money": 60, "networking": 4 }
+  },
+  {
+    "id": "de_afd",
+    "name": "AfD",
+    "shortName": "AfD",
+    "icon": "🦅",
+    "color": "#1d3557",
+    "ideology": "radical_right",
+    "country": "germany",
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -7 },
+    "currents": [
+      {
+        "id": "curr_de_afd_nat",
+        "name": "Nazionalisti",
+        "icon": "📢",
+        "leader": "Alice Weidel",
+        "influence": 68,
+        "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -7 },
+        "bonus": "+12 consenso aree periferiche",
+        "malus": "Coalizioni quasi impossibili"
+      }
+    ],
+    "startingBonus": { "carisma": 3, "stress": 4 }
+  },
+  {
+    "id": "de_linke",
+    "name": "Die Linke",
+    "shortName": "LINKE",
+    "icon": "🚩",
+    "color": "#9d0208",
+    "ideology": "radical_left",
+    "country": "germany",
+    "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 6, "difesa": -3, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_de_linke_social",
+        "name": "Socialisti Radicali",
+        "icon": "✊",
+        "leader": "Janine Wissler",
+        "influence": 61,
+        "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 6, "difesa": -3, "diritti": 9 },
+        "bonus": "+10 mobilitazione sindacale",
+        "malus": "Compromessi di governo penalizzano coerenza"
+      }
+    ],
+    "startingBonus": { "morale": 8, "reputazione": 2 }
+  },
+  {
+    "id": "de_konservative_union",
+    "name": "Konservative Union",
+    "shortName": "KU",
+    "icon": "🛡️",
+    "color": "#2f3e46",
+    "ideology": "right",
+    "country": "germany",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -4, "immigrazione": -4, "ambiente": -1, "difesa": 6, "diritti": -2 },
+    "currents": [
+      {
+        "id": "curr_de_ku_main",
+        "name": "Conservatori Federali",
+        "icon": "🏰",
+        "leader": "Markus Adler",
+        "influence": 54,
+        "bonus": "+8 consenso territori tradizionali",
+        "malus": "Flessibilita coalizione ridotta"
+      }
+    ],
+    "startingBonus": { "reputazioneNazionale": 2, "money": 40 }
   }
 ]

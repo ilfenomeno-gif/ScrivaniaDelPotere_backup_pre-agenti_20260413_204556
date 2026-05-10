@@ -143,5 +143,51 @@
       }
     ],
     "startingBonus": { "reputazione": 3, "morale": 10 }
+  },
+  {
+    "id": "it_azione_iv",
+    "name": "Azione - Italia Viva",
+    "shortName": "AZ/IV",
+    "icon": "⚖️",
+    "color": "#ffb703",
+    "ideology": "center",
+    "country": "italy",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 0, "immigrazione": 2, "ambiente": 3, "difesa": 2, "diritti": 4 },
+    "currents": [
+      {
+        "id": "curr_it_azione_iv_riformista",
+        "name": "Riformisti Liberali",
+        "icon": "🧭",
+        "leader": "Carlo Calenda / Matteo Renzi",
+        "influence": 56,
+        "bonus": "+10 successo negoziazioni",
+        "malus": "Base elettorale volatile"
+      }
+    ],
+    "startingBonus": { "networking": 6, "coherence": 2 }
+  },
+  {
+    "id": "it_ppe_civico",
+    "name": "Polo Civico Europeo",
+    "shortName": "PCE",
+    "icon": "🏛️",
+    "color": "#4f6d7a",
+    "ideology": "center_right",
+    "country": "italy",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": -1, "ambiente": 1, "difesa": 4, "diritti": 1 },
+    "currents": [
+      {
+        "id": "curr_it_pce_main",
+        "name": "Moderati Popolari",
+        "icon": "🤝",
+        "leader": "Giorgio Bellini",
+        "influence": 52,
+        "bonus": "+8 stabilita di coalizione",
+        "malus": "Visibilita mediatica limitata"
+      }
+    ],
+    "startingBonus": { "money": 45, "reputazioneNazionale": 2 }
   }
 ]

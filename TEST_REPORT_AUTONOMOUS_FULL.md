@@ -1,6 +1,6 @@
 # Autonomous Full Test Report
 
-- Date: 2026-05-10T10:17:13.653Z
+- Date: 2026-05-10T10:48:50.797Z
 - Modes tested: sandbox, campaign_sindaco, campaign_famoso, campaign_ricco
 - Online mode detected: no
 - Custom mode detected: no
@@ -12,33 +12,33 @@
 - Outcome: superato
 - Bugs found: 0
 - Fixes applied: No fix needed in this mode after codebase fixes
-- Latency avg/max: 4.84ms / 38.6ms
+- Latency avg/max: 4.5ms / 35ms
 - Final day: 11, restarts: 2
-- Balance: money mean=21998.07, var=61806.77; stress mean=61.18, var=840.62; coherence mean=78.84, var=251.78
+- Balance: money mean=22064.34, var=261283.84; stress mean=89.56, var=21.98; coherence mean=77.15, var=283.78
 
 ### campaign_sindaco
 - Outcome: superato
 - Bugs found: 0
 - Fixes applied: No fix needed in this mode after codebase fixes
-- Latency avg/max: 3.32ms / 12.1ms
-- Final day: 10, restarts: 2
-- Balance: money mean=23034.81, var=83814.05; stress mean=84.11, var=79.95; coherence mean=88.75, var=38.74
+- Latency avg/max: 2.88ms / 12.2ms
+- Final day: 9, restarts: 2
+- Balance: money mean=24163.2, var=8974.54; stress mean=57.25, var=395.51; coherence mean=98.48, var=3.57
 
 ### campaign_famoso
 - Outcome: superato
 - Bugs found: 0
 - Fixes applied: No fix needed in this mode after codebase fixes
-- Latency avg/max: 3.26ms / 23.1ms
-- Final day: 9, restarts: 2
-- Balance: money mean=23609.57, var=13686.35; stress mean=95.23, var=21.24; coherence mean=96.88, var=15.97
+- Latency avg/max: 3.39ms / 22.8ms
+- Final day: 10, restarts: 2
+- Balance: money mean=23829.73, var=32064.76; stress mean=91.99, var=31.97; coherence mean=98.16, var=4.91
 
 ### campaign_ricco
 - Outcome: superato
 - Bugs found: 0
 - Fixes applied: No fix needed in this mode after codebase fixes
-- Latency avg/max: 2.28ms / 11.2ms
-- Final day: 9, restarts: 2
-- Balance: money mean=24040.43, var=48873.8; stress mean=91.18, var=46.9; coherence mean=97.72, var=3.88
+- Latency avg/max: 3.3ms / 19.1ms
+- Final day: 10, restarts: 2
+- Balance: money mean=23654.24, var=60828.22; stress mean=92.26, var=36.53; coherence mean=96.97, var=16.92
 
 ## Unresolved Problems
 - None

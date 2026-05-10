@@ -106,5 +106,97 @@
       { "stat": "industryFunding", "value": -0.15, "condition": "always", "label": "-15% fondi industriali" }
     ],
     "startingBonus": { "reputazione": 2, "morale": 15 }
+  },
+  {
+    "id": "fr_rn",
+    "name": "Rassemblement National",
+    "shortName": "RN",
+    "icon": "🦅",
+    "color": "#14213d",
+    "ideology": "radical_right",
+    "country": "france",
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -10, "ambiente": -4, "difesa": 8, "diritti": -7 },
+    "currents": [
+      {
+        "id": "curr_fr_rn_identitaire",
+        "name": "Bloc Identitaire",
+        "icon": "📢",
+        "leader": "Jordan Bardella",
+        "influence": 69,
+        "ideologyMatrix": { "tasse": -5, "immigrazione": -10, "ambiente": -4, "difesa": 8, "diritti": -7 },
+        "bonus": "+12 consenso base periferie",
+        "malus": "Coesione coalizione -15%"
+      }
+    ],
+    "startingBonus": { "carisma": 4, "stress": 3 }
+  },
+  {
+    "id": "fr_renaissance",
+    "name": "Renaissance",
+    "shortName": "REN",
+    "icon": "⚖️",
+    "color": "#ffb703",
+    "ideology": "center",
+    "country": "france",
+    "ideologyMatrix": { "tasse": 0, "immigrazione": 2, "ambiente": 3, "difesa": 3, "diritti": 4 },
+    "currents": [
+      {
+        "id": "curr_fr_ren_reform",
+        "name": "Riformisti Europeisti",
+        "icon": "🇪🇺",
+        "leader": "Gabriel Attal",
+        "influence": 58,
+        "ideologyMatrix": { "tasse": 0, "immigrazione": 2, "ambiente": 3, "difesa": 3, "diritti": 4 },
+        "bonus": "+10 successo negoziazioni UE",
+        "malus": "Base elettorale fluttuante"
+      }
+    ],
+    "startingBonus": { "networking": 6, "coherence": 2 }
+  },
+  {
+    "id": "fr_lfi",
+    "name": "La France Insoumise",
+    "shortName": "LFI",
+    "icon": "🚩",
+    "color": "#9d0208",
+    "ideology": "radical_left",
+    "country": "france",
+    "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 7, "difesa": -2, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_fr_lfi_militant",
+        "name": "Sinistra Popolare",
+        "icon": "✊",
+        "leader": "Jean-Luc Melenchon",
+        "influence": 66,
+        "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 7, "difesa": -2, "diritti": 9 },
+        "bonus": "+10 mobilitazione piazza",
+        "malus": "Compromessi istituzionali -coerenza"
+      }
+    ],
+    "startingBonus": { "morale": 9, "reputazione": 2 }
+  },
+  {
+    "id": "fr_centre_droit_republicain",
+    "name": "Centre Droit Republicain",
+    "shortName": "CDR",
+    "icon": "🏛️",
+    "color": "#4a5568",
+    "ideology": "center_right",
+    "country": "france",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": 0, "ambiente": 1, "difesa": 4, "diritti": 1 },
+    "currents": [
+      {
+        "id": "curr_fr_cdr_main",
+        "name": "Gaullisti Moderati",
+        "icon": "🤝",
+        "leader": "Etienne Morel",
+        "influence": 53,
+        "bonus": "+8 affidabilita coalizione",
+        "malus": "Consenso giovanile contenuto"
+      }
+    ],
+    "startingBonus": { "reputazioneNazionale": 2, "coherence": 2 }
   }
 ]

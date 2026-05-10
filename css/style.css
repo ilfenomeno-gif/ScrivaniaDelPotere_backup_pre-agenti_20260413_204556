@@ -6051,6 +6051,9 @@ html, body {
     font-size: 10px;
     text-align: center;
     color: #D0D0D0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 @keyframes legendFadeIn {

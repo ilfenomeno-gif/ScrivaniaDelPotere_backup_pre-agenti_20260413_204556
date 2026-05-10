@@ -37,5 +37,83 @@
     "ideologyMatrix": { "tasse": -3, "immigrazione": -8, "ambiente": -2, "difesa": 8, "diritti": -6 },
     "currents": [{ "id": "curr_bx_nf_main", "name": "Sovranisti", "icon": "📢", "leader": "Pieter Van Doorn", "influence": 68, "bonus": "+6 reputazione locale", "malus": "Media pressure" }],
     "startingBonus": { "carisma": 4, "stress": 3 }
+  },
+  {
+    "id": "bx_social_front",
+    "name": "Benelux Social Front",
+    "shortName": "BSF",
+    "icon": "🌹",
+    "color": "#c1121f",
+    "ideology": "left",
+    "country": "benelux",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 6, "ambiente": 5, "difesa": 0, "diritti": 7 },
+    "currents": [{ "id": "curr_bx_sf_main", "name": "Socialdemocratici", "icon": "🔴", "leader": "Anne Peeters", "influence": 57, "bonus": "+8 consenso urbano", "malus": "Fondi privati ridotti" }],
+    "startingBonus": { "reputazione": 3, "morale": 4 }
+  },
+  {
+    "id": "bx_liberal_union",
+    "name": "Liberal Union Benelux",
+    "shortName": "LUB",
+    "icon": "⚖️",
+    "color": "#3a86ff",
+    "ideology": "center",
+    "country": "benelux",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -1, "immigrazione": 3, "ambiente": 3, "difesa": 2, "diritti": 5 },
+    "currents": [{ "id": "curr_bx_lub_main", "name": "Liberali Pragmatici", "icon": "🧭", "leader": "Jules Lambert", "influence": 54, "bonus": "+10 networking istituzionale", "malus": "Rischio neutralita politica" }],
+    "startingBonus": { "networking": 6, "coherence": 2 }
+  },
+  {
+    "id": "bx_christian_democrats",
+    "name": "Benelux Christian Democrats",
+    "shortName": "BCD",
+    "icon": "✝️",
+    "color": "#264653",
+    "ideology": "center_right",
+    "country": "benelux",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": 0, "ambiente": 1, "difesa": 4, "diritti": 1 },
+    "currents": [{ "id": "curr_bx_bcd_main", "name": "Moderati Cristiani", "icon": "🏛️", "leader": "Milan De Vries", "influence": 56, "bonus": "+8 stabilita governativa", "malus": "Difficolta con alleanze radicali" }],
+    "startingBonus": { "reputazioneNazionale": 2, "money": 35 }
+  },
+  {
+    "id": "bx_left_unity",
+    "name": "Benelux Left Unity",
+    "shortName": "BLU",
+    "icon": "🚩",
+    "color": "#9d0208",
+    "ideology": "radical_left",
+    "country": "benelux",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 7, "immigrazione": 7, "ambiente": 7, "difesa": -2, "diritti": 9 },
+    "currents": [{ "id": "curr_bx_blu_main", "name": "Sinistra Sociale", "icon": "✊", "leader": "Noah Janssen", "influence": 49, "bonus": "+10 mobilitazione cittadina", "malus": "Compromessi istituzionali difficili" }],
+    "startingBonus": { "morale": 7, "reputazione": 2 }
+  },
+  {
+    "id": "bx_progressive_center",
+    "name": "Progressive Center Benelux",
+    "shortName": "PCB",
+    "icon": "🌱",
+    "color": "#2a9d8f",
+    "ideology": "center_left",
+    "country": "benelux",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 2, "immigrazione": 5, "ambiente": 7, "difesa": 0, "diritti": 7 },
+    "currents": [{ "id": "curr_bx_pcb_main", "name": "Riformisti Verdi", "icon": "♻️", "leader": "Emma De Wilde", "influence": 50, "bonus": "+8 reputazione metropolitana", "malus": "Funding industriale in calo" }],
+    "startingBonus": { "reputazione": 2, "coherence": 3 }
+  },
+  {
+    "id": "bx_conservative_block",
+    "name": "Benelux Conservative Block",
+    "shortName": "BCB",
+    "icon": "🛡️",
+    "color": "#264653",
+    "ideology": "right",
+    "country": "benelux",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -3, "immigrazione": -4, "ambiente": -1, "difesa": 5, "diritti": -2 },
+    "currents": [{ "id": "curr_bx_bcb_main", "name": "Conservatori Civici", "icon": "🏰", "leader": "Pieter Lambert", "influence": 48, "bonus": "+8 consenso aree tradizionali", "malus": "Relazioni sindacali deboli" }],
+    "startingBonus": { "money": 30, "reputazioneNazionale": 2 }
   }
 ]

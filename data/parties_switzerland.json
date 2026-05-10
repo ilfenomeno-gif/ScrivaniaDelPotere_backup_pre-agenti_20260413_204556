@@ -37,5 +37,70 @@
     "ideologyMatrix": { "tasse": -6, "immigrazione": -8, "ambiente": -3, "difesa": 7, "diritti": -4 },
     "currents": [{ "id": "curr_ch_svp_main", "name": "Conservatori", "icon": "🛡️", "leader": "Marco Chiesa", "influence": 66, "bonus": "+10 consenso rurale", "malus": "Coalizioni difficili" }],
     "startingBonus": { "muscoli": 5, "reputazione": 3 }
+  },
+  {
+    "id": "ch_pdc",
+    "name": "Partito Democratico Cristiano",
+    "shortName": "PDC",
+    "icon": "🤝",
+    "color": "#577590",
+    "ideology": "center_right",
+    "country": "switzerland",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -1, "immigrazione": 0, "ambiente": 2, "difesa": 3, "diritti": 2 },
+    "currents": [{ "id": "curr_ch_pdc_main", "name": "Popolari Moderati", "icon": "🏔️", "leader": "Gerhard Pfister", "influence": 55, "bonus": "+7 stabilita coalizione", "malus": "Visibilita mediatica limitata" }],
+    "startingBonus": { "coherence": 3, "networking": 4 }
+  },
+  {
+    "id": "ch_udc",
+    "name": "Unione Democratica di Centro",
+    "shortName": "UDC",
+    "icon": "🦅",
+    "color": "#1b4332",
+    "ideology": "right",
+    "country": "switzerland",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -8, "ambiente": -3, "difesa": 6, "diritti": -4 },
+    "currents": [{ "id": "curr_ch_udc_main", "name": "Nazional-Conservatori", "icon": "📢", "leader": "Albert Rohr", "influence": 64, "bonus": "+10 consenso territoriale", "malus": "Relazioni estere difficili" }],
+    "startingBonus": { "reputazione": 2, "carisma": 3 }
+  },
+  {
+    "id": "ch_left_collective",
+    "name": "Swiss Left Collective",
+    "shortName": "SLC",
+    "icon": "🚩",
+    "color": "#9d0208",
+    "ideology": "radical_left",
+    "country": "switzerland",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 7, "difesa": -3, "diritti": 9 },
+    "currents": [{ "id": "curr_ch_slc_main", "name": "Sinistra Civica", "icon": "✊", "leader": "Lea Bianchi", "influence": 47, "bonus": "+10 mobilitazione urbana", "malus": "Accordi moderati complessi" }],
+    "startingBonus": { "morale": 7, "reputazione": 2 }
+  },
+  {
+    "id": "ch_green_social",
+    "name": "Green Social Switzerland",
+    "shortName": "GSS",
+    "icon": "🌿",
+    "color": "#2a9d8f",
+    "ideology": "center_left",
+    "country": "switzerland",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 3, "immigrazione": 5, "ambiente": 8, "difesa": 0, "diritti": 7 },
+    "currents": [{ "id": "curr_ch_gss_main", "name": "Ecologisti Moderati", "icon": "♻️", "leader": "Nina Frei", "influence": 48, "bonus": "+8 consenso under35", "malus": "Sostegno rurale limitato" }],
+    "startingBonus": { "coherence": 3, "reputazione": 2 }
+  },
+  {
+    "id": "ch_identity_front",
+    "name": "Swiss Identity Front",
+    "shortName": "SIF",
+    "icon": "🦅",
+    "color": "#14213d",
+    "ideology": "radical_right",
+    "country": "switzerland",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -6 },
+    "currents": [{ "id": "curr_ch_sif_main", "name": "Sovranisti Alpini", "icon": "📢", "leader": "Jonas Keller", "influence": 46, "bonus": "+8 consenso identitario", "malus": "Coalizioni quasi nulle" }],
+    "startingBonus": { "carisma": 3, "stress": 3 }
   }
 ]

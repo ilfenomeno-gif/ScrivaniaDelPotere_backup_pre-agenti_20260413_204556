@@ -1115,6 +1115,10 @@ const GameMap = {
                         <option value="france" ${currentNation === 'france' ? 'selected' : ''}>Francia</option>
                         <option value="germany" ${currentNation === 'germany' ? 'selected' : ''}>Germania</option>
                         <option value="uk" ${currentNation === 'uk' ? 'selected' : ''}>Regno Unito</option>
+                        <option value="spain" ${currentNation === 'spain' ? 'selected' : ''}>Spagna</option>
+                        <option value="portugal" ${currentNation === 'portugal' ? 'selected' : ''}>Portogallo</option>
+                        <option value="benelux" ${currentNation === 'benelux' ? 'selected' : ''}>Benelux</option>
+                        <option value="switzerland" ${currentNation === 'switzerland' ? 'selected' : ''}>Svizzera</option>
                     </select>
                     <label class="city-filter-toggle">
                         <input type="checkbox" id="city-filter-capoluoghi">

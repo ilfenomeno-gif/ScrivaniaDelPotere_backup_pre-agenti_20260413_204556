@@ -43,5 +43,57 @@
     "currents": [{ "id": "curr_es_vox_sovranista", "name": "Sovranisti", "icon": "📢", "leader": "Santiago Abascal", "influence": 70, "bonus": "+12 consenso base", "malus": "Media ostile +10 stress" }],
     "bonuses": [{ "stat": "reputazione", "value": 3, "condition": "always", "label": "+3 reputazione su temi identitari" }],
     "startingBonus": { "carisma": 4, "stress": 4 }
+  },
+  {
+    "id": "es_sumar",
+    "name": "Sumar",
+    "shortName": "SUMAR",
+    "icon": "✊",
+    "color": "#7b2cbf",
+    "ideology": "radical_left",
+    "country": "spain",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 7, "immigrazione": 7, "ambiente": 8, "difesa": -2, "diritti": 9 },
+    "currents": [{ "id": "curr_es_sumar_coalicion", "name": "Coalicion Progressista", "icon": "🟣", "leader": "Yolanda Diaz", "influence": 63, "bonus": "+12 consenso under35", "malus": "Accordi centristi riducono coerenza" }],
+    "startingBonus": { "reputazione": 3, "morale": 9 }
+  },
+  {
+    "id": "es_centrista_democratico",
+    "name": "Centrista Democratico",
+    "shortName": "CD",
+    "icon": "🧭",
+    "color": "#f4d35e",
+    "ideology": "center",
+    "country": "spain",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 0, "immigrazione": 2, "ambiente": 3, "difesa": 2, "diritti": 4 },
+    "currents": [{ "id": "curr_es_cd_mod", "name": "Area Moderata", "icon": "⚖️", "leader": "Ines Romero", "influence": 52, "bonus": "+8% successo coalizioni", "malus": "Rischio irrilevanza elettorale" }],
+    "startingBonus": { "networking": 5, "coherence": 3 }
+  },
+  {
+    "id": "es_ecologistas_sociales",
+    "name": "Ecologistas Sociales",
+    "shortName": "ECO-S",
+    "icon": "🌿",
+    "color": "#2a9d8f",
+    "ideology": "center_left",
+    "country": "spain",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 3, "immigrazione": 6, "ambiente": 8, "difesa": 0, "diritti": 8 },
+    "currents": [{ "id": "curr_es_ecos_main", "name": "Riformisti Verdi", "icon": "♻️", "leader": "Clara Mendez", "influence": 53, "bonus": "+10 reputazione urbana", "malus": "Coalizioni a destra complesse" }],
+    "startingBonus": { "reputazione": 3, "morale": 5 }
+  },
+  {
+    "id": "es_democrata_cristiano",
+    "name": "Democrata Cristiano",
+    "shortName": "DC",
+    "icon": "🏛️",
+    "color": "#4a5568",
+    "ideology": "center_right",
+    "country": "spain",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": -1, "ambiente": 1, "difesa": 4, "diritti": 1 },
+    "currents": [{ "id": "curr_es_dc_main", "name": "Moderati Popolari", "icon": "🤝", "leader": "Luis Ortega", "influence": 51, "bonus": "+8 stabilita coalizione", "malus": "Fascia giovane limitata" }],
+    "startingBonus": { "reputazioneNazionale": 2, "coherence": 2 }
   }
 ]

@@ -40,5 +40,70 @@
     "ideologyMatrix": { "tasse": -4, "immigrazione": -8, "ambiente": -2, "difesa": 7, "diritti": -5 },
     "currents": [{ "id": "curr_pt_chega_main", "name": "Linea Dura", "icon": "🦅", "leader": "Andre Ventura", "influence": 72, "bonus": "+500 followers", "malus": "Debate malus" }],
     "startingBonus": { "followers": 300, "carisma": 3 }
+  },
+  {
+    "id": "pt_ad",
+    "name": "Alianca Democratica",
+    "shortName": "AD",
+    "icon": "🏛️",
+    "color": "#1d4e89",
+    "ideology": "center_right",
+    "country": "portugal",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": -1, "ambiente": 0, "difesa": 4, "diritti": 1 },
+    "currents": [{ "id": "curr_pt_ad_main", "name": "Coalizione Governista", "icon": "🤝", "leader": "Luis Montenegro", "influence": 61, "bonus": "+8 stabilita governo", "malus": "Rischio attriti interni" }],
+    "startingBonus": { "money": 55, "reputazioneNazionale": 2 }
+  },
+  {
+    "id": "pt_be",
+    "name": "Bloco de Esquerda",
+    "shortName": "BE",
+    "icon": "🚩",
+    "color": "#9d0208",
+    "ideology": "radical_left",
+    "country": "portugal",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 6, "difesa": -3, "diritti": 9 },
+    "currents": [{ "id": "curr_pt_be_main", "name": "Sinistra Sociale", "icon": "✊", "leader": "Mariana Mortagua", "influence": 59, "bonus": "+10 mobilitazione piazza", "malus": "Coalizioni difficili" }],
+    "startingBonus": { "morale": 8, "reputazione": 2 }
+  },
+  {
+    "id": "pt_centro_democratico",
+    "name": "Centro Democratico",
+    "shortName": "CDP",
+    "icon": "⚖️",
+    "color": "#e9c46a",
+    "ideology": "center",
+    "country": "portugal",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -1, "immigrazione": 1, "ambiente": 2, "difesa": 2, "diritti": 3 },
+    "currents": [{ "id": "curr_pt_cd_main", "name": "Moderati", "icon": "🧭", "leader": "Rui Almeida", "influence": 50, "bonus": "+6 consenso trasversale", "malus": "Base ridotta" }],
+    "startingBonus": { "coherence": 2, "networking": 4 }
+  },
+  {
+    "id": "pt_conservador_nacional",
+    "name": "Conservador Nacional",
+    "shortName": "CN",
+    "icon": "🛡️",
+    "color": "#1d3557",
+    "ideology": "right",
+    "country": "portugal",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -3, "immigrazione": -4, "ambiente": -1, "difesa": 5, "diritti": -2 },
+    "currents": [{ "id": "curr_pt_cn_main", "name": "Conservatori Tradizionali", "icon": "🏛️", "leader": "Joao Pereira", "influence": 52, "bonus": "+8 consenso territoriale", "malus": "Flessibilita negoziale ridotta" }],
+    "startingBonus": { "reputazioneNazionale": 2, "money": 35 }
+  },
+  {
+    "id": "pt_identitario",
+    "name": "Fronte Identitario",
+    "shortName": "FI-PT",
+    "icon": "🦅",
+    "color": "#14213d",
+    "ideology": "radical_right",
+    "country": "portugal",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -6 },
+    "currents": [{ "id": "curr_pt_fipt_main", "name": "Blocco Sovranista", "icon": "📢", "leader": "Miguel Duarte", "influence": 50, "bonus": "+10 consenso anti-establishment", "malus": "Coalizioni quasi nulle" }],
+    "startingBonus": { "carisma": 3, "stress": 3 }
   }
 ]

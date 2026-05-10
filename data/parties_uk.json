@@ -108,5 +108,97 @@
       { "stat": "ruralConsensus", "value": -0.10, "condition": "always", "label": "-10% consenso rurale" }
     ],
     "startingBonus": { "reputazione": 3, "morale": 10 }
+  },
+  {
+    "id": "uk_reform",
+    "name": "Reform UK",
+    "shortName": "REFORM",
+    "icon": "🦅",
+    "color": "#14213d",
+    "ideology": "radical_right",
+    "country": "uk",
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -6 },
+    "currents": [
+      {
+        "id": "curr_uk_reform_pop",
+        "name": "National Populists",
+        "icon": "📢",
+        "leader": "Nigel Farage",
+        "influence": 66,
+        "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -6 },
+        "bonus": "+10 consenso anti-establishment",
+        "malus": "Partnership istituzionali difficili"
+      }
+    ],
+    "startingBonus": { "carisma": 3, "stress": 3 }
+  },
+  {
+    "id": "uk_greens",
+    "name": "Green Party",
+    "shortName": "GREEN",
+    "icon": "🌿",
+    "color": "#2a9d8f",
+    "ideology": "center_left",
+    "country": "uk",
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 7, "ambiente": 10, "difesa": -3, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_uk_green_eco",
+        "name": "Eco Progressives",
+        "icon": "🌍",
+        "leader": "Carla Denyer",
+        "influence": 58,
+        "ideologyMatrix": { "tasse": 4, "immigrazione": 7, "ambiente": 10, "difesa": -3, "diritti": 9 },
+        "bonus": "+12 popolarita under30",
+        "malus": "Fondi industriali ridotti"
+      }
+    ],
+    "startingBonus": { "morale": 10, "reputazione": 2 }
+  },
+  {
+    "id": "uk_socialist_alliance",
+    "name": "Socialist Alliance UK",
+    "shortName": "SA",
+    "icon": "🚩",
+    "color": "#9d0208",
+    "ideology": "radical_left",
+    "country": "uk",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": 8, "immigrazione": 7, "ambiente": 6, "difesa": -3, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_uk_sa_main",
+        "name": "Left Activists",
+        "icon": "✊",
+        "leader": "Nadia Collins",
+        "influence": 51,
+        "bonus": "+10 mobilitazione piazza",
+        "malus": "Coalizioni istituzionali complesse"
+      }
+    ],
+    "startingBonus": { "morale": 8, "reputazione": 2 }
+  },
+  {
+    "id": "uk_christian_democrats",
+    "name": "Christian Democrats UK",
+    "shortName": "CDUK",
+    "icon": "🏛️",
+    "color": "#5e6472",
+    "ideology": "center_right",
+    "country": "uk",
+    "isReal": false,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": 0, "ambiente": 1, "difesa": 4, "diritti": 1 },
+    "currents": [
+      {
+        "id": "curr_uk_cduk_main",
+        "name": "Moderate Conservatives",
+        "icon": "🤝",
+        "leader": "George Hamilton",
+        "influence": 50,
+        "bonus": "+8 stabilita di governo",
+        "malus": "Base elettorale ristretta"
+      }
+    ],
+    "startingBonus": { "coherence": 2, "reputazioneNazionale": 2 }
   }
 ]
