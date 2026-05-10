@@ -57,7 +57,98 @@ document.addEventListener('DOMContentLoaded', function () {
         session: 'pop_session_v1',
         legacySave: 'scrivaniaDelPotere_save',
         pendingLoad: 'pop_pending_load_v1',
+        leaderboard: 'pop_leaderboard_v1',
     };
+
+    function computeFinalScore(state) {
+        const day = Number(state.day || 0);
+        const money = Number(state.money || 0);
+        const rep = Number(state.reputazione || 0) + Number(state.reputazioneNazionale || 0);
+        const coherence = Number(state.coherence || 0);
+        const health = Number(state.stats && state.stats.salute ? state.stats.salute : 0);
+        const stress = Number(state.stats && state.stats.stress ? state.stats.stress : 0);
+
+        // Score weights tuned to reward longevity + balanced profile
+        const raw = (day * 12) + Math.round(money / 15) + (rep * 5) + (coherence * 3) + (health * 2) - (stress * 2);
+        return Math.max(0, Math.round(raw));
+    }
+
+    function loadLeaderboard() {
+        try {
+            const raw = localStorage.getItem(STORAGE.leaderboard);
+            const data = raw ? JSON.parse(raw) : [];
+            return Array.isArray(data) ? data : [];
+        } catch (_) {
+            return [];
+        }
+    }
+
+    function saveLeaderboard(entries) {
+        localStorage.setItem(STORAGE.leaderboard, JSON.stringify(entries || []));
+    }
+
+    function pushLeaderboardEntry(state) {
+        const entries = loadLeaderboard();
+        const score = computeFinalScore(state);
+        const entry = {
+            id: `lb_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            name: (state.character && state.character.name) || 'Sconosciuto',
+            mode: state.gameMode || 'sandbox',
+            day: Number(state.day || 0),
+            money: Number(state.money || 0),
+            score,
+            at: nowIso(),
+        };
+
+        entries.push(entry);
+        entries.sort((a, b) => b.score - a.score);
+        const trimmed = entries.slice(0, 10);
+        saveLeaderboard(trimmed);
+        return { score, top: trimmed };
+    }
+
+    function renderLeaderboard(topEntries) {
+        const host = document.getElementById('gameover-leaderboard');
+        if (!host) return;
+        if (!Array.isArray(topEntries) || topEntries.length === 0) {
+            host.innerHTML = '<p>Nessun punteggio registrato.</p>';
+            return;
+        }
+
+        host.innerHTML = `
+            <h4>🏆 Classifica Locale</h4>
+            <div>
+                ${topEntries.map((e, i) => `
+                    <p><strong>#${i + 1}</strong> ${Game.esc(e.name)} — ${e.score} pt • Giorno ${e.day} • ${e.mode === 'campaign' ? 'Campagna' : 'Sandbox'}</p>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    async function shareCurrentScore() {
+        const st = Game.state || {};
+        const score = computeFinalScore(st);
+        const modeLabel = st.gameMode === 'campaign' ? 'Campagna' : 'Sandbox';
+        const msg = `Power of Politics | ${st.character && st.character.name ? st.character.name : 'Player'} | ${modeLabel} | Giorno ${st.day || 0} | Score ${score}`;
+
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(msg);
+                alert('Punteggio copiato negli appunti.');
+                return;
+            }
+        } catch (_) {
+            // fallback below
+        }
+
+        const ta = document.createElement('textarea');
+        ta.value = msg;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('Punteggio copiato negli appunti.');
+    }
 
     const DLC_CATALOG = [
         // === EXPANSION PACKS ===
@@ -75,20 +166,18 @@ document.addEventListener('DOMContentLoaded', function () {
             desc: 'Accordi bilaterali, lobbying UE, conti offshore, relazioni internazionali. Gratuito: notizie generiche estere. Completo: schermata diplomatica, gestione dossier, fondi EU.',
             systems: ['diplomacy.js'],
         },
-
-        // === FLAVOR PACKS ===
         {
             id: 'dlc_radici_housing',
             type: 'Expansion',
             title: '🏡 Radici — Sistema Abitativo',
-            desc: 'Nuove abitazioni (Villa Suburbana, Attico Prestigio), seconda proprietà, sale riunioni private. Gratuito: nuove migliorie, 4° livello stanze. Completo: doppio domicilio, scandali.',
+            desc: 'Nuove abitazioni (Villa Suburbana, Attico Prestigio), seconda proprietà, sale riunioni private. Gratuito: nuove migliorie, 4° livello stanze. Completo: doppio domicilio, scandali da casa segreta.',
             systems: ['housingExtended.js'],
         },
         {
             id: 'dlc_agenda_piena_slots',
             type: 'Expansion',
             title: '⏰ Agenda Piena — Gestione del Tempo',
-            desc: 'Sistema slot giornalieri (mattina/pomeriggio/sera), attività personali, fatigue. Gratuito: slot visibili. Completo: attività avanzate, burnout.',
+            desc: 'Sistema slot giornalieri (mattina/pomeriggio/sera), attività personali strutturate, sistema fatigue. Gratuito: slot visibili, 3 slot/giorno. Completo: attività avanzate, burnout events.',
             systems: ['dailySlots.js'],
         },
 
@@ -106,20 +195,20 @@ document.addEventListener('DOMContentLoaded', function () {
             title: '🎭 La Prima Repubblica — Scenario Storico',
             desc: 'Modalità scenario 1970-1992 con partiti storici, Mani Pulite come evento catastrofico, terrorismo degli Anni di Piombo. 60+ eventi storici, 5 scenari di partenza.',
             systems: ['scenario.js'],
-                {
-                    id: 'dlc_corpo_mente_wellness',
-                    type: 'Flavor',
-                    title: '💪 Corpo e Mente — Salute e Benessere',
-                    desc: 'Medico fiduciario corrompibile, abitudini tracciabili, crisi mediche narrative. Gratuito: tab benessere, 5 abitudini base. Completo: 30+ eventi salute, dipendenze escalation.',
-                    systems: ['wellnessSystem.js'],
-                },
-                {
-                    id: 'dlc_casa_dolce_casa_narrative',
-                    type: 'Flavor',
-                    title: '🏠 Casa, Dolce Casa — Narrativa Domestica',
-                    desc: 'Visite domiciliari narrative, anniversari domestici, staff con personalità. Gratuito: anniversari, 5 staff base. Completo: 25+ eventi, 12 oggetti speciali, gossip staff.',
-                    systems: ['houseNarrative.js'],
-                },
+        },
+        {
+            id: 'dlc_corpo_mente_wellness',
+            type: 'Flavor',
+            title: '💪 Corpo e Mente — Salute e Benessere',
+            desc: 'Medico fiduciario corrompibile, abitudini tracciabili, crisi mediche narrative. Gratuito: tab benessere, 5 abitudini base. Completo: 30+ eventi salute, dipendenze escalation.',
+            systems: ['wellnessSystem.js'],
+        },
+        {
+            id: 'dlc_casa_dolce_casa_narrative',
+            type: 'Flavor',
+            title: '🏠 Casa, Dolce Casa — Narrativa Domestica',
+            desc: 'Visite domiciliari narrative, anniversari domestici, staff con personalità. Gratuito: anniversari, 5 staff base. Completo: 25+ eventi, 12 oggetti speciali, gossip staff.',
+            systems: ['houseNarrative.js'],
         },
 
         // === IMMERSION PACKS ===
@@ -136,6 +225,20 @@ document.addEventListener('DOMContentLoaded', function () {
             title: '🗞️ La Stampa — Ecosystem Mediatico',
             desc: '8 direttori di testata corrompibili, gestione narrativa pubblica, press conference come minigioco, bolla informativa. Trasforma ticker.js in sistema di relazioni.',
             systems: ['press.js'],
+        },
+        {
+            id: 'dlc_prezzo_potere_expenses',
+            type: 'Immersion',
+            title: '💰 Il Prezzo del Potere — Economia Quotidiana',
+            desc: 'Spese quotidiane granulari, rappresentanza, budget tracking. Gratuito: 3 spese casuali, notifiche. Completo: 15 categorie spese, evasione grigia, assicurazione.',
+            systems: ['dailyExpenses.js'],
+        },
+        {
+            id: 'dlc_tempo_libero_hobbies',
+            type: 'Immersion',
+            title: '🎮 Tempo Libero — Sistema Hobby',
+            desc: '8 hobby con connessioni trasversali, identità pubblica, rischi scandalo. Gratuito: 2 hobby base. Completo: 8 hobby avanzati con 5 eventi ciascuno, integrazioni factions/intel.',
+            systems: ['hobbySystem.js'],
         },
     ];
 
@@ -335,11 +438,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function showGameOver() {
         showScreen('screen-gameover');
         const st = Game.state;
+        const scoreData = pushLeaderboardEntry(st);
         const el = document.getElementById('gameover-stats');
         if (!el) return;
         el.innerHTML = `
             <p><strong>${Game.esc(st.character.name)}</strong> — ${Game.esc(st.character.ideology)}</p>
             <p>📅 Giorni sopravvissuti: <strong>${st.day}</strong></p>
+            <p>🏆 Punteggio Finale: <strong>${scoreData.score}</strong></p>
             <hr>
             <h4>Attributi</h4>
             <p>🧠 Intelligenza: ${st.attributes.intelligenza}</p>
@@ -357,6 +462,8 @@ document.addEventListener('DOMContentLoaded', function () {
             <p>🌐 Reputazione Nazionale: ${st.reputazioneNazionale}/100</p>
             <p>💰 Soldi: ${st.money}€</p>
         `;
+
+        renderLeaderboard(scoreData.top);
     }
 
     /* ----- Game Over Conditions (extra, beyond game.js checks) ----- */
@@ -409,8 +516,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* ----- Restart & Export/Import Save ----- */
     const restartBtn = document.getElementById('btn-restart');
+    const shareScoreBtn = document.getElementById('btn-share-score');
     if (restartBtn) {
         restartBtn.addEventListener('click', () => location.reload());
+    }
+    if (shareScoreBtn) {
+        shareScoreBtn.addEventListener('click', () => {
+            shareCurrentScore().catch(() => {
+                alert('Impossibile condividere il punteggio in questo momento.');
+            });
+        });
     }
     const exportBtn = document.getElementById('btn-export-save');
     if (exportBtn) {
@@ -654,24 +769,16 @@ document.addEventListener('DOMContentLoaded', function () {
             homeCampaignList.innerHTML = '<div class="home-list-item">Nessuna campagna salvata.</div>';
             return;
         }
-            {
-                id: 'dlc_prezzo_potere_expenses',
-                type: 'Immersion',
-                title: '💰 Il Prezzo del Potere — Economia Quotidiana',
-                desc: 'Spese quotidiane granulari, rappresentanza, budget tracking. Gratuito: 3 spese casuali, notifiche. Completo: 15 categorie spese, evasione grigia, assicurazione.',
-                systems: ['dailyExpenses.js'],
-            },
-            {
-                id: 'dlc_tempo_libero_hobbies',
-                type: 'Immersion',
-                title: '🎮 Tempo Libero — Sistema Hobby',
-                desc: '8 hobby con connessioni trasversali, identità pubblica, rischi scandalo. Gratuito: 2 hobby base. Completo: 8 hobby avanzati con 5 eventi ciascuno, integrazioni factions/intel.',
-                systems: ['hobbySystem.js'],
-            },
+        homeCampaignList.innerHTML = campaigns.map((c) => {
+            const savesHtml = (c.saves || []).map((sv) => {
+                return `
+                    <div class="home-list-item-actions">
+                        <span class="home-list-tag">${sv.label || 'Autosave'} • ${new Date(sv.updatedAt || c.lastPlayedAt || c.createdAt).toLocaleString('it-IT')}</span>
                         <button class="home-action-btn" data-load-campaign="${c.id}" data-load-save="${sv.id}">Carica</button>
                     </div>
                 `;
             }).join('') || '<div class="home-list-tag">Nessun salvataggio</div>';
+
             return `
                 <div class="home-list-item">
                     <div><strong>${c.name}</strong></div>
@@ -734,6 +841,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!u.dlcState) u.dlcState = {};
                     u.dlcState[id] = !u.dlcState[id];
                 });
+                syncActiveDlcToGameState();
                 renderDlcList();
                 setHomeMessage('Stato DLC aggiornato.');
             });

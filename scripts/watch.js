@@ -25,6 +25,7 @@ let initialRunStarted = false;
 let suppressEventsUntil = 0;
 let analysisRuns = 0;
 let runtimeRunning = false;
+let matrixRunning = false;
 
 function parseRuntimeEveryArg() {
     const idx = process.argv.findIndex(v => v === '--runtime-every');
@@ -87,6 +88,33 @@ function runRuntimeCheck(triggerReason) {
     });
 }
 
+function runDlcMatrixCheck(triggerReason) {
+    if (matrixRunning) return;
+    matrixRunning = true;
+    const startedAt = Date.now();
+    const prefix = `[WATCH ${ts()}]`;
+
+    console.log(`${prefix} Avvio DLC matrix check (${triggerReason})...`);
+    const child = spawn(process.execPath, [path.join(__dirname, 'dlcIntegrationMatrix.js'), '--days', '20'], {
+        cwd: ROOT,
+        stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    let out = '';
+    let err = '';
+    child.stdout.on('data', d => { out += String(d); });
+    child.stderr.on('data', d => { err += String(d); });
+
+    child.on('close', code => {
+        const elapsed = Date.now() - startedAt;
+        const summaryLine = `${out}\n${err}`.split(/\r?\n/).find(l => l.includes('Passed:')) || 'Summary non disponibile';
+        console.log(`${prefix} DLC matrix terminata in ${elapsed} ms (exit ${code})`);
+        console.log(`${prefix} ${summaryLine}`);
+        process.stdout.write('\u0007');
+        matrixRunning = false;
+    });
+}
+
 function runFastAnalysis(reason) {
     if (running) {
         rerunPending = true;
@@ -136,6 +164,7 @@ function runFastAnalysis(reason) {
         process.stdout.write('\u0007');
 
         analysisRuns += 1;
+        runDlcMatrixCheck(`analisi #${analysisRuns}`);
         const shouldRunRuntime = runtimeCheckEvery > 0
             && reason !== 'initial'
             && analysisRuns % runtimeCheckEvery === 0;

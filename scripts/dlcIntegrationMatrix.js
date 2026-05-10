@@ -31,6 +31,15 @@ function parseArgNumber(flag, fallback) {
     return Number.isFinite(value) ? value : fallback;
 }
 
+function parseThresholds() {
+    return {
+        minMoney: parseArgNumber('--min-money', -20000),
+        maxStress: parseArgNumber('--max-stress', 300),
+        minStress: parseArgNumber('--min-stress', -600),
+        minCoherence: parseArgNumber('--min-coherence', 0),
+    };
+}
+
 function buildGameStub() {
     const listeners = new Map();
     const notifications = [];
@@ -202,7 +211,7 @@ function buildScenarios() {
     return scenarios;
 }
 
-function runScenario(scenario, days) {
+function runScenario(scenario, days, thresholds) {
     const ctx = createContext();
     const loaded = [];
 
@@ -270,20 +279,38 @@ function runScenario(scenario, days) {
         if (errors.length > 30) break;
     }
 
+    const assertionErrors = [];
+    const finalMoney = Number(game.state.money || 0);
+    const finalStress = Number(game.state.stats.stress || 0);
+    const finalCoherence = Number(game.state.coherence || 0);
+
+    if (finalMoney < thresholds.minMoney) {
+        assertionErrors.push(`Money below threshold: ${finalMoney} < ${thresholds.minMoney}`);
+    }
+    if (finalStress > thresholds.maxStress) {
+        assertionErrors.push(`Stress above threshold: ${finalStress} > ${thresholds.maxStress}`);
+    }
+    if (finalStress < thresholds.minStress) {
+        assertionErrors.push(`Stress below threshold: ${finalStress} < ${thresholds.minStress}`);
+    }
+    if (finalCoherence < thresholds.minCoherence) {
+        assertionErrors.push(`Coherence below threshold: ${finalCoherence} < ${thresholds.minCoherence}`);
+    }
+
     return {
         scenario: scenario.name,
-        ok: errors.length === 0,
+        ok: errors.length === 0 && assertionErrors.length === 0,
         dayReached: game.state.day,
         notifications: game.notifications.length,
-        money: game.state.money,
-        stress: game.state.stats.stress,
+        money: finalMoney,
+        stress: finalStress,
         salute: game.state.stats.salute,
-        coherence: game.state.coherence,
-        errors,
+        coherence: finalCoherence,
+        errors: errors.concat(assertionErrors),
     };
 }
 
-function buildMarkdownReport(days, results, elapsedMs) {
+function buildMarkdownReport(days, results, elapsedMs, thresholds) {
     const total = results.length;
     const passed = results.filter(r => r.ok).length;
     const failed = total - passed;
@@ -297,6 +324,7 @@ function buildMarkdownReport(days, results, elapsedMs) {
     lines.push(`- Passed: ${passed}`);
     lines.push(`- Failed: ${failed}`);
     lines.push(`- Elapsed: ${elapsedMs} ms`);
+    lines.push(`- Thresholds: money >= ${thresholds.minMoney}, ${thresholds.minStress} <= stress <= ${thresholds.maxStress}, coherence >= ${thresholds.minCoherence}`);
     lines.push('');
     lines.push('## Scenario Results');
     lines.push('');
@@ -327,17 +355,18 @@ function buildMarkdownReport(days, results, elapsedMs) {
 function main() {
     const start = Date.now();
     const days = Math.max(5, parseArgNumber('--days', 30));
+    const thresholds = parseThresholds();
     const scenarios = buildScenarios();
 
     console.log('DLC integration matrix test started');
     console.log(`Workspace: ${ROOT}`);
     console.log(`Scenarios: ${scenarios.length}, days: ${days}`);
 
-    const results = scenarios.map(s => runScenario(s, days));
+    const results = scenarios.map(s => runScenario(s, days, thresholds));
     const elapsedMs = Date.now() - start;
     const failed = results.filter(r => !r.ok);
 
-    const report = buildMarkdownReport(days, results, elapsedMs);
+    const report = buildMarkdownReport(days, results, elapsedMs, thresholds);
     fs.writeFileSync(REPORT_PATH, report, 'utf8');
 
     console.log('--- Summary ---');
