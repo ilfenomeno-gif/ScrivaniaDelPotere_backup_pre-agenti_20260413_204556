@@ -1004,18 +1004,23 @@ const Phone = {
     // ====== WORK NOTIFICATIONS TAB ======
     renderWorkNotifs() {
         const container = document.getElementById('work-notifications');
+        if (!container) return;
         const notifs = Game.state.workNotifs;
+        container.setAttribute('role', 'region');
+        container.setAttribute('aria-label', 'Notifiche di lavoro');
+
+        const heading = '<h4 class="visually-hidden">Elenco notifiche lavoro</h4>';
         if (notifs.length === 0) {
-            container.innerHTML = '<p style="color:#666">Nessuna notifica.</p>';
+            container.innerHTML = `${heading}<p style="color:#666">Nessuna notifica.</p>`;
             return;
         }
-        container.innerHTML = notifs.map(n => `
+        container.innerHTML = `${heading}${notifs.map(n => `
             <div class="work-notif">
                 <div class="work-notif-title">${this.esc(n.title)}</div>
                 <div class="work-notif-body">${this.esc(n.body)}</div>
                 <div class="work-notif-time">${this.esc(n.time)}</div>
             </div>
-        `).join('');
+        `).join('')}`;
     },
 
     renderFavori() {
@@ -1116,13 +1121,48 @@ const Phone = {
 
     // ====== WORK SUB-TABS ======
     initWorkSubTabs() {
-        document.querySelectorAll('.phone-work-tab').forEach(tab => {
+        const labels = {
+            urgenti: 'Urgenti',
+            lavoro: 'Lavoro',
+            favori: 'Favori',
+        };
+
+        const tabList = document.querySelector('#tab-attivita .phone-work-tabs');
+        if (tabList) {
+            tabList.setAttribute('role', 'tablist');
+            tabList.setAttribute('aria-label', 'Sezioni attivita');
+        }
+
+        document.querySelectorAll('.phone-work-tab').forEach((tab, idx) => {
+            const key = tab.dataset.wtab;
+            const panelId = `phone-wtab-${key}`;
+            if (!tab.id) tab.id = `phone-work-tab-${key || idx}`;
+            tab.setAttribute('role', 'tab');
+            tab.setAttribute('aria-controls', panelId);
+            tab.setAttribute('aria-selected', tab.classList.contains('active') ? 'true' : 'false');
+            tab.setAttribute('aria-label', `Sezione ${labels[key] || key || 'attivita'}`);
+
+            const content = document.getElementById(panelId);
+            if (content) {
+                content.setAttribute('role', 'tabpanel');
+                content.setAttribute('aria-labelledby', tab.id);
+            }
+
             tab.addEventListener('click', () => {
-                document.querySelectorAll('.phone-work-tab').forEach(t => t && t.classList.remove('active'));
+                document.querySelectorAll('.phone-work-tab').forEach(t => {
+                    if (!t) return;
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
                 document.querySelectorAll('.phone-work-content').forEach(c => c && c.classList.remove('active'));
+
                 tab.classList.add('active');
-                const content = document.getElementById(`phone-wtab-${tab.dataset.wtab}`);
-                if (content) content.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                if (content) {
+                    content.classList.add('active');
+                    this._focusWorkSubSection(content, labels[key] || key);
+                }
+                if (window.SR) SR.announce(`Sezione lavoro: ${labels[key] || key}.`, 'polite');
             });
         });
 
@@ -1130,8 +1170,25 @@ const Phone = {
         if (activeTab) {
             document.querySelectorAll('.phone-work-content').forEach(c => c && c.classList.remove('active'));
             const target = document.getElementById(`phone-wtab-${activeTab.dataset.wtab}`);
-            if (target) target.classList.add('active');
+            if (target) {
+                target.classList.add('active');
+                activeTab.setAttribute('aria-selected', 'true');
+            }
         }
+    },
+
+    _focusWorkSubSection(content, label) {
+        if (!content) return;
+        let heading = content.querySelector('[data-sr-work-heading]');
+        if (!heading) {
+            heading = document.createElement('h4');
+            heading.className = 'visually-hidden';
+            heading.setAttribute('data-sr-work-heading', '1');
+            heading.setAttribute('tabindex', '-1');
+            content.insertBefore(heading, content.firstChild);
+        }
+        heading.textContent = `Sezione ${label || 'lavoro'}`;
+        requestAnimationFrame(() => heading.focus({ preventScroll: false }));
     },
 
     // ====== WORK MESSAGES (Opportunities) ======
@@ -1171,12 +1228,18 @@ const Phone = {
         if (!container) return;
         if (!Game.state.workMessages) Game.state.workMessages = [];
         const msgs = Game.state.workMessages.filter(m => !m.handled);
+
+        container.setAttribute('role', 'region');
+        container.setAttribute('aria-live', 'polite');
+        container.setAttribute('aria-label', 'Messaggi e opportunita di lavoro');
+
+        const heading = '<h4 class="visually-hidden">Elenco opportunita lavoro</h4><p class="visually-hidden">Prima di scegliere, ascolta costo in azioni, denaro e impatto su stress o reputazione.</p>';
         if (msgs.length === 0) {
-            container.innerHTML = '<p style="color:#666">Nessun messaggio di lavoro.</p>';
+            container.innerHTML = `${heading}<p style="color:#666">Nessun messaggio di lavoro.</p>`;
             return;
         }
         const noPA = !Game.hasPhoneActions(1);
-        container.innerHTML = msgs.map(m => {
+        container.innerHTML = `${heading}${msgs.map(m => {
             const parts = [];
             if (m.money > 0) parts.push(`+€${m.money}`);
             Object.entries(m.reward).forEach(([k, v]) => {
@@ -1205,7 +1268,7 @@ const Phone = {
                         ${noPA ? '📱 Esaurite' : '✅ Accetta'} <span class="task-ap-cost">1 📱</span>
                     </button>
                 </div>`;
-        }).join('');
+        }).join('')}`;
 
         container.querySelectorAll('.work-msg-accept').forEach(btn => {
             btn.addEventListener('click', () => {

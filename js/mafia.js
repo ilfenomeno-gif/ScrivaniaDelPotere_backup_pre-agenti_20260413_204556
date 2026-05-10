@@ -729,6 +729,7 @@ const Mafia = {
 
     // === UI: MODAL A 2 SCELTE (riusa urgent-choice-overlay) ===
     showMafiaChoice(event) {
+        const _triggerEl = document.activeElement;
         let overlay = document.getElementById('urgent-choice-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -736,9 +737,10 @@ const Mafia = {
             overlay.className = 'urgent-choice-overlay';
             document.body.appendChild(overlay);
         }
+        const headingId = `mafia-choice-h-${Date.now()}`;
         overlay.innerHTML = `
-            <div class="urgent-choice-modal mafia-modal">
-                <div class="urgent-choice-header mafia-header">🔫 ${Game.esc(event.title)}</div>
+            <div class="urgent-choice-modal mafia-modal" role="dialog" aria-modal="true" aria-labelledby="${headingId}">
+                <div id="${headingId}" class="urgent-choice-header mafia-header">🔫 ${Game.esc(event.title)}</div>
                 <div class="urgent-choice-from">Da: ${Game.esc(event.from)}</div>
                 <div class="urgent-choice-body">${Game.esc(event.body)}</div>
                 <div class="urgent-choice-buttons">
@@ -748,6 +750,9 @@ const Mafia = {
             </div>
         `;
         overlay.classList.add('visible');
+
+        const modalEl = overlay.querySelector('[role="dialog"]');
+        if (window.SR) SR.openModal(modalEl, event.title, event.body);
 
         overlay.querySelectorAll('.urgent-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -765,12 +770,14 @@ const Mafia = {
                 // Callback
                 if (choice.callback) choice.callback();
                 overlay.classList.remove('visible');
+                if (window.SR) SR.closeModal(_triggerEl, `Scelta mafia: ${choice.label}.`);
             }, { once: true });
         });
     },
 
     // === UI: MODAL A 3 SCELTE (primo contatto) ===
     showMafiaChoice3(event) {
+        const _triggerEl = document.activeElement;
         let overlay = document.getElementById('urgent-choice-overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -778,13 +785,14 @@ const Mafia = {
             overlay.className = 'urgent-choice-overlay';
             document.body.appendChild(overlay);
         }
+        const headingId = `mafia-choice3-h-${Date.now()}`;
         const buttonsHTML = event.choices.map((c, i) =>
             `<button class="urgent-btn mafia-btn-opt" data-idx="${i}">${c.label}</button>`
         ).join('');
 
         overlay.innerHTML = `
-            <div class="urgent-choice-modal mafia-modal">
-                <div class="urgent-choice-header mafia-header">🔫 ${Game.esc(event.title)}</div>
+            <div class="urgent-choice-modal mafia-modal" role="dialog" aria-modal="true" aria-labelledby="${headingId}">
+                <div id="${headingId}" class="urgent-choice-header mafia-header">🔫 ${Game.esc(event.title)}</div>
                 <div class="urgent-choice-from">Da: ${Game.esc(event.from)}</div>
                 <div class="urgent-choice-body">${Game.esc(event.body)}</div>
                 <div class="urgent-choice-buttons mafia-buttons-3">${buttonsHTML}</div>
@@ -792,12 +800,16 @@ const Mafia = {
         `;
         overlay.classList.add('visible');
 
+        const modalEl = overlay.querySelector('[role="dialog"]');
+        if (window.SR) SR.openModal(modalEl, event.title, event.body);
+
         overlay.querySelectorAll('.mafia-btn-opt').forEach(btn => {
             btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx);
+                const idx = parseInt(btn.dataset.idx, 10);
                 const chosen = event.choices[idx];
-                if (chosen.callback) chosen.callback();
+                if (chosen && chosen.callback) chosen.callback();
                 overlay.classList.remove('visible');
+                if (window.SR) SR.closeModal(_triggerEl, `Scelta mafia: ${(chosen && chosen.label) || 'opzione confermata'}.`);
             }, { once: true });
         });
     },

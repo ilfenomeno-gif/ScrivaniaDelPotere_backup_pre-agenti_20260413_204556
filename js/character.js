@@ -324,7 +324,36 @@ const Character = {
 
     getMentorBonusText(mentorId) {
         const mentor = this.getMentorById(mentorId);
-        return mentor && mentor.bonusText ? mentor.bonusText : 'Nessun bonus';
+        if (!mentor) return 'Nessun bonus';
+        
+        // Support both old format (bonusText) and new format (bonus object)
+        if (mentor.bonusText) return mentor.bonusText;
+        
+        if (!mentor.bonus || Object.keys(mentor.bonus).length === 0) {
+            return 'Nessun bonus';
+        }
+        
+        // Build bonus text from bonus object (e.g., { ap: 2, charisma: 1 })
+        const bonusLabels = {
+            ap: 'PA',
+            charisma: 'Carisma',
+            intellect: 'Intelletto',
+            budget: 'Budget',
+        };
+        const bonusItems = Object.entries(mentor.bonus)
+            .filter(([_, val]) => val > 0)
+            .map(([key, val]) => `+${val} ${bonusLabels[key] || key}`)
+            .join(', ');
+        
+        return bonusItems || 'Nessun bonus';
+    },
+
+    getDefaultAvatarForGender(gender) {
+        const avatarList = this.AVATARS[gender] || this.AVATARS['X'];
+        if (!avatarList || avatarList.length === 0) return '👤';
+        // Pick a random avatar from the list for this gender
+        const randomIndex = Math.floor(Math.random() * avatarList.length);
+        return avatarList[randomIndex].value;
     },
 
     getAvailableMentors() {
@@ -403,13 +432,46 @@ const Character = {
         };
     },
 
-    getAvailableMentorsForNation() {
-        const mentorsByIdeology = Game.state.mentorsDB;
-        if (!mentorsByIdeology) return this.getAvailableMentors();
+    async getAvailableMentorsForNation() {
+        // Load mentors from mentors-parties.json (per-nation party-based mentors)
+        if (!this._mentorsPartiesDB) {
+            try {
+                const resp = await fetch('/data/mentors-parties.json');
+                this._mentorsPartiesDB = await resp.json();
+            } catch (err) {
+                console.error('Failed to load mentors-parties.json:', err);
+                return this.getAvailableMentors();  // Fallback to old system
+            }
+        }
 
         const ideology = Game.state.character.ideology;
-        const nationMentors = mentorsByIdeology[ideology] || [];
-        return [...nationMentors, this.MENTOR_AUTONOMO];
+        if (!ideology) return [];
+
+        // Get nation ID
+        const nationId = (Game.state.nation && Game.state.nation.id) || Game.state.startingNation || 'italy';
+        const nationData = this._mentorsPartiesDB[nationId];
+        if (!nationData || !nationData.mentors) {
+            console.warn(`No mentors found for nation ${nationId} in mentors-parties.json`);
+            return this.getAvailableMentors();  // Fallback
+        }
+
+        // Filter mentors by selected ideology
+        const mentorsForIdeology = nationData.mentors.filter(m => this.mapPartyIdeologyToGame(m.ideology) === ideology);
+        return [...mentorsForIdeology, this.MENTOR_AUTONOMO];
+    },
+
+    // Map ideology from mentors-parties.json (Italian names) to game ideology constants (English)
+    mapPartyIdeologyToGame(partyIdeology) {
+        const ideologyMap = {
+            'sinistra_radicale': 'radical_left',
+            'sinistra': 'left',
+            'centro_sinistra': 'center_left',
+            'centro': 'center',
+            'centro_destra': 'center_right',
+            'destra': 'right',
+            'destra_radicale': 'radical_right',
+        };
+        return ideologyMap[partyIdeology] || 'center';  // Default to center if unknown
     },
 
     // A. Ideology → protocol color codes
@@ -467,12 +529,10 @@ const Character = {
         const self = this;
 
         const STEP_LABELS = {
-            '1': 'Passaggio 1 di 6: Anagrafica. Inserisci nome e genere.',
-            '2': 'Passaggio 2 di 6: Ideologia. Scegli il tuo tratto ideologico.',
-            '3': 'Passaggio 3 di 6: Mentori. Scegli il tuo mentore politico.',
-            '4': 'Passaggio 4 di 6: Avatar. Scegli la foto identificativa.',
-            '5': 'Passaggio 5 di 6: Modalità di gioco. Scegli sandbox o campagna.',
-            '6': 'Passaggio 6 di 6: Mappa. Seleziona la città di partenza.',
+            '1': 'Passaggio 1 di 4: Anagrafica. Inserisci nome e genere.',
+            '2': 'Passaggio 2 di 4: Mappa. Seleziona la città di partenza.',
+            '3': 'Passaggio 3 di 4: Ideologia. Scegli il tuo tratto ideologico.',
+            '4': 'Passaggio 4 di 4: Mentori. Scegli il tuo mentore politico.',
         };
 
         function showTab(step) {
@@ -482,8 +542,8 @@ const Character = {
                 btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
             });
             tabContents.forEach(tab => tab.classList.toggle('hidden', tab.id !== `character-step-${step}`));
-            if (String(step) === '3') self.renderMentorSelectionStep();
-            if (String(step) === '6') self.renderOnboardingCityStep();
+            if (String(step) === '4') self.renderMentorSelectionStep().catch(e => console.error('Error rendering mentors:', e));
+            if (String(step) === '2') self.renderOnboardingCityStep();
             // SR: announce step and move focus to panel heading or first input
             if (window.SR) SR.announce(STEP_LABELS[String(step)] || `Passaggio ${step}`, 'assertive');
             requestAnimationFrame(() => {
@@ -530,7 +590,8 @@ const Character = {
                 btn.classList.add('selected');
                 btn.setAttribute('aria-pressed', 'true');
                 Game.state.character.gender = btn.dataset.value;
-                this.showAvatarSelection(btn.dataset.value);
+                // Avatar generation removed - use default based on gender
+                Game.state.character.avatar = this.getDefaultAvatarForGender(btn.dataset.value);
                 this.checkReady();
                 this.updatePreview();
                 this.updateProtocol();
@@ -547,7 +608,7 @@ const Character = {
                 card.setAttribute('aria-pressed', 'true');
                 Game.state.character.ideology = card.dataset.value;
                 this._selectedMentorId = null;
-                this.renderMentorSelectionStep();
+                this.renderMentorSelectionStep().catch(e => console.error('Error rendering mentors:', e));
                 this.checkReady();
                 this.updatePreview();
                 this.updateProtocol();
@@ -569,17 +630,10 @@ const Character = {
             });
         });
 
-        // Step 4: Avatar (logic unchanged, handled by showAvatarSelection)
-
-        // Step 5: Modalità di gioco
-        const gamemodeBtns = document.querySelectorAll('.stamp-btn[data-group="gamemode"]');
-        gamemodeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                gamemodeBtns.forEach(b => { b.classList.remove('selected', 'active'); b.setAttribute('aria-pressed', 'false'); });
-                btn.classList.add('selected', 'active');
-                btn.setAttribute('aria-pressed', 'true');
-            });
-        });
+        // Set default game mode to Sandbox (removed modal selection)
+        if (!Game.state.gameMode) {
+            Game.state.gameMode = 'sandbox';
+        }
 
         // Approve button (final step)
         const approveBtn = document.getElementById('btn-approve');
@@ -597,13 +651,13 @@ const Character = {
             if (defaultNationBtn) defaultNationBtn.classList.add('selected');
         }
         this.updateIdeologyDisplay(Game.state.nation.id);
-        this.renderMentorSelectionStep();
+        this.renderMentorSelectionStep().catch(e => console.error('Error rendering mentors:', e));
         this.checkReady();
         this.updatePreview();
         Game.on('new-day', ({ day }) => this.handleMentorProgression(day));
     },
 
-    renderMentorSelectionStep() {
+    async renderMentorSelectionStep() {
         const container = document.getElementById('onboarding-mentor-choices');
         if (!container) return;
 
@@ -613,16 +667,16 @@ const Character = {
             return;
         }
 
-        const mentors = this.getAvailableMentorsForNation();
+        const mentors = await this.getAvailableMentorsForNation();
         this._currentMentorPool = mentors;
 
         container.innerHTML = mentors.map((mentor) => `
             <button class="mentor-quick-card ${this._selectedMentorId === mentor.id ? 'selected' : ''}" data-mentor-id="${mentor.id}"
                 aria-pressed="${this._selectedMentorId === mentor.id ? 'true' : 'false'}"
-                aria-label="${Game.esc((mentor.shortName || mentor.name) + ': ' + (mentor.bonusText || this.getMentorBonusText(mentor.id)))}">
+                aria-label="${Game.esc((mentor.short_name || mentor.shortName || mentor.name) + ': ' + (mentor.bonusText || this.getMentorBonusText(mentor.id)))}">
                 <div class="mentor-quick-head">
-                    <span class="mentor-quick-icon">${mentor.icon}</span>
-                    <span class="mentor-quick-name">${Game.esc(mentor.shortName || mentor.name)}</span>
+                    <span class="mentor-quick-icon">${mentor.icon || '🎩'}</span>
+                    <span class="mentor-quick-name">${Game.esc(mentor.short_name || mentor.shortName || mentor.name)}</span>
                 </div>
                 <div class="mentor-quick-bonus">${Game.esc(mentor.bonusText || this.getMentorBonusText(mentor.id))}</div>
             </button>
@@ -906,21 +960,9 @@ const Character = {
         Game.state.contacts = [];
         Game.state.flags = { activeDlc: preservedActiveDlc };
 
-        // 🎮 Read selected game mode
-        const selectedMode = document.querySelector('.stamp-btn[data-group="gamemode"].selected');
-        const modeValue = (selectedMode && selectedMode.dataset.value) || 'sandbox';
-        if (modeValue === 'sandbox') {
-            Game.state.gameMode = 'sandbox';
-            Game.state.campaignObjective = null;
-        } else {
-            const campaignMap = {
-                campaign_sindaco: { type: 'sindaco', deadline: 365, label: 'Diventa Sindaco entro 365 giorni' },
-                campaign_famoso:  { type: 'famoso',  deadline: 300, label: 'Raggiungi Notorietà 90+ entro 300 giorni' },
-                campaign_ricco:   { type: 'ricco',   deadline: 365, label: 'Accumula €5000 entro 365 giorni' },
-            };
-            Game.state.gameMode = 'campaign';
-            Game.state.campaignObjective = Object.assign({ achieved: false }, campaignMap[modeValue] || campaignMap.campaign_sindaco);
-        }
+        // 🎮 Game mode now defaults to sandbox (modal selection removed)
+        Game.state.gameMode = 'sandbox';
+        Game.state.campaignObjective = null;
 
         // 🌍 Load nation and apply its modifiers
         if (typeof Game.loadNation === 'function') {
@@ -1006,7 +1048,7 @@ const Character = {
     },
 
     // === J. SCELTA DEL MENTORE ===
-    showMentorScreen() {
+    async showMentorScreen() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('screen-mentor').classList.add('active');
 
@@ -1014,7 +1056,7 @@ const Character = {
         if (!container) return;
 
         container.innerHTML = '';
-        const mentors = this.getAvailableMentorsForNation();
+        const mentors = await this.getAvailableMentorsForNation();
         this._currentMentorPool = mentors;
 
         mentors.forEach((mentor) => {
@@ -1022,10 +1064,10 @@ const Character = {
             card.className = 'mentor-card';
             card.dataset.mentor = mentor.id;
             card.innerHTML = `
-                <div class="mentor-avatar">${mentor.icon}</div>
+                <div class="mentor-avatar">${mentor.icon || '🎩'}</div>
                 <div class="mentor-ideology">${Game.esc(mentor.ideology)}</div>
-                <div class="mentor-name">${Game.esc(mentor.shortName)}</div>
-                <div class="mentor-quote">"${Game.esc(mentor.quote)}"</div>
+                <div class="mentor-name">${Game.esc(mentor.short_name || mentor.shortName || mentor.name)}</div>
+                <div class="mentor-quote">"${Game.esc(mentor.quote || mentor.description || 'Una buona scelta politica')}"</div>
                 <div class="mentor-bonus">${Game.esc(mentor.bonusText || this.getMentorBonusText(mentor.id))}</div>
             `;
             card.addEventListener('click', () => {

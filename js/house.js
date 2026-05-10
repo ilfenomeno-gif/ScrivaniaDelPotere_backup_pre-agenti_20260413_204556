@@ -3,7 +3,7 @@
    ============================================ */
 
 const House = {
-    _pendingFocusSelector: null,
+    _pendingFocus: null,
 
     init() {
         // Tab switching
@@ -43,14 +43,15 @@ const House = {
         this.renderHomeStaff();
         if (typeof Bank !== 'undefined') Bank.renderBankPanel();
 
-        if (this._pendingFocusSelector && window.SR && SR.afterActionFocus) {
-            const selector = this._pendingFocusSelector;
-            this._pendingFocusSelector = null;
+        if (this._pendingFocus && window.SR && SR.afterActionFocus) {
+            const pending = this._pendingFocus;
+            this._pendingFocus = null;
             setTimeout(() => {
-                const el = document.querySelector(selector)
-                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn')
-                    || document.querySelector('.house-tab.active,.house-tab,#payments-list .payments-header,#panel-house h2');
-                if (el) SR.afterActionFocus(el);
+                const heading = document.querySelector('#tab-economia .payments-header, #panel-house h2, .house-tab.active, .house-tab');
+                const target = document.querySelector(pending.selector)
+                    || heading
+                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn');
+                if (target) SR.afterActionFocus(target, pending.announcement, pending.urgency || 'polite');
             }, 700);
         }
     },
@@ -115,6 +116,9 @@ const House = {
     renderPayments() {
         const container = document.getElementById('payments-list');
         if (!container) return;
+        container.setAttribute('role', 'region');
+        container.setAttribute('aria-live', 'polite');
+        container.setAttribute('aria-label', 'Pagamenti, rate e scadenze della casa');
         const bills = Game.state.bills || [];
         const day = Game.state.day;
 
@@ -473,23 +477,19 @@ const House = {
     },
 
     bindPaymentButtons() {
-        const _restoreFocus = (selector, announcement, urgency) => {
-            if (!window.SR || !SR.afterActionFocus) return;
-            setTimeout(() => {
-                const el = document.querySelector(selector)
-                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn')
-                    || document.querySelector('.house-tab.active,.house-tab,#payments-list .payments-header,#panel-house h2');
-                if (el) SR.afterActionFocus(el, announcement, urgency || 'polite');
-            }, 650);
-        };
-
         document.querySelectorAll('.pay-now').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const billId = btn.dataset.id;
-                this._pendingFocusSelector = `.pay-now[data-id="${billId}"]`;
+                this._pendingFocus = {
+                    selector: `.pay-now[data-id="${billId}"]`,
+                    announcement: 'Pagamento registrato.',
+                    urgency: 'polite',
+                };
                 const success = Game.payBill(btn.dataset.id);
                 if (!success) {
+                    this._pendingFocus.announcement = 'Pagamento non riuscito.';
+                    this._pendingFocus.urgency = 'assertive';
                     btn.style.background = '#E53935';
                     btn.textContent = 'No fondi!';
                     if (window.SR) SR.announce('Fondi insufficienti per pagare la bolletta.', 'assertive');
@@ -499,7 +499,6 @@ const House = {
                     }, 1200, { group: 'house', label: 'btn-reset' });
                 }
                 this.refresh();
-                _restoreFocus(`.pay-now[data-id="${billId}"]`, success ? 'Pagamento registrato.' : 'Pagamento non riuscito.');
             });
         });
 
@@ -507,55 +506,85 @@ const House = {
             btn.addEventListener('click', () => {
                 const months = parseInt(btn.dataset.months, 10);
                 const billId = btn.dataset.id;
-                this._pendingFocusSelector = `.inst-btn[data-id="${billId}"][data-months="${months}"]`;
+                this._pendingFocus = {
+                    selector: `.inst-btn[data-id="${billId}"][data-months="${months}"]`,
+                    announcement: `Piano rate ${months} mesi creato.`,
+                    urgency: 'polite',
+                };
                 const ok = this.createInstallmentPlan(btn.dataset.id, months);
-                _restoreFocus(`.inst-btn[data-id="${billId}"][data-months="${months}"]`, ok ? `Piano rate ${months} mesi creato.` : 'Impossibile creare il piano rate.', ok ? 'polite' : 'assertive');
+                if (!ok) {
+                    this._pendingFocus.announcement = 'Impossibile creare il piano rate.';
+                    this._pendingFocus.urgency = 'assertive';
+                    this.refresh();
+                }
             });
         });
 
         document.querySelectorAll('.pay-installment').forEach(btn => {
             btn.addEventListener('click', () => {
                 const planId = btn.dataset.id;
-                this._pendingFocusSelector = `.pay-installment[data-id="${planId}"]`;
+                this._pendingFocus = {
+                    selector: `.pay-installment[data-id="${planId}"]`,
+                    announcement: 'Rata pagata.',
+                    urgency: 'polite',
+                };
                 const ok = this.payInstallment(btn.dataset.id);
-                _restoreFocus(`.pay-installment[data-id="${planId}"]`, ok ? 'Rata pagata.' : 'Impossibile pagare la rata.', ok ? 'polite' : 'assertive');
+                if (!ok) {
+                    this._pendingFocus.announcement = 'Impossibile pagare la rata.';
+                    this._pendingFocus.urgency = 'assertive';
+                    this.refresh();
+                }
             });
         });
     },
 
     bindMortgageButtons() {
-        const _restoreFocus = (selector, announcement, urgency) => {
-            if (!window.SR || !SR.afterActionFocus) return;
-            setTimeout(() => {
-                const el = document.querySelector(selector)
-                    || document.querySelector('.pay-now,.inst-btn,.pay-installment,.mortgage-pay-btn,.mortgage-btn,.mortgage-extinguish-btn')
-                    || document.querySelector('.house-tab.active,.house-tab,#payments-list .payments-header,#panel-house h2');
-                if (el) SR.afterActionFocus(el, announcement, urgency || 'polite');
-            }, 650);
-        };
-
         const reqBtn = document.querySelector('.mortgage-btn');
         if (reqBtn) {
             reqBtn.addEventListener('click', () => {
-                this._pendingFocusSelector = '.mortgage-btn';
+                this._pendingFocus = {
+                    selector: '.mortgage-btn',
+                    announcement: 'Mutuo richiesto.',
+                    urgency: 'polite',
+                };
                 const ok = this.requestMortgage(reqBtn.dataset.type);
-                _restoreFocus('.mortgage-btn', ok ? 'Mutuo richiesto.' : 'Richiesta mutuo non disponibile.', ok ? 'polite' : 'assertive');
+                if (!ok) {
+                    this._pendingFocus.announcement = 'Richiesta mutuo non disponibile.';
+                    this._pendingFocus.urgency = 'assertive';
+                    this.refresh();
+                }
             });
         }
         const payBtn = document.querySelector('.mortgage-pay-btn');
         if (payBtn) {
             payBtn.addEventListener('click', () => {
-                this._pendingFocusSelector = '.mortgage-pay-btn';
+                this._pendingFocus = {
+                    selector: '.mortgage-pay-btn',
+                    announcement: 'Rata mutuo pagata.',
+                    urgency: 'polite',
+                };
                 const ok = this.payMortgageInstallment();
-                _restoreFocus('.mortgage-pay-btn', ok ? 'Rata mutuo pagata.' : 'Impossibile pagare la rata del mutuo.', ok ? 'polite' : 'assertive');
+                if (!ok) {
+                    this._pendingFocus.announcement = 'Impossibile pagare la rata del mutuo.';
+                    this._pendingFocus.urgency = 'assertive';
+                    this.refresh();
+                }
             });
         }
         const closeBtn = document.querySelector('.mortgage-extinguish-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                this._pendingFocusSelector = '.mortgage-extinguish-btn';
+                this._pendingFocus = {
+                    selector: '.mortgage-extinguish-btn',
+                    announcement: 'Mutuo estinto.',
+                    urgency: 'polite',
+                };
                 const ok = this.extinguishMortgage();
-                _restoreFocus('.mortgage-extinguish-btn', ok ? 'Mutuo estinto.' : 'Impossibile estinguere il mutuo.', ok ? 'polite' : 'assertive');
+                if (!ok) {
+                    this._pendingFocus.announcement = 'Impossibile estinguere il mutuo.';
+                    this._pendingFocus.urgency = 'assertive';
+                    this.refresh();
+                }
             });
         }
     },

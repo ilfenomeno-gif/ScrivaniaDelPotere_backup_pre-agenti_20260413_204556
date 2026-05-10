@@ -1,0 +1,301 @@
+{
+  "metadata": {
+    "description": "Mentor-Party mapping system for DLC: links political parties to ideologies and nations",
+    "ideology_scale": [
+      "sinistra_radicale",
+      "sinistra",
+      "centro_sinistra",
+      "centro",
+      "centro_destra",
+      "destra",
+      "destra_radicale"
+    ],
+    "version": "2.0"
+  },
+  "italy": {
+    "nation_name": "Italia",
+    "mentors": [
+      {
+        "id": "italy_avs",
+        "name": "Alleanza Verdi-Sinistra",
+        "short_name": "AVS",
+        "ideology": "sinistra_radicale",
+        "description": "Alleanza ecologista e di sinistra, progressive",
+        "bonus": { "ap": 2, "charisma": 1 },
+        "malus": { "budget": -1 }
+      },
+      {
+        "id": "italy_pd",
+        "name": "Partito Democratico",
+        "short_name": "PD",
+        "ideology": "centro_sinistra",
+        "description": "Principale forza di centro-sinistra, riformista",
+        "bonus": { "ap": 1, "intellect": 1 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "italy_m5s",
+        "name": "Movimento 5 Stelle",
+        "short_name": "M5S",
+        "ideology": "centro",
+        "description": "Populista, temi civili e ambiente",
+        "bonus": { "ap": 1, "charisma": 2 },
+        "malus": { "intellect": -1 }
+      },
+      {
+        "id": "italy_azione",
+        "name": "Azione",
+        "short_name": "AZ",
+        "ideology": "centro",
+        "description": "Riformista, centrista moderato",
+        "bonus": { "intellect": 2, "ap": 0.5 },
+        "malus": { "charisma": -1 }
+      },
+      {
+        "id": "italy_italia_viva",
+        "name": "Italia Viva",
+        "short_name": "IV",
+        "ideology": "centro",
+        "description": "Centrista, liberale riformista",
+        "bonus": { "intellect": 1, "budget": 1 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "italy_piu_europa",
+        "name": "+Europa",
+        "short_name": "+EU",
+        "ideology": "centro_destra",
+        "description": "Centro-liberale, europeista",
+        "bonus": { "intellect": 1, "ap": 1 },
+        "malus": {}
+      },
+      {
+        "id": "italy_fi",
+        "name": "Forza Italia",
+        "short_name": "FI",
+        "ideology": "centro_destra",
+        "description": "Liberale conservatore, moderato",
+        "bonus": { "budget": 2, "intellect": 1 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "italy_lega",
+        "name": "Lega",
+        "short_name": "LG",
+        "ideology": "destra",
+        "description": "Sovranista di destra, regionalista",
+        "bonus": { "charisma": 2, "ap": 1 },
+        "malus": { "intellect": -1 }
+      },
+      {
+        "id": "italy_fdi",
+        "name": "Fratelli d'Italia",
+        "short_name": "FdI",
+        "ideology": "destra_radicale",
+        "description": "Destra nazionale, conservatore-identitario",
+        "bonus": { "charisma": 2, "ap": 1.5 },
+        "malus": { "intellect": -0.5 }
+      }
+    ]
+  },
+  "spain": {
+    "nation_name": "Spagna",
+    "mentors": [
+      {
+        "id": "spain_sumar",
+        "name": "Sumar",
+        "short_name": "SUM",
+        "ideology": "sinistra_radicale",
+        "description": "Coalizione di sinistra radicale (Podemos, UP)",
+        "bonus": { "ap": 2, "charisma": 1 },
+        "malus": { "budget": -1.5 }
+      },
+      {
+        "id": "spain_psoe",
+        "name": "PSOE",
+        "short_name": "PSOE",
+        "ideology": "centro_sinistra",
+        "description": "Partito Socialista Operaio, storico governo",
+        "bonus": { "ap": 1.5, "intellect": 1 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "spain_ciudadanos",
+        "name": "Ciudadanos",
+        "short_name": "Cs",
+        "ideology": "centro",
+        "description": "Centrista liberale, riformista moderato",
+        "bonus": { "intellect": 2, "ap": 0.5 },
+        "malus": { "charisma": -1 }
+      },
+      {
+        "id": "spain_pp",
+        "name": "Partido Popular",
+        "short_name": "PP",
+        "ideology": "centro_destra",
+        "description": "Principale forza di destra, conservatore",
+        "bonus": { "budget": 2, "intellect": 1 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "spain_vox",
+        "name": "Vox",
+        "short_name": "VOX",
+        "ideology": "destra_radicale",
+        "description": "Destra nazional-populista, sovranista",
+        "bonus": { "charisma": 2.5, "ap": 1.5 },
+        "malus": { "intellect": -1 }
+      }
+    ]
+  },
+  "portugal": {
+    "nation_name": "Portogallo",
+    "mentors": [
+      {
+        "id": "portugal_pcp",
+        "name": "Partido Comunista Português",
+        "short_name": "PCP",
+        "ideology": "sinistra_radicale",
+        "description": "Comunista storico, sinistra estrema",
+        "bonus": { "ap": 2, "charisma": 0.5 },
+        "malus": { "budget": -2 }
+      },
+      {
+        "id": "portugal_be",
+        "name": "Bloco de Esquerda",
+        "short_name": "BE",
+        "ideology": "sinistra",
+        "description": "Sinistra radicale libertaria, progressista",
+        "bonus": { "ap": 1.5, "charisma": 1.5 },
+        "malus": { "budget": -1 }
+      },
+      {
+        "id": "portugal_ps",
+        "name": "Partido Socialista",
+        "short_name": "PS",
+        "ideology": "centro_sinistra",
+        "description": "Storico partito di governo, centro-sinistra",
+        "bonus": { "ap": 1, "intellect": 1.5 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "portugal_psd",
+        "name": "Aliança Democrática",
+        "short_name": "AD",
+        "ideology": "centro_destra",
+        "description": "Blocco conservatore centro-destra (PSD-CDS)",
+        "bonus": { "budget": 2, "intellect": 1 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "portugal_chega",
+        "name": "Chega",
+        "short_name": "CH",
+        "ideology": "destra_radicale",
+        "description": "Destra populista e nazional-conservatrice",
+        "bonus": { "charisma": 2.5, "ap": 1.5 },
+        "malus": { "intellect": -1.5 }
+      }
+    ]
+  },
+  "benelux": {
+    "nation_name": "Benelux (Belgio, Olanda, Lussemburgo)",
+    "mentors": [
+      {
+        "id": "benelux_sp",
+        "name": "Partito Socialista",
+        "short_name": "SP",
+        "ideology": "sinistra",
+        "description": "Socialista di sinistra, welfare progressista",
+        "bonus": { "ap": 1.5, "charisma": 1 },
+        "malus": { "budget": -1.5 }
+      },
+      {
+        "id": "benelux_greens",
+        "name": "Verdi (Groen/Ecolo)",
+        "short_name": "GRN",
+        "ideology": "centro_sinistra",
+        "description": "Ambientalista e progressista, europeo",
+        "bonus": { "intellect": 1, "charisma": 1.5 },
+        "malus": { "budget": -0.5 }
+      },
+      {
+        "id": "benelux_liberals",
+        "name": "Liberali (VVD/MR/DP)",
+        "short_name": "LIB",
+        "ideology": "centro",
+        "description": "Centro-liberale, pro-mercato moderato",
+        "bonus": { "intellect": 2, "budget": 1.5 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "benelux_cdv",
+        "name": "Cristian Democrazia (CD&V/CVP)",
+        "short_name": "CDV",
+        "ideology": "centro_destra",
+        "description": "Centro-destra cristiano-democratico",
+        "bonus": { "budget": 1.5, "intellect": 1 },
+        "malus": {}
+      },
+      {
+        "id": "benelux_vb",
+        "name": "Nazional-Destra (Vlaams Belang/PVV)",
+        "short_name": "VB",
+        "ideology": "destra_radicale",
+        "description": "Destra radicale sovranista, anti-immigrazione",
+        "bonus": { "charisma": 2.5, "ap": 1.5 },
+        "malus": { "intellect": -1.5 }
+      }
+    ]
+  },
+  "switzerland": {
+    "nation_name": "Svizzera",
+    "mentors": [
+      {
+        "id": "switzerland_sp",
+        "name": "Partito Socialista",
+        "short_name": "PS",
+        "ideology": "sinistra",
+        "description": "Centro-sinistra in contesto svizzero, welfare",
+        "bonus": { "ap": 1, "charisma": 1 },
+        "malus": { "budget": -1 }
+      },
+      {
+        "id": "switzerland_greens",
+        "name": "Partito Verde",
+        "short_name": "G",
+        "ideology": "centro_sinistra",
+        "description": "Ambientalista svizzero, progressista moderato",
+        "bonus": { "intellect": 1, "charisma": 1.5 },
+        "malus": { "budget": -0.5 }
+      },
+      {
+        "id": "switzerland_flp",
+        "name": "Liberali Radicali (FDP/PLR)",
+        "short_name": "FDP",
+        "ideology": "centro",
+        "description": "Centro-liberale svizzero, pro-mercato",
+        "bonus": { "intellect": 2, "budget": 2 },
+        "malus": { "charisma": -1 }
+      },
+      {
+        "id": "switzerland_mitte",
+        "name": "Die Mitte (ex-CVP/LC)",
+        "short_name": "DM",
+        "ideology": "centro_destra",
+        "description": "Centro-destra cristiano-democratico riformato",
+        "bonus": { "budget": 1.5, "intellect": 1.5 },
+        "malus": { "charisma": -0.5 }
+      },
+      {
+        "id": "switzerland_udc",
+        "name": "Unione Democratica di Centro",
+        "short_name": "UDC",
+        "ideology": "destra",
+        "description": "Destra nazional-conservatrice svizzera",
+        "bonus": { "charisma": 2, "ap": 1 },
+        "malus": { "intellect": -0.5 }
+      }
+    ]
+  }
+}

@@ -791,6 +791,16 @@ const SR = (() => {
             h.textContent = 'Sezione Politica — Azioni di partito, influenza e carriera.';
             politicaContent.insertBefore(h, politicaContent.firstChild);
         }
+
+        const actionsGrid = politicaContent.querySelector('.politica-actions-grid');
+        if (actionsGrid && !actionsGrid.querySelector('[data-sr-politica-actions-desc]')) {
+            const p = document.createElement('p');
+            p.className = 'visually-hidden';
+            p.setAttribute('data-sr-politica-actions-desc', '1');
+            p.textContent = 'Prima di scegliere un azione politica, ascolta il costo in azioni, denaro e l impatto su reputazione, stress e stanchezza.';
+            actionsGrid.insertBefore(p, actionsGrid.firstChild);
+        }
+
         // Add descriptions to action buttons that only show cost badge
         politicaContent.querySelectorAll('button:not([aria-describedby])').forEach(btn => {
             const costBadges = btn.querySelectorAll('.phone-cost-badge, .task-ap-cost');
