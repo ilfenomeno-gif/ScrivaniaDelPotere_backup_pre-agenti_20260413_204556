@@ -9,6 +9,7 @@
     "analyze:fast": "node scripts/agentAnalyzer.js --fast",
     "runtime:check": "node scripts/runtimeChecker.js",
     "simulate": "node scripts/headlessSimulation.js --runs 10 --day 15",
+    "test:dlc-matrix": "node scripts/dlcIntegrationMatrix.js --days 30",
     "panel": "node scripts/panel-server.js",
     "watch": "node scripts/watch.js",
     "watch:runtime": "node scripts/watch.js --runtime-every 1"

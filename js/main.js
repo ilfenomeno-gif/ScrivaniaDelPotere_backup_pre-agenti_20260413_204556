@@ -60,30 +60,82 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const DLC_CATALOG = [
+        // === EXPANSION PACKS ===
         {
-            id: 'dlc_stato_diritto_crimine',
-            title: 'Stato di Diritto vs Maestri del Crimine',
-            desc: 'Indagini, processi, corruzione istituzionale e conseguenze legali multilivello.',
+            id: 'dlc_toghe_judiciary',
+            type: 'Expansion',
+            title: '🏛️ Le Toghe — Sistema Giudiziario',
+            desc: 'Indagini, processi, corruzione giudiziale, magistrati come personaggi ricorrenti. Gratuito: eventi base. Completo: sistema tributi, avvocati difensori, gradi di giudizio.',
+            systems: ['judiciary.js'],
         },
         {
-            id: 'dlc_elezioni_globali_europa',
-            title: 'Elezioni Globali - Europa',
-            desc: 'Nuove nazioni, sistemi elettorali differenti e scalata verso istituzioni europee.',
+            id: 'dlc_oltre_confini_diplomacy',
+            type: 'Expansion',
+            title: '🌍 Oltre i Confini — Diplomazia e Geopolitica',
+            desc: 'Accordi bilaterali, lobbying UE, conti offshore, relazioni internazionali. Gratuito: notizie generiche estere. Completo: schermata diplomatica, gestione dossier, fondi EU.',
+            systems: ['diplomacy.js'],
+        },
+
+        // === FLAVOR PACKS ===
+        {
+            id: 'dlc_radici_housing',
+            type: 'Expansion',
+            title: '🏡 Radici — Sistema Abitativo',
+            desc: 'Nuove abitazioni (Villa Suburbana, Attico Prestigio), seconda proprietà, sale riunioni private. Gratuito: nuove migliorie, 4° livello stanze. Completo: doppio domicilio, scandali.',
+            systems: ['housingExtended.js'],
         },
         {
-            id: 'dlc_media_infodemia',
-            title: 'Media e Infodemia',
-            desc: 'Redazioni schierate, viralita, disinformazione e trading di scoop politici.',
+            id: 'dlc_agenda_piena_slots',
+            type: 'Expansion',
+            title: '⏰ Agenda Piena — Gestione del Tempo',
+            desc: 'Sistema slot giornalieri (mattina/pomeriggio/sera), attività personali, fatigue. Gratuito: slot visibili. Completo: attività avanzate, burnout.',
+            systems: ['dailySlots.js'],
+        },
+
+        // === FLAVOR PACKS ===
+        {
+            id: 'dlc_cupola_mafia',
+            type: 'Flavor',
+            title: '🔴 La Cupola — Profondità Criminale',
+            desc: '40+ eventi narrativi esclusivi, 3 archi familiari, rituali di affiliazione, mappa criminale per regione. Enrichisce mafia.js con storia e personalità.',
+            systems: ['mafiaExtensions.js'],
         },
         {
-            id: 'dlc_storia_italia',
-            title: 'Storia d\'Italia - Epoca Specifica',
-            desc: 'Campagne storiche con eventi contestuali, vincoli reali e modalita sandbox storico.',
+            id: 'dlc_prima_repubblica_scenario',
+            type: 'Flavor',
+            title: '🎭 La Prima Repubblica — Scenario Storico',
+            desc: 'Modalità scenario 1970-1992 con partiti storici, Mani Pulite come evento catastrofico, terrorismo degli Anni di Piombo. 60+ eventi storici, 5 scenari di partenza.',
+            systems: ['scenario.js'],
+                {
+                    id: 'dlc_corpo_mente_wellness',
+                    type: 'Flavor',
+                    title: '💪 Corpo e Mente — Salute e Benessere',
+                    desc: 'Medico fiduciario corrompibile, abitudini tracciabili, crisi mediche narrative. Gratuito: tab benessere, 5 abitudini base. Completo: 30+ eventi salute, dipendenze escalation.',
+                    systems: ['wellnessSystem.js'],
+                },
+                {
+                    id: 'dlc_casa_dolce_casa_narrative',
+                    type: 'Flavor',
+                    title: '🏠 Casa, Dolce Casa — Narrativa Domestica',
+                    desc: 'Visite domiciliari narrative, anniversari domestici, staff con personalità. Gratuito: anniversari, 5 staff base. Completo: 25+ eventi, 12 oggetti speciali, gossip staff.',
+                    systems: ['houseNarrative.js'],
+                },
+        },
+
+        // === IMMERSION PACKS ===
+        {
+            id: 'dlc_potere_tasca_lifestyle',
+            type: 'Immersion',
+            title: '📱 Potere in Tasca — Lifestyle',
+            desc: 'Social media con follower, dating app con meccanica di relazioni, 15+ eventi sociali. Gratuito: 3 decorazioni, 1 app. Completo: agenda mondana, scandali romantici.',
+            systems: ['phoneExtensions.js'],
         },
         {
-            id: 'dlc_geopolitica_diplomazia',
-            title: 'Mondo Globale - Geopolitica e Diplomazia',
-            desc: 'Blocchi, trattati, crisi internazionali e impatti su economia, reputazione e stabilita.',
+            id: 'dlc_stampa_media',
+            type: 'Immersion',
+            title: '🗞️ La Stampa — Ecosystem Mediatico',
+            desc: '8 direttori di testata corrompibili, gestione narrativa pubblica, press conference come minigioco, bolla informativa. Trasforma ticker.js in sistema di relazioni.',
+            systems: ['press.js'],
         },
     ];
 
@@ -448,6 +500,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof DeepState !== 'undefined' && DeepState.init) DeepState.init();
     if (typeof SocialCrisis !== 'undefined' && SocialCrisis.init) SocialCrisis.init();
 
+    // New DLC Systems (Victoria 3-style)
+    if (typeof Judiciary !== 'undefined' && Judiciary.init) Judiciary.init();
+    if (typeof Diplomacy !== 'undefined' && Diplomacy.init) Diplomacy.init();
+    if (typeof Press !== 'undefined' && Press.init) Press.init();
+    if (typeof Scenario !== 'undefined' && Scenario.init) Scenario.init();
+    if (typeof PhoneExtensions !== 'undefined' && PhoneExtensions.init) PhoneExtensions.init();
+    if (typeof MafiaExtensions !== 'undefined' && MafiaExtensions.init) MafiaExtensions.init();
+    if (typeof HousingExtended !== 'undefined' && HousingExtended.init) HousingExtended.init();
+    if (typeof DailySlots !== 'undefined' && DailySlots.init) DailySlots.init();
+    if (typeof WellnessSystem !== 'undefined' && WellnessSystem.init) WellnessSystem.init();
+    if (typeof HouseNarrative !== 'undefined' && HouseNarrative.init) HouseNarrative.init();
+    if (typeof DailyExpenses !== 'undefined' && DailyExpenses.init) DailyExpenses.init();
+    if (typeof HobbySystem !== 'undefined' && HobbySystem.init) HobbySystem.init();
+
     /* ----- Campaign Win/Loss ----- */
     Game.on('campaign-won', (d) => {
         if (typeof Scheduler !== 'undefined') Scheduler.clearAll();
@@ -588,13 +654,20 @@ document.addEventListener('DOMContentLoaded', function () {
             homeCampaignList.innerHTML = '<div class="home-list-item">Nessuna campagna salvata.</div>';
             return;
         }
-        homeCampaignList.innerHTML = campaigns.map((c) => {
-            const saves = Array.isArray(c.saves) ? c.saves : [];
-            const savesHtml = saves.slice(0, 5).map((sv) => {
-                const label = `${sv.label || 'Salvataggio'} • ${new Date(sv.updatedAt || nowIso()).toLocaleString('it-IT')}`;
-                return `
-                    <div class="home-list-item-actions">
-                        <span class="home-list-tag">${label}</span>
+            {
+                id: 'dlc_prezzo_potere_expenses',
+                type: 'Immersion',
+                title: '💰 Il Prezzo del Potere — Economia Quotidiana',
+                desc: 'Spese quotidiane granulari, rappresentanza, budget tracking. Gratuito: 3 spese casuali, notifiche. Completo: 15 categorie spese, evasione grigia, assicurazione.',
+                systems: ['dailyExpenses.js'],
+            },
+            {
+                id: 'dlc_tempo_libero_hobbies',
+                type: 'Immersion',
+                title: '🎮 Tempo Libero — Sistema Hobby',
+                desc: '8 hobby con connessioni trasversali, identità pubblica, rischi scandalo. Gratuito: 2 hobby base. Completo: 8 hobby avanzati con 5 eventi ciascuno, integrazioni factions/intel.',
+                systems: ['hobbySystem.js'],
+            },
                         <button class="home-action-btn" data-load-campaign="${c.id}" data-load-save="${sv.id}">Carica</button>
                     </div>
                 `;
