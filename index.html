@@ -56,6 +56,7 @@
                     <button id="home-campaign" class="home-menu-item">Campagna</button>
                     <button id="home-load-campaign" class="home-menu-item">Carica Campagna</button>
                     <button id="home-dlc" class="home-menu-item">DLC</button>
+                    <button id="home-store" class="home-menu-item">Store</button>
                     <button id="home-settings" class="home-menu-item">Impostazioni</button>
                     <button id="home-exit" class="home-menu-item home-exit">Esci</button>
                 </nav>
@@ -86,6 +87,17 @@
                     <div id="home-dlc-list" class="home-list"></div>
                     <div class="home-actions">
                         <button id="home-dlc-back" class="home-action-btn">Indietro</button>
+                    </div>
+                </section>
+
+                <section id="home-panel-store" class="home-panel hidden" aria-label="Store DLC">
+                    <h2>Store DLC</h2>
+                    <p>Espansioni, Flavor e Immersion divisi per reparto, con prezzi, dettagli e bundle.</p>
+                    <div id="home-store-bundles" class="home-store-bundles"></div>
+                    <div id="home-store-list" class="home-store-list"></div>
+                    <div id="home-store-detail" class="home-store-detail" aria-live="polite"></div>
+                    <div class="home-actions">
+                        <button id="home-store-back" class="home-action-btn">Indietro</button>
                     </div>
                 </section>
 
@@ -155,30 +167,40 @@
                     <legend>TRATTO IDEOLOGICO</legend>
                     <p class="form-row-desc visually-hidden">Scegli l'orientamento politico del tuo personaggio. Questa scelta influenza bonus, malus e stile di gioco.</p>
                     <div class="ideology-cards" role="group" aria-label="Tratto ideologico">
-                        <button class="ideology-card" data-value="estrema-sinistra" aria-pressed="false">
+                        <button class="ideology-card" data-value="radical_left" aria-pressed="false">
                             <div class="card-icon" aria-hidden="true">🚩</div>
-                            <div class="card-title">Sinistra Radicale</div>
-                            <div class="card-desc">Base fedele (min 20%). Stress da compromesso. Irrilevanza parlamentare (-50%).</div>
+                            <div class="card-title">Sinistra radicale</div>
+                            <div class="card-desc">Linea identitaria forte, base militante molto fedele.</div>
                         </button>
-                        <button class="ideology-card" data-value="centro" aria-pressed="false">
+                        <button class="ideology-card" data-value="left" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">🔴</div>
+                            <div class="card-title">Sinistra</div>
+                            <div class="card-desc">Equilibrio tra welfare, riforme sociali e coalizione.</div>
+                        </button>
+                        <button class="ideology-card" data-value="center_left" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">🟠</div>
+                            <div class="card-title">Centro-sinistra</div>
+                            <div class="card-desc">Riformismo progressista con forte focus istituzionale.</div>
+                        </button>
+                        <button class="ideology-card" data-value="center" aria-pressed="false">
                             <div class="card-icon" aria-hidden="true">⚖️</div>
-                            <div class="card-title">Centro Liberale</div>
-                            <div class="card-desc">Ago della bilancia. Alleanze +30%, sconti cene. Rischio estinzione elettorale.</div>
+                            <div class="card-title">Centro</div>
+                            <div class="card-desc">Mediazione politica e massima flessibilità di alleanza.</div>
                         </button>
-                        <button class="ideology-card" data-value="populista" aria-pressed="false">
-                            <div class="card-icon" aria-hidden="true">📢</div>
-                            <div class="card-title">Populista</div>
-                            <div class="card-desc">Consenso social +80%. Coerenza in caduta libera con ogni compromesso.</div>
+                        <button class="ideology-card" data-value="center_right" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">🟡</div>
+                            <div class="card-title">Centro-destra</div>
+                            <div class="card-desc">Stabilità amministrativa, impresa e pragmatismo di governo.</div>
                         </button>
-                        <button class="ideology-card" data-value="tecnocrate" aria-pressed="false">
-                            <div class="card-icon" aria-hidden="true">📊</div>
-                            <div class="card-title">Tecnocrate</div>
-                            <div class="card-desc">Stipendio +50%. Rispettato dalle istituzioni. Inviso ai populisti, distante dal "paese reale".</div>
+                        <button class="ideology-card" data-value="right" aria-pressed="false">
+                            <div class="card-icon" aria-hidden="true">🔵</div>
+                            <div class="card-title">Destra</div>
+                            <div class="card-desc">Ordine, sicurezza e coalizioni strutturate.</div>
                         </button>
-                        <button class="ideology-card" data-value="estrema-destra" aria-pressed="false">
+                        <button class="ideology-card" data-value="radical_right" aria-pressed="false">
                             <div class="card-icon" aria-hidden="true">🦅</div>
-                            <div class="card-title">Destra Sovranista</div>
-                            <div class="card-desc">Potere e controllo. Base fedele (min 20%). Coalizione ingovernabile (+Stress alleati).</div>
+                            <div class="card-title">Destra radicale</div>
+                            <div class="card-desc">Polarizzazione alta, base compatta e forte spinta identitaria.</div>
                         </button>
                     </div>
                     </fieldset>
@@ -514,6 +536,9 @@
                         <button class="phone-app-btn" data-app="politica"><span class="phone-app-icon">🏛️</span><span class="phone-app-label">Politica</span></button>
                         <button class="phone-app-btn" data-app="comitato"><span class="phone-app-icon">🏛️</span><span class="phone-app-label">Comitato</span></button>
                         <button class="phone-app-btn" data-app="finanza"><span class="phone-app-icon">💰</span><span class="phone-app-label">Finanza</span></button>
+                        <button class="phone-app-btn" data-app="app_europalink"><span class="phone-app-icon">🇪🇺</span><span class="phone-app-label">EuroLink</span></button>
+                        <button class="phone-app-btn" data-app="app_parlamento_live"><span class="phone-app-icon">🎙️</span><span class="phone-app-label">Parlamento Live</span></button>
+                        <button class="phone-app-btn" data-app="app_borsa_europea"><span class="phone-app-icon">📈</span><span class="phone-app-label">Borsa Europea</span></button>
                         <button class="phone-app-btn" data-app="partner"><span class="phone-app-icon">💕</span><span class="phone-app-label">Vita</span></button>
                         <button class="phone-app-btn" data-app="home"><span class="phone-app-icon">←</span><span class="phone-app-label">Indietro</span></button>
                     </div>
@@ -924,6 +949,7 @@
         <script src="js/systems/houseNarrative.js?v=1"></script>
         <script src="js/systems/dailyExpenses.js?v=1"></script>
         <script src="js/systems/hobbySystem.js?v=1"></script>
+        <script src="js/systems/nation_profile.js?v=1"></script>
     <script src="js/main.js"></script>
     <script src="scripts/auto-10-games.js"></script>
 </body>

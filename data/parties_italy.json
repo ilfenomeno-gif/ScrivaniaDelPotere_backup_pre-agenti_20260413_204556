@@ -1,131 +1,146 @@
 [
   {
-    "id": "it_progressisti",
-    "name": "Progressisti",
-    "shortName": "PROG",
+    "id": "it_fdi",
+    "name": "Fratelli d'Italia",
+    "shortName": "FdI",
+    "logo": "photos/parties/italy/fdi.svg",
+    "icon": "🦅",
+    "color": "#1b3a8a",
+    "ideology": "estremistra",
+    "country": "italy",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -4, "immigrazione": -8, "ambiente": -3, "difesa": 8, "diritti": -5 },
+    "currents": [
+      {
+        "id": "curr_it_fdi_governo",
+        "name": "Linea di Governo",
+        "icon": "🏛️",
+        "leader": "Giorgia Meloni",
+        "influence": 62,
+        "bonus": "+10% stabilita in coalizione",
+        "malus": "Media ostili +5 stress"
+      }
+    ],
+    "bonuses": [{ "stat": "reputazioneNazionale", "value": 4, "condition": "always", "label": "+4 reputazione nazionale" }],
+    "startingBonus": { "reputazione": 3, "coherence": 4 }
+  },
+  {
+    "id": "it_lega",
+    "name": "Lega",
+    "shortName": "LEGA",
+    "logo": "photos/parties/italy/lega.svg",
+    "icon": "🛡️",
+    "color": "#2f6b3f",
+    "ideology": "populista",
+    "country": "italy",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -4, "difesa": 7, "diritti": -6 },
+    "currents": [
+      {
+        "id": "curr_it_lega_identitaria",
+        "name": "Ala Identitaria",
+        "icon": "📢",
+        "leader": "Matteo Salvini",
+        "influence": 70,
+        "bonus": "+500 followers",
+        "malus": "Coerenza volatile"
+      }
+    ],
+    "startingBonus": { "followers": 300, "carisma": 3 }
+  },
+  {
+    "id": "it_pd",
+    "name": "Partito Democratico",
+    "shortName": "PD",
+    "logo": "photos/parties/italy/pd.svg",
     "icon": "🌹",
-    "color": "#e63946",
-    "ideology": "social-liberal",
+    "color": "#d62828",
+    "ideology": "sinistra",
     "country": "italy",
-    "ideologyMatrix": { "tasse": 6, "immigrazione": 5, "ambiente": 7, "difesa": 2, "diritti": 8 },
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 5, "immigrazione": 5, "ambiente": 6, "difesa": 1, "diritti": 8 },
     "currents": [
       {
-        "id": "curr_prog_giovani",
-        "name": "Ala Giovane",
-        "icon": "⚡",
-        "leader": "Valentina Ricci",
-        "influence": 35,
-        "ideologyMatrix": { "tasse": 7, "immigrazione": 7, "ambiente": 9, "difesa": 1, "diritti": 9 },
-        "bonus": "Task politici +15% efficacia nelle Metropoli",
-        "malus": "Relazione Mentori classici -10"
-      },
-      {
-        "id": "curr_prog_moderati",
-        "name": "Moderati di Centro",
+        "id": "curr_it_pd_riformista",
+        "name": "Riformisti",
         "icon": "⚖️",
-        "leader": "Franco Bellini",
-        "influence": 40,
-        "ideologyMatrix": { "tasse": 5, "immigrazione": 4, "ambiente": 6, "difesa": 4, "diritti": 6 },
-        "bonus": "Coalizioni con altri partiti +20% probabilità successo",
-        "malus": "Coerenza -3 ogni riforma radicale approvata"
-      },
-      {
-        "id": "curr_prog_ambientalisti",
-        "name": "Verdi del Partito",
-        "icon": "🌿",
-        "leader": "Sara Fontana",
-        "influence": 25,
-        "ideologyMatrix": { "tasse": 5, "immigrazione": 6, "ambiente": 10, "difesa": 1, "diritti": 8 },
-        "bonus": "Sblocca mentore 'Attivista Verde' con +20 popolarità under30",
-        "malus": "Alleanza con partiti industriali impossibile"
+        "leader": "Elly Schlein",
+        "influence": 58,
+        "bonus": "+8 reputazione urbana",
+        "malus": "Tensioni interne"
       }
     ],
-    "bonuses": [
-      { "stat": "urbanPopularity", "value": 0.10, "condition": "cityLevel >= 3", "label": "+10% popolarità in città e metropoli" },
-      { "stat": "reputazione", "value": 5, "condition": "firstJoin", "label": "+5 Reputazione all'iscrizione" }
-    ],
-    "maluses": [
-      { "stat": "ruralConsensus", "value": -0.05, "condition": "cityPopulation < 10000", "label": "-5% consenso nei piccoli comuni" }
-    ],
-    "startingBonus": { "reputazione": 5, "coherence": 3 }
+    "startingBonus": { "reputazione": 4, "coherence": 4 }
   },
   {
-    "id": "it_tradizionalisti",
-    "name": "Tradizionalisti",
-    "shortName": "TRAD",
-    "icon": "🏛️",
-    "color": "#1d3557",
-    "ideology": "conservative",
+    "id": "it_m5s",
+    "name": "Movimento 5 Stelle",
+    "shortName": "M5S",
+    "logo": "photos/parties/italy/m5s.svg",
+    "icon": "⭐",
+    "color": "#f4a261",
+    "ideology": "populista",
     "country": "italy",
-    "ideologyMatrix": { "tasse": -6, "immigrazione": -7, "ambiente": -2, "difesa": 7, "diritti": -5 },
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 1, "immigrazione": 1, "ambiente": 7, "difesa": -1, "diritti": 6 },
     "currents": [
       {
-        "id": "curr_trad_patrioti",
-        "name": "Patrioti",
-        "icon": "🇮🇹",
-        "leader": "Sergio Mantovani",
-        "influence": 50,
-        "ideologyMatrix": { "tasse": -5, "immigrazione": -9, "ambiente": -1, "difesa": 9, "diritti": -7 },
-        "bonus": "+8% consenso nei comuni < 5.000 abitanti",
-        "malus": "Impossibile allearsi con partiti di sinistra"
-      },
-      {
-        "id": "curr_trad_liberisti",
-        "name": "Liberisti",
-        "icon": "📈",
-        "leader": "Alberto Croci",
-        "influence": 50,
-        "ideologyMatrix": { "tasse": -9, "immigrazione": -4, "ambiente": -4, "difesa": 5, "diritti": -2 },
-        "bonus": "Taglio tasse imprese: +12% popolarità capoluoghi",
-        "malus": "Proteste sindacali: blocco azioni per 1 turno"
+        "id": "curr_it_m5s_movimentista",
+        "name": "Movimentisti",
+        "icon": "⚡",
+        "leader": "Giuseppe Conte",
+        "influence": 64,
+        "bonus": "+12 consenso social",
+        "malus": "Alleanze difficili"
       }
     ],
-    "bonuses": [
-      { "stat": "ruralConsensus", "value": 0.08, "condition": "cityPopulation < 5000", "label": "+8% consenso piccoli comuni" },
-      { "stat": "money", "value": 30, "condition": "taxCut", "label": "+€30/giorno per taglio fiscale" }
-    ],
-    "maluses": [
-      { "stat": "reformSpeed", "value": -0.05, "condition": "always", "label": "-5% velocità riforme" }
-    ],
-    "startingBonus": { "money": 50, "stress": -5 }
+    "startingBonus": { "reputazione": 2, "morale": 8 }
   },
   {
-    "id": "it_ecologisti",
-    "name": "Ecologisti Uniti",
-    "shortName": "ECO",
-    "icon": "🌱",
-    "color": "#2d6a4f",
-    "ideology": "green-left",
+    "id": "it_fi",
+    "name": "Forza Italia",
+    "shortName": "FI",
+    "logo": "photos/parties/italy/fi.svg",
+    "icon": "🔵",
+    "color": "#1565c0",
+    "ideology": "destra",
     "country": "italy",
-    "ideologyMatrix": { "tasse": 4, "immigrazione": 8, "ambiente": 10, "difesa": -3, "diritti": 9 },
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -3, "immigrazione": -2, "ambiente": 0, "difesa": 4, "diritti": 1 },
     "currents": [
       {
-        "id": "curr_eco_radicali",
-        "name": "Radicali Verdi",
+        "id": "curr_it_fi_moderata",
+        "name": "Moderati",
+        "icon": "🤝",
+        "leader": "Antonio Tajani",
+        "influence": 57,
+        "bonus": "+10 networking imprese",
+        "malus": "Base elettorale anziana"
+      }
+    ],
+    "startingBonus": { "money": 70, "reputazioneNazionale": 2 }
+  },
+  {
+    "id": "it_avs",
+    "name": "Alleanza Verdi e Sinistra",
+    "shortName": "AVS",
+    "logo": "photos/parties/italy/avs.svg",
+    "icon": "🌿",
+    "color": "#2a9d8f",
+    "ideology": "radicale",
+    "country": "italy",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 6, "immigrazione": 8, "ambiente": 10, "difesa": -3, "diritti": 9 },
+    "currents": [
+      {
+        "id": "curr_it_avs_eco",
+        "name": "Eco-Sociale",
         "icon": "🌍",
-        "leader": "Elena Grassi",
-        "influence": 55,
-        "ideologyMatrix": { "tasse": 5, "immigrazione": 9, "ambiente": 10, "difesa": -5, "diritti": 10 },
-        "bonus": "Sblocca decreto 'Energia Rinnovabile' senza costi politici",
-        "malus": "Malcontento industria: -12% fondi aziendali campagna"
-      },
-      {
-        "id": "curr_eco_pragmatici",
-        "name": "Pragmatici Verdi",
-        "icon": "♻️",
-        "leader": "Marco Delvecchio",
-        "influence": 45,
-        "ideologyMatrix": { "tasse": 3, "immigrazione": 6, "ambiente": 8, "difesa": 0, "diritti": 7 },
-        "bonus": "Coalizioni centro-sinistra +15% successo",
-        "malus": "Base militante -5 fedeltà ogni accordo con industria"
+        "leader": "Angelo Bonelli",
+        "influence": 60,
+        "bonus": "+20% popolarita under30",
+        "malus": "Donor industriali in calo"
       }
-    ],
-    "bonuses": [
-      { "stat": "popularityUnder30", "value": 0.20, "condition": "always", "label": "+20% popolarità under 30" },
-      { "stat": "reputazione", "value": 8, "condition": "greenLawPassed", "label": "+8 reputazione per ogni legge verde approvata" }
-    ],
-    "maluses": [
-      { "stat": "industryRelations", "value": -0.12, "condition": "always", "label": "-12% relazioni industriali" }
     ],
     "startingBonus": { "reputazione": 3, "morale": 10 }
   }

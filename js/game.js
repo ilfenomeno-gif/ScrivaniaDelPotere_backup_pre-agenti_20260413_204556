@@ -362,9 +362,26 @@ const Game = {
         'nemico': -15,
     },
 
+    IDEOLOGY_NORMALIZATION: {
+        radical_left: 'estrema-sinistra',
+        left: 'estrema-sinistra',
+        center_left: 'centro',
+        center: 'centro',
+        center_right: 'tecnocrate',
+        right: 'estrema-destra',
+        radical_right: 'estrema-destra',
+    },
+
+    normalizeIdeologyKey(ideology) {
+        const key = String(ideology || '').toLowerCase();
+        return this.IDEOLOGY_NORMALIZATION[key] || key;
+    },
+
     getCoalitionStance(playerIdeology, otherIdeology) {
-        const row = this.COALITION_MATRIX[playerIdeology];
-        return row ? (row[otherIdeology] || 'diffidente') : 'diffidente';
+        const a = this.normalizeIdeologyKey(playerIdeology);
+        const b = this.normalizeIdeologyKey(otherIdeology);
+        const row = this.COALITION_MATRIX[a];
+        return row ? (row[b] || 'diffidente') : 'diffidente';
     },
 
     CAREER_LEVELS: [
@@ -423,7 +440,8 @@ const Game = {
     },
 
     getIdeologyClass() {
-        return this.IDEOLOGY_CLASSES[this.state.character.ideology] || this.IDEOLOGY_CLASSES['centro'];
+        const key = this.normalizeIdeologyKey(this.state.character.ideology);
+        return this.IDEOLOGY_CLASSES[key] || this.IDEOLOGY_CLASSES['centro'];
     },
 
     getCareerLevel() {
@@ -2347,11 +2365,106 @@ const Game = {
     },
 
     async loadMentorsForNation() {
+        const normalizeIdeology = (value) => {
+            const v = String(value || '').toLowerCase();
+            const map = {
+                radical_left: 'radical_left',
+                left: 'left',
+                center_left: 'center_left',
+                center: 'center',
+                center_right: 'center_right',
+                right: 'right',
+                radical_right: 'radical_right',
+                radicale: 'radical_left',
+                'estrema-sinistra': 'radical_left',
+                sinistra: 'left',
+                populista: 'center_left',
+                centro: 'center',
+                tecnocrate: 'center_right',
+                destra: 'right',
+                estremistra: 'radical_right',
+                'estrema-destra': 'radical_right',
+            };
+            return map[v] || 'center';
+        };
+
+        const nationPartyFile = {
+            italy: 'parties_italy.json',
+            france: 'parties_france.json',
+            germany: 'parties_germany.json',
+            uk: 'parties_uk.json',
+            spain: 'parties_spain.json',
+            portugal: 'parties_portugal.json',
+            benelux: 'parties_benelux.json',
+            switzerland: 'parties_switzerland.json',
+        };
+
+        const seedMentorsFromParties = (nationId, parties) => {
+            const out = {
+                radical_left: [],
+                left: [],
+                center_left: [],
+                center: [],
+                center_right: [],
+                right: [],
+                radical_right: [],
+            };
+
+            (parties || []).forEach((party, idx) => {
+                const ideology = normalizeIdeology(party && party.ideology);
+                if (!out[ideology]) out[ideology] = [];
+                const short = (party && (party.shortName || party.name || party.id)) || `Partito ${idx + 1}`;
+                const fullName = (party && party.name) || short;
+                out[ideology].push({
+                    id: `mentor_${nationId}_${party.id || idx}`,
+                    archetype: 'custom',
+                    name: `${fullName} Mentor`,
+                    shortName: short,
+                    icon: (party && party.icon) || '🏛️',
+                    ideology,
+                    quote: `Mentore ufficiale del partito ${fullName}.`,
+                    bonusText: `Guida politica di ${fullName}.`,
+                    partyId: party && party.id,
+                    effects: {
+                        reputazione: 2,
+                        coherence: 1,
+                    },
+                });
+            });
+
+            return out;
+        };
+
         try {
-            const resp = await fetch('data/mentors.json?v=' + Date.now());
-            const allMentors = await resp.json();
             const nationId = (this.state.nation && this.state.nation.id) || 'italy';
-            this.state.mentorsDB = allMentors[nationId] || allMentors.italy || null;
+            const mentorsResp = await fetch('data/mentors.json?v=' + Date.now());
+            const allMentors = await mentorsResp.json();
+            const file = nationPartyFile[nationId];
+            let seeded = null;
+
+            if (file) {
+                const partyResp = await fetch(`data/${file}?v=` + Date.now());
+                const parties = await partyResp.json();
+                if (Array.isArray(parties) && parties.length > 0) {
+                    seeded = seedMentorsFromParties(nationId, parties);
+                }
+            }
+
+            const fallback = allMentors[nationId] || allMentors.italy || null;
+            if (!seeded) {
+                this.state.mentorsDB = fallback;
+                return;
+            }
+
+            if (fallback && typeof fallback === 'object') {
+                Object.entries(fallback).forEach(([legacyKey, list]) => {
+                    const key = normalizeIdeology(legacyKey);
+                    if (!Array.isArray(seeded[key])) seeded[key] = [];
+                    (Array.isArray(list) ? list : []).forEach((item) => seeded[key].push(item));
+                });
+            }
+
+            this.state.mentorsDB = seeded;
         } catch (err) {
             console.warn('Mentors DB load failed:', err);
             this.state.mentorsDB = null;
@@ -2412,13 +2525,41 @@ const Game = {
      * Applica costi e conseguenze
      * @param {string} newNationId - ID della nazione di destinazione
      */
-    changeNation(newNationId) {
+    async changeNation(newNationId) {
         if (newNationId === this.state.nation.id) {
             console.warn('Already in that nation');
             return false;
         }
 
         const oldNationId = this.state.nation.id;
+
+        if (typeof Nations !== 'undefined' && typeof Nations.canTransferToNation === 'function') {
+            if (!Nations.canTransferToNation(oldNationId, newNationId)) {
+                this.addWorkNotif('🔒 Trasferimento Bloccato', 'La nazione selezionata richiede Il Vecchio Mondo Expansion attivo.', `Giorno ${this.state.day}`);
+                return false;
+            }
+        }
+
+        const isNationChangePro = typeof Nations !== 'undefined' && Nations.isNationChangeProActive && Nations.isNationChangeProActive();
+        if (isNationChangePro) {
+            const waitDays = (typeof Nations !== 'undefined' && Nations.getApprovalWindowDays) ? Nations.getApprovalWindowDays() : 7;
+            if (!this.state.flags.pendingNationTransfer || this.state.flags.pendingNationTransfer.toNation !== newNationId) {
+                this.state.flags.pendingNationTransfer = {
+                    fromNation: oldNationId,
+                    toNation: newNationId,
+                    requestedDay: this.state.day,
+                    approvalDay: this.state.day + waitDays,
+                };
+                this.addWorkNotif('🛂 Richiesta Trasferimento', `Richiesta inviata. Approvazione in ${waitDays} giorni.`, `Giorno ${this.state.day}`);
+                return false;
+            }
+
+            if (this.state.day < this.state.flags.pendingNationTransfer.approvalDay) {
+                const remaining = this.state.flags.pendingNationTransfer.approvalDay - this.state.day;
+                this.addWorkNotif('⏳ Pratica in lavorazione', `Il trasferimento sara approvato tra ${remaining} giorni.`, `Giorno ${this.state.day}`);
+                return false;
+            }
+        }
 
         const transferCost = typeof Nations !== 'undefined' && Nations.getInternationalTransferCost
             ? Nations.getInternationalTransferCost(this.state.nation.id, newNationId)
@@ -2436,7 +2577,9 @@ const Game = {
         this.changeStat('coherence', -15); // Adattamento
 
         // Trasferisciti nella nuova nazione
-        this.loadNation(newNationId);
+        const oldNation = oldNationId;
+        this.emit('nation-change', { oldNation, newNation: newNationId });
+        await this.loadNation(newNationId);
 
         // Perde contatti nella vecchia nazione
         const oldNationContacts = (this.state.contacts || []).filter(c => c.city);
@@ -2456,6 +2599,10 @@ const Game = {
             `Trasferito a ${this.state.nation.name}. Costo: €${transferCost}. Morale -10, Coerenza -15.`,
             `Giorno ${this.state.day}`
         );
+
+        if (this.state.flags) {
+            this.state.flags.pendingNationTransfer = null;
+        }
 
         this.emit('nation-changed', { fromNation: oldNationId, toNation: newNationId });
         return true;

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "ch_fdp",
+    "name": "FDP.The Liberals",
+    "shortName": "FDP",
+    "icon": "⚖️",
+    "color": "#1976d2",
+    "ideology": "centro",
+    "country": "switzerland",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -4, "immigrazione": 1, "ambiente": 1, "difesa": 3, "diritti": 4 },
+    "currents": [{ "id": "curr_ch_fdp_main", "name": "Liberali", "icon": "📈", "leader": "Thierry Burkart", "influence": 62, "bonus": "+20 euro/day finanza", "malus": "Base sociale tiepida" }],
+    "startingBonus": { "money": 100, "networking": 6 }
+  },
+  {
+    "id": "ch_sp",
+    "name": "SP Switzerland",
+    "shortName": "SP",
+    "icon": "🌹",
+    "color": "#c62828",
+    "ideology": "sinistra",
+    "country": "switzerland",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 5, "immigrazione": 6, "ambiente": 7, "difesa": -1, "diritti": 8 },
+    "currents": [{ "id": "curr_ch_sp_main", "name": "Socialdemocratici", "icon": "🔴", "leader": "Mattea Meyer", "influence": 58, "bonus": "+8 reputazione citta", "malus": "Business donor -" }],
+    "startingBonus": { "reputazione": 5, "coherence": 4 }
+  },
+  {
+    "id": "ch_svp",
+    "name": "Swiss People's Party",
+    "shortName": "SVP",
+    "icon": "🦅",
+    "color": "#1b5e20",
+    "ideology": "destra",
+    "country": "switzerland",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -6, "immigrazione": -8, "ambiente": -3, "difesa": 7, "diritti": -4 },
+    "currents": [{ "id": "curr_ch_svp_main", "name": "Conservatori", "icon": "🛡️", "leader": "Marco Chiesa", "influence": 66, "bonus": "+10 consenso rurale", "malus": "Coalizioni difficili" }],
+    "startingBonus": { "muscoli": 5, "reputazione": 3 }
+  }
+]

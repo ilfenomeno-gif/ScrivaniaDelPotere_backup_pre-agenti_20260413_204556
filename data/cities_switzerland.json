@@ -1,0 +1,50 @@
+{
+  "zurich": {
+    "id": "zurich",
+    "name": "Zurigo",
+    "region": "ZH",
+    "lat": 47.3769,
+    "lng": 8.5417,
+    "desc": "Capitale economica svizzera.",
+    "bonus": { "money": 30, "intelligenza": 2 },
+    "malus": { "stress": 2, "concorrenza": 0.92 },
+    "rentMultiplier": 1.65,
+    "salaryMultiplier": 1.6,
+    "startingMoney": 400,
+    "tier": 1,
+    "settlementType": "city",
+    "population": "large"
+  },
+  "geneva": {
+    "id": "geneva",
+    "name": "Ginevra",
+    "region": "GE",
+    "lat": 46.2044,
+    "lng": 6.1432,
+    "desc": "Diplomazia e ONG internazionali.",
+    "bonus": { "reputazioneNazionale": 3, "networking": 12 },
+    "malus": { "stress": 2, "concorrenza": 0.93 },
+    "rentMultiplier": 1.7,
+    "salaryMultiplier": 1.55,
+    "startingMoney": 400,
+    "tier": 1,
+    "settlementType": "city",
+    "population": "medium"
+  },
+  "bern": {
+    "id": "bern",
+    "name": "Berna",
+    "region": "BE",
+    "lat": 46.948,
+    "lng": 7.4474,
+    "desc": "Capitale federale e stabilita amministrativa.",
+    "bonus": { "coherence": 4, "reputazione": 2 },
+    "malus": { "stress": 1, "concorrenza": 0.94 },
+    "rentMultiplier": 1.4,
+    "salaryMultiplier": 1.35,
+    "startingMoney": 400,
+    "tier": 2,
+    "settlementType": "city",
+    "population": "medium"
+  }
+}

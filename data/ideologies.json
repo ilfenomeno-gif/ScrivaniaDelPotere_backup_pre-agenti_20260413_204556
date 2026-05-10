@@ -1,0 +1,53 @@
+{
+  "ideologies": [
+    {
+      "id": "radical_left",
+      "name": "Sinistra radicale",
+      "position": -3,
+      "color": "crimson",
+      "legacyIds": ["radicale", "estrema-sinistra"]
+    },
+    {
+      "id": "left",
+      "name": "Sinistra",
+      "position": -2,
+      "color": "red",
+      "legacyIds": ["sinistra"]
+    },
+    {
+      "id": "center_left",
+      "name": "Centro-sinistra",
+      "position": -1,
+      "color": "orange",
+      "legacyIds": ["populista"]
+    },
+    {
+      "id": "center",
+      "name": "Centro",
+      "position": 0,
+      "color": "green",
+      "legacyIds": ["centro"]
+    },
+    {
+      "id": "center_right",
+      "name": "Centro-destra",
+      "position": 1,
+      "color": "yellow",
+      "legacyIds": ["tecnocrate"]
+    },
+    {
+      "id": "right",
+      "name": "Destra",
+      "position": 2,
+      "color": "blue",
+      "legacyIds": ["destra"]
+    },
+    {
+      "id": "radical_right",
+      "name": "Destra radicale",
+      "position": 3,
+      "color": "purple",
+      "legacyIds": ["estremistra", "estrema-destra"]
+    }
+  ]
+}

@@ -582,7 +582,7 @@ const GameMap = {
     },
 
     async loadAllCapoluoghi() {
-        const nations = ['italy', 'france', 'germany', 'uk'];
+        const nations = ['italy', 'france', 'germany', 'uk', 'spain', 'portugal', 'benelux', 'switzerland'];
         const all = {};
         for (const nation of nations) {
             const cities = await this.loadCitiesForNation(nation);
@@ -623,6 +623,10 @@ const GameMap = {
             { file: 'data/cities_france.json', nationId: 'france' },
             { file: 'data/cities_germany.json', nationId: 'germany' },
             { file: 'data/cities_uk.json', nationId: 'uk' },
+            { file: 'data/cities_spain.json', nationId: 'spain' },
+            { file: 'data/cities_portugal.json', nationId: 'portugal' },
+            { file: 'data/cities_benelux.json', nationId: 'benelux' },
+            { file: 'data/cities_switzerland.json', nationId: 'switzerland' },
         ];
 
         let merged = {};

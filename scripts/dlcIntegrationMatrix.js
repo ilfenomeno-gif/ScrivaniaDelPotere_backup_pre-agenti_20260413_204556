@@ -22,7 +22,12 @@ const DLC_SYSTEMS = [
     { id: 'dlc_casa_dolce_casa_narrative', symbol: 'HouseNarrative', file: 'houseNarrative.js', group: 'daily_mechanics' },
     { id: 'dlc_prezzo_potere_expenses', symbol: 'DailyExpenses', file: 'dailyExpenses.js', group: 'daily_mechanics' },
     { id: 'dlc_tempo_libero_hobbies', symbol: 'HobbySystem', file: 'hobbySystem.js', group: 'daily_mechanics' },
+    { id: 'il_vecchio_mondo_expansion', symbol: 'NationProfileSystem', file: 'nation_profile.js', group: 'nation_expansion' },
 ];
+
+const DLC_DEPENDENCIES = {
+    cambio_nazione_pro: 'il_vecchio_mondo_expansion',
+};
 
 function parseArgNumber(flag, fallback) {
     const idx = process.argv.findIndex(v => v === flag);
@@ -34,8 +39,11 @@ function parseArgNumber(flag, fallback) {
 function parseThresholds() {
     return {
         minMoney: parseArgNumber('--min-money', -20000),
-        maxStress: parseArgNumber('--max-stress', 300),
-        minStress: parseArgNumber('--min-stress', -600),
+        maxStress: parseArgNumber('--max-stress', 100),
+        minStress: parseArgNumber('--min-stress', 0),
+        maxHealth: parseArgNumber('--max-health', 100),
+        minHealth: parseArgNumber('--min-health', 0),
+        maxCoherence: parseArgNumber('--max-coherence', 100),
         minCoherence: parseArgNumber('--min-coherence', 0),
     };
 }
@@ -90,18 +98,26 @@ function buildGameStub() {
         changeStat(statName, delta) {
             const d = Number(delta || 0);
             if (statName === 'coherence') {
-                this.state.coherence = Number(this.state.coherence || 0) + d;
+                this.state.coherence = Math.max(0, Math.min(100, Number(this.state.coherence || 0) + d));
                 return;
             }
             if (statName in this.state.stats) {
-                this.state.stats[statName] = Number(this.state.stats[statName] || 0) + d;
+                this.state.stats[statName] = Math.max(0, Math.min(100, Number(this.state.stats[statName] || 0) + d));
                 return;
             }
             if (statName in this.state.attributes) {
-                this.state.attributes[statName] = Number(this.state.attributes[statName] || 0) + d;
+                this.state.attributes[statName] = Math.max(0, Math.min(100, Number(this.state.attributes[statName] || 0) + d));
                 return;
             }
             this.state[statName] = Number(this.state[statName] || 0) + d;
+        },
+        changeReputazione(delta, scope) {
+            const d = Number(delta || 0);
+            if (scope === 'nazionale') {
+                this.state.reputazioneNazionale = Math.max(0, Math.min(100, Number(this.state.reputazioneNazionale || 0) + d));
+                return;
+            }
+            this.state.reputazione = Math.max(0, Math.min(100, Number(this.state.reputazione || 0) + d));
         },
         advanceDay() {
             this.state.day += 1;
@@ -202,6 +218,10 @@ function buildScenarios() {
         { name: 'all', activeDlc: all },
         { name: 'bundle_political_criminal', activeDlc: political },
         { name: 'bundle_daily_mechanics', activeDlc: daily },
+        { name: 'old_world_off_cambio_off', activeDlc: [] },
+        { name: 'old_world_on_cambio_off', activeDlc: ['il_vecchio_mondo_expansion'] },
+        { name: 'old_world_on_cambio_on', activeDlc: ['il_vecchio_mondo_expansion', 'cambio_nazione_pro'] },
+        { name: 'old_world_off_cambio_on_dependency_violation', activeDlc: ['cambio_nazione_pro'], expectDependencyViolation: true },
     ];
 
     for (const system of DLC_SYSTEMS) {
@@ -282,7 +302,22 @@ function runScenario(scenario, days, thresholds) {
     const assertionErrors = [];
     const finalMoney = Number(game.state.money || 0);
     const finalStress = Number(game.state.stats.stress || 0);
+    const finalHealth = Number(game.state.stats.salute || 0);
     const finalCoherence = Number(game.state.coherence || 0);
+
+    const dependencyErrors = [];
+    for (const [child, parent] of Object.entries(DLC_DEPENDENCIES)) {
+        if (activeSet.has(child) && !activeSet.has(parent)) {
+            dependencyErrors.push(`Dependency violation: ${child} requires ${parent}`);
+        }
+    }
+    if (scenario.expectDependencyViolation) {
+        if (dependencyErrors.length === 0) {
+            assertionErrors.push('Expected dependency violation was not detected');
+        }
+    } else {
+        assertionErrors.push(...dependencyErrors);
+    }
 
     if (finalMoney < thresholds.minMoney) {
         assertionErrors.push(`Money below threshold: ${finalMoney} < ${thresholds.minMoney}`);
@@ -292,6 +327,15 @@ function runScenario(scenario, days, thresholds) {
     }
     if (finalStress < thresholds.minStress) {
         assertionErrors.push(`Stress below threshold: ${finalStress} < ${thresholds.minStress}`);
+    }
+    if (finalHealth > thresholds.maxHealth) {
+        assertionErrors.push(`Health above threshold: ${finalHealth} > ${thresholds.maxHealth}`);
+    }
+    if (finalHealth < thresholds.minHealth) {
+        assertionErrors.push(`Health below threshold: ${finalHealth} < ${thresholds.minHealth}`);
+    }
+    if (finalCoherence > thresholds.maxCoherence) {
+        assertionErrors.push(`Coherence above threshold: ${finalCoherence} > ${thresholds.maxCoherence}`);
     }
     if (finalCoherence < thresholds.minCoherence) {
         assertionErrors.push(`Coherence below threshold: ${finalCoherence} < ${thresholds.minCoherence}`);
@@ -324,7 +368,7 @@ function buildMarkdownReport(days, results, elapsedMs, thresholds) {
     lines.push(`- Passed: ${passed}`);
     lines.push(`- Failed: ${failed}`);
     lines.push(`- Elapsed: ${elapsedMs} ms`);
-    lines.push(`- Thresholds: money >= ${thresholds.minMoney}, ${thresholds.minStress} <= stress <= ${thresholds.maxStress}, coherence >= ${thresholds.minCoherence}`);
+    lines.push(`- Thresholds: money >= ${thresholds.minMoney}, ${thresholds.minStress} <= stress <= ${thresholds.maxStress}, ${thresholds.minHealth} <= health <= ${thresholds.maxHealth}, ${thresholds.minCoherence} <= coherence <= ${thresholds.maxCoherence}`);
     lines.push('');
     lines.push('## Scenario Results');
     lines.push('');

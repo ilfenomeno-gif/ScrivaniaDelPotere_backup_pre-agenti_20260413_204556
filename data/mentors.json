@@ -1236,5 +1236,157 @@
         }
       }
     ]
+  },
+  "spain": {
+    "sinistra": [
+      {
+        "id": "mentor_es_psoe_1",
+        "name": "Mentor PSOE Madrid",
+        "shortName": "PSOE Mentor",
+        "icon": "🌹",
+        "partyId": "es_psoe",
+        "quote": "Coalizione e territorio.",
+        "bonusText": "+8 reputazione, +4 coerenza",
+        "effects": { "reputazione": 8, "coherence": 4 }
+      }
+    ],
+    "destra": [
+      {
+        "id": "mentor_es_pp_1",
+        "name": "Mentor PP Nacional",
+        "shortName": "PP Mentor",
+        "icon": "🔵",
+        "partyId": "es_pp",
+        "quote": "Gestione e stabilita.",
+        "bonusText": "+10 networking",
+        "effects": { "networking": 10 }
+      }
+    ],
+    "estremistra": [
+      {
+        "id": "mentor_es_vox_1",
+        "name": "Mentor Vox",
+        "shortName": "Vox Mentor",
+        "icon": "🦅",
+        "partyId": "es_vox",
+        "quote": "Linea dura e consenso rapido.",
+        "bonusText": "+6 carisma, +4 stress",
+        "effects": { "carisma": 6, "stress": 4 }
+      }
+    ]
+  },
+  "portugal": {
+    "sinistra": [
+      {
+        "id": "mentor_pt_ps_1",
+        "name": "Mentor PS Lisboa",
+        "shortName": "PS Mentor",
+        "icon": "🌹",
+        "partyId": "pt_ps",
+        "quote": "Riforme graduali, consenso solido.",
+        "bonusText": "+7 reputazione, +3 morale",
+        "effects": { "reputazione": 7, "morale": 3 }
+      }
+    ],
+    "centro": [
+      {
+        "id": "mentor_pt_psd_1",
+        "name": "Mentor PSD Porto",
+        "shortName": "PSD Mentor",
+        "icon": "⚖️",
+        "partyId": "pt_psd",
+        "quote": "Compromesso prima del conflitto.",
+        "bonusText": "+8 networking",
+        "effects": { "networking": 8 }
+      }
+    ],
+    "populista": [
+      {
+        "id": "mentor_pt_chega_1",
+        "name": "Mentor Chega",
+        "shortName": "Chega Mentor",
+        "icon": "📢",
+        "partyId": "pt_chega",
+        "quote": "Visibilita immediata.",
+        "bonusText": "+250 followers",
+        "effects": { "followers": 250 }
+      }
+    ]
+  },
+  "benelux": {
+    "centro": [
+      {
+        "id": "mentor_bx_union_1",
+        "name": "Mentor Civic Union",
+        "shortName": "BCU Mentor",
+        "icon": "🇪🇺",
+        "partyId": "bx_epp_union",
+        "quote": "Diplomazia prima di polarizzazione.",
+        "bonusText": "+10 reputazione nazionale",
+        "effects": { "reputazioneNazionale": 10 }
+      }
+    ],
+    "sinistra": [
+      {
+        "id": "mentor_bx_green_1",
+        "name": "Mentor Green Pact",
+        "shortName": "GPB Mentor",
+        "icon": "🌿",
+        "partyId": "bx_green_pact",
+        "quote": "Transizione e consenso civico.",
+        "bonusText": "+5 coerenza, +5 reputazione",
+        "effects": { "coherence": 5, "reputazione": 5 }
+      }
+    ],
+    "estremistra": [
+      {
+        "id": "mentor_bx_nf_1",
+        "name": "Mentor National Frontier",
+        "shortName": "NF Mentor",
+        "icon": "🛡️",
+        "partyId": "bx_national_frontier",
+        "quote": "Ordine e blocco identitario.",
+        "bonusText": "+5 muscoli, +3 reputazione",
+        "effects": { "muscoli": 5, "reputazione": 3 }
+      }
+    ]
+  },
+  "switzerland": {
+    "centro": [
+      {
+        "id": "mentor_ch_fdp_1",
+        "name": "Mentor FDP Zurich",
+        "shortName": "FDP Mentor",
+        "icon": "⚖️",
+        "partyId": "ch_fdp",
+        "quote": "Conta il dato, non il rumore.",
+        "bonusText": "+120 euro, +6 intelligenza",
+        "effects": { "money": 120, "intelligenza": 6 }
+      }
+    ],
+    "sinistra": [
+      {
+        "id": "mentor_ch_sp_1",
+        "name": "Mentor SP Bern",
+        "shortName": "SP Mentor",
+        "icon": "🌹",
+        "partyId": "ch_sp",
+        "quote": "Stato sociale, consenso stabile.",
+        "bonusText": "+8 reputazione, +4 coerenza",
+        "effects": { "reputazione": 8, "coherence": 4 }
+      }
+    ],
+    "destra": [
+      {
+        "id": "mentor_ch_svp_1",
+        "name": "Mentor SVP",
+        "shortName": "SVP Mentor",
+        "icon": "🦅",
+        "partyId": "ch_svp",
+        "quote": "Disciplina e territorio.",
+        "bonusText": "+6 muscoli, +2 reputazione",
+        "effects": { "muscoli": 6, "reputazione": 2 }
+      }
+    ]
   }
 }

@@ -335,6 +335,13 @@ const Character = {
 
     getDefaultArchetypeForIdeology(ideology) {
         const map = {
+            'radical_left': 'marta',
+            'left': 'marta',
+            'center_left': 'roberto',
+            'center': 'roberto',
+            'center_right': 'elena',
+            'right': 'massimo',
+            'radical_right': 'massimo',
             'estrema-sinistra': 'marta',
             'centro': 'roberto',
             'populista': 'beppe',
@@ -407,6 +414,13 @@ const Character = {
 
     // A. Ideology → protocol color codes
     IDEOLOGY_CODES: {
+        'radical_left': 'RL',
+        'left': 'LF',
+        'center_left': 'CL',
+        'center': 'CT',
+        'center_right': 'CR',
+        'right': 'RG',
+        'radical_right': 'RR',
         'estrema-sinistra': 'RS',
         'centro': 'CE',
         'populista': 'PO',
@@ -837,6 +851,11 @@ const Character = {
         const name = this.sanitizeName(document.getElementById('char-name').value.trim());
         if (!name || !Game.state.character.gender || !Game.state.character.ideology || !this._selectedMentorId || !this._selectedStartingCityId) return;
 
+        // Keep home-selected DLC active after the character sheet hard reset.
+        const preservedActiveDlc = Array.isArray(Game.state.flags && Game.state.flags.activeDlc)
+            ? [...Game.state.flags.activeDlc]
+            : [];
+
         // Stop idle timers
         Scheduler.clear(this._idleTimer);
         Scheduler.clear(this._coffeeTimer);
@@ -885,7 +904,7 @@ const Character = {
         Game.state.visitedCities = [];
         Game.state.housing = { rent: 250, bonuses: [], maluses: [] };  // Set rent to 250 (base, before city multiplier)
         Game.state.contacts = [];
-        Game.state.flags = {};
+        Game.state.flags = { activeDlc: preservedActiveDlc };
 
         // 🎮 Read selected game mode
         const selectedMode = document.querySelector('.stamp-btn[data-group="gamemode"].selected');
@@ -1268,6 +1287,7 @@ const Character = {
     // D. Silent tutorial — ideology adjusts starting stats
     applyIdeologyBonuses(ideology) {
         switch (ideology) {
+            case 'radical_left':
             case 'estrema-sinistra': // Sinistra Radicale / AVS
                 Game.state.attributes.carisma += 10;
                 Game.state.attributes.muscoli += 10;
@@ -1276,12 +1296,33 @@ const Character = {
                 Game.state.stats.stress += 12;
                 Game.state.money -= 15; // L'idealismo costa
                 break;
+            case 'left':
+                Game.state.attributes.carisma += 8;
+                Game.state.attributes.autenticita += 8;
+                Game.changeReputazione(5);
+                Game.state.stats.stress += 8;
+                Game.state.money -= 8;
+                break;
+            case 'center_left':
+                Game.state.attributes.intelligenza += 8;
+                Game.state.attributes.carisma += 6;
+                Game.changeReputazione(5);
+                Game.state.stats.stress += 7;
+                Game.state.money += 12;
+                break;
+            case 'center':
             case 'centro': // Centro Liberale / IV+Azione
                 Game.state.attributes.intelligenza += 8;
                 Game.state.attributes.estetica += 5;
                 Game.state.money += 35; // Networking = denaro
                 Game.state.coherence = Math.min(100, (Game.state.coherence || 100) + 4);
                 Game.state.stats.stress += 5;
+                break;
+            case 'center_right':
+                Game.state.attributes.intelligenza += 10;
+                Game.state.attributes.autenticita += 5;
+                Game.state.money += 30;
+                Game.state.stats.stress += 6;
                 break;
             case 'populista': // M5S / Antisistema
                 Game.state.attributes.carisma += 20;
@@ -1297,6 +1338,14 @@ const Character = {
                 Game.state.reputazioneNazionale = Math.min(100, (Game.state.reputazioneNazionale || 0) + 2);
                 Game.state.stats.stress += 5;
                 break;
+            case 'right':
+                Game.state.attributes.carisma += 8;
+                Game.state.attributes.muscoli += 8;
+                Game.changeReputazione(5);
+                Game.state.stats.stress += 8;
+                Game.state.money += 8;
+                break;
+            case 'radical_right':
             case 'estrema-destra': // Destra Sovranista / FdI+Lega
                 Game.state.attributes.carisma += 10;
                 Game.state.attributes.muscoli += 10;

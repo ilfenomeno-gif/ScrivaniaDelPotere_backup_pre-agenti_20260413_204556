@@ -58,6 +58,22 @@ const Agents = {
             first: ['Eleanor', 'William', 'Thomas', 'Charlotte', 'James', 'Amelia', 'Henry', 'Victoria'],
             last: ['Smith', 'Jones', 'Williams', 'Brown', 'Taylor', 'Davies', 'Wilson'],
         },
+        spain: {
+            first: ['Carlos', 'Lucia', 'Javier', 'Marta', 'Diego', 'Sofia', 'Alvaro', 'Elena'],
+            last: ['Garcia', 'Rodriguez', 'Lopez', 'Martinez', 'Sanchez', 'Perez', 'Gomez'],
+        },
+        portugal: {
+            first: ['Joao', 'Ines', 'Miguel', 'Beatriz', 'Tiago', 'Rita', 'Andre', 'Catarina'],
+            last: ['Silva', 'Santos', 'Ferreira', 'Pereira', 'Costa', 'Oliveira', 'Sousa'],
+        },
+        benelux: {
+            first: ['Noor', 'Pieter', 'Sophie', 'Lars', 'Emma', 'Jules', 'Milan', 'Anne'],
+            last: ['Vermeer', 'Peeters', 'Van Dijk', 'Dubois', 'Janssen', 'De Wilde', 'Lambert'],
+        },
+        switzerland: {
+            first: ['Luca', 'Nina', 'Jonas', 'Lea', 'Marco', 'Sven', 'Clara', 'Nora'],
+            last: ['Muller', 'Meier', 'Schmid', 'Rossi', 'Bianchi', 'Keller', 'Frei'],
+        },
     },
 
     ROLE_TYPES: ['politico', 'imprenditore', 'giornalista', 'sindacalista', 'cittadino'],

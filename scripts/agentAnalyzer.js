@@ -463,18 +463,38 @@ function runSingleSimulation(targetDay) {
     const Tasks = ctx.Tasks;
 
     Game.init();
+    // Align headless regression with a real started run (post-character creation).
+    Game.state.screen = 'desk';
+    Game.state.character = Game.state.character || {};
+    if (!Game.state.character.name) Game.state.character.name = 'AutoTester';
+    if (!Game.state.character.ideology) Game.state.character.ideology = 'centro';
+    if (!Game.state.city) {
+        Game.state.city = { id: 'roma', name: 'Roma', country: 'italy' };
+    }
 
     let completed = 0;
     let potentialActions = 0;
     let gameover = 0;
     let gameOverReason = null;
 
+    const detectGameOverReason = () => {
+        const stats = Game.state.stats || {};
+        if (Number(Game.state.coherence || 0) <= 0) return 'coerenza';
+        if (Number(stats.stanchezza || 0) >= 100) return 'stanchezza';
+        if (Number(stats.stress || 0) >= 100) return 'stress';
+        if (Number(stats.salute || 0) <= 0) return 'salute';
+        if (Number(Game.state.money || 0) < -800) return 'debito';
+        return 'screen';
+    };
+
     while (Game.state.day < targetDay) {
         const health = Game.state.stats && typeof Game.state.stats.salute === 'number'
             ? Game.state.stats.salute : Infinity;
         const money = Number(Game.state.money || 0);
+        const coherence = Number(Game.state.coherence || 0);
 
-        if (Game.state.screen === 'gameover') { gameover += 1; gameOverReason = 'screen'; break; }
+        if (Game.state.screen === 'gameover') { gameover += 1; gameOverReason = detectGameOverReason(); break; }
+        if (coherence <= 0) { gameover += 1; gameOverReason = 'coerenza'; break; }
         if (health <= 0)  { gameover += 1; gameOverReason = 'salute'; break; }
         if (money < -800) { gameover += 1; gameOverReason = 'debito'; break; }
 
@@ -499,7 +519,10 @@ function runSingleSimulation(targetDay) {
             }
             completed += 1;
 
-            if (Game.state.screen === 'gameover') break;
+            if (Game.state.screen === 'gameover') {
+                gameOverReason = detectGameOverReason();
+                break;
+            }
         }
 
         Game.advanceTime();
@@ -507,8 +530,10 @@ function runSingleSimulation(targetDay) {
         const healthAfter = Game.state.stats && typeof Game.state.stats.salute === 'number'
             ? Game.state.stats.salute : Infinity;
         const moneyAfter = Number(Game.state.money || 0);
+        const coherenceAfter = Number(Game.state.coherence || 0);
 
-        if (Game.state.screen === 'gameover') { gameover += 1; gameOverReason = 'screen'; break; }
+        if (Game.state.screen === 'gameover') { gameover += 1; gameOverReason = detectGameOverReason(); break; }
+        if (coherenceAfter <= 0) { gameover += 1; gameOverReason = 'coerenza'; break; }
         if (healthAfter <= 0)  { gameover += 1; gameOverReason = 'salute'; break; }
         if (moneyAfter < -800) { gameover += 1; gameOverReason = 'debito'; break; }
     }
@@ -531,7 +556,7 @@ function runRegression(runs, targetDay) {
     const endDay = Math.max(2, Number(targetDay) || 10);
 
     const totals = { money: 0, stress: 0, health: 0, healthCount: 0, completed: 0, potentialActions: 0, gameover: 0 };
-    const gameOverReasons = { screen: 0, salute: 0, debito: 0 };
+    const gameOverReasons = { screen: 0, salute: 0, debito: 0, coerenza: 0, stress: 0, stanchezza: 0 };
 
     for (let i = 0; i < sampleRuns; i++) {
         const sample = runSingleSimulation(endDay);

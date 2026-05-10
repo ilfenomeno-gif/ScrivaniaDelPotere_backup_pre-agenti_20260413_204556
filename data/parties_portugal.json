@@ -1,0 +1,44 @@
+[
+  {
+    "id": "pt_ps",
+    "name": "Partido Socialista",
+    "shortName": "PS",
+    "logo": "photos/parties/portugal/ps.svg",
+    "icon": "🌹",
+    "color": "#d62828",
+    "ideology": "sinistra",
+    "country": "portugal",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 5, "ambiente": 5, "difesa": 1, "diritti": 7 },
+    "currents": [{ "id": "curr_pt_ps_main", "name": "Socialisti", "icon": "🔴", "leader": "Pedro Nuno Santos", "influence": 60, "bonus": "+8 consenso urbano", "malus": "Spesa pubblica +" }],
+    "startingBonus": { "reputazione": 4, "coherence": 3 }
+  },
+  {
+    "id": "pt_psd",
+    "name": "Partido Social Democrata",
+    "shortName": "PSD",
+    "logo": "photos/parties/portugal/pscd.svg",
+    "icon": "🔵",
+    "color": "#0d47a1",
+    "ideology": "centro",
+    "country": "portugal",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -2, "immigrazione": 0, "ambiente": 1, "difesa": 3, "diritti": 3 },
+    "currents": [{ "id": "curr_pt_psd_main", "name": "Riformisti", "icon": "⚖️", "leader": "Luis Montenegro", "influence": 58, "bonus": "+10 networking", "malus": "Coerenza -2 su compromessi" }],
+    "startingBonus": { "money": 60, "reputazioneNazionale": 2 }
+  },
+  {
+    "id": "pt_chega",
+    "name": "Chega",
+    "shortName": "CH",
+    "logo": "photos/parties/portugal/chega.svg",
+    "icon": "📢",
+    "color": "#222222",
+    "ideology": "populista",
+    "country": "portugal",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -4, "immigrazione": -8, "ambiente": -2, "difesa": 7, "diritti": -5 },
+    "currents": [{ "id": "curr_pt_chega_main", "name": "Linea Dura", "icon": "🦅", "leader": "Andre Ventura", "influence": 72, "bonus": "+500 followers", "malus": "Debate malus" }],
+    "startingBonus": { "followers": 300, "carisma": 3 }
+  }
+]

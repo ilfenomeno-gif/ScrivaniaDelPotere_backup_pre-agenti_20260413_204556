@@ -1,0 +1,7 @@
+[
+  { "id": "ngo_pressure", "name": "Pressione NGO", "logo": "photos/mechanics/ngo_pressure.svg" },
+  { "id": "ngo_deals", "name": "Accordi NGO", "logo": "photos/mechanics/ngo_deals.svg" },
+  { "id": "ngo_reputation", "name": "Reputazione NGO", "logo": "photos/mechanics/ngo_reputation.svg" },
+  { "id": "ngo_scandal", "name": "Scandalo NGO", "logo": "photos/mechanics/ngo_scandal.svg" },
+  { "id": "ngo_lobby", "name": "Lobby NGO", "logo": "photos/mechanics/ngo_lobby.svg" }
+]

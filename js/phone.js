@@ -111,6 +111,7 @@ const Phone = {
         this.renderUrgenti();
         this.renderArchivio();
         this.renderPhoneTerritory();
+        if (this._activeApp === 'politica') this.renderPolitica();
         if (typeof Factions !== 'undefined' && Factions.renderPhoneCommittee) Factions.renderPhoneCommittee();
         this.updateBadge();
         this.updatePhoneAPDots();
@@ -122,6 +123,10 @@ const Phone = {
         document.querySelectorAll('.phone-app-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const app = btn.dataset.app;
+                if (app === 'app_europalink' || app === 'app_parlamento_live' || app === 'app_borsa_europea') {
+                    this.openDlcUtilityApp(app);
+                    return;
+                }
                 if (app === 'more') {
                     const main = document.getElementById('phone-app-grid-main');
                     const more = document.getElementById('phone-app-grid-more');
@@ -137,6 +142,37 @@ const Phone = {
                 this.openApp(app);
             });
         });
+    },
+
+    openDlcUtilityApp(appId) {
+        const active = (Game.state.flags && Array.isArray(Game.state.flags.activeDlc)) ? Game.state.flags.activeDlc : [];
+        if (!active.includes('il_vecchio_mondo_expansion')) {
+            Game.addUrgentMessage('Store DLC', 'Questa app richiede Il Vecchio Mondo Expansion attivo.', 'info');
+            if (window.SR) SR.announce('App bloccata. Attiva prima Il Vecchio Mondo Expansion.', 'assertive');
+            return;
+        }
+
+        if (appId === 'app_europalink') {
+            Game.changeReputazione(2, 'nazionale');
+            Game.addWorkNotif('🇪🇺 EuroLink', 'Nuovo canale diplomatico attivato: reputazione nazionale +2.', `Giorno ${Game.state.day}`);
+            this.openApp('mondo');
+            return;
+        }
+
+        if (appId === 'app_parlamento_live') {
+            Game.changeStat('coherence', 2);
+            Game.addWorkNotif('🎙️ Parlamento Live', 'Segui il dibattito europeo: coerenza +2.', `Giorno ${Game.state.day}`);
+            this.openApp('politica');
+            return;
+        }
+
+        if (appId === 'app_borsa_europea') {
+            const gain = 30 + Math.floor(Math.random() * 80);
+            Game.changeMoney(gain);
+            Game.changeStat('stress', 2);
+            Game.addWorkNotif('📈 Borsa Europea', `Operazione finanziaria chiusa: +€${gain}, stress +2.`, `Giorno ${Game.state.day}`);
+            this.openApp('finanza');
+        }
     },
 
     _activateTab(tabId) {
@@ -2236,6 +2272,7 @@ const Phone = {
         const party = Game.state.party;
         const partyName = party ? (party.name || party.id || '—') : '—';
         const partyIcon = party ? (party.icon || '🏛️') : '🏛️';
+        const partyLogoPath = party && party._partyData && party._partyData.logo ? party._partyData.logo : (party && party.logo ? party.logo : null);
         const career = Game.state.politicalCareer || {};
         const careerLevels = ['Militante', 'Capo Sezione', 'Consigliere', 'Assessore', 'Sindaco / Deputato'];
         const careerLabel = careerLevels[career.level || 0] || 'Militante';
@@ -2248,6 +2285,44 @@ const Phone = {
 
         const noPA = !Game.hasPhoneActions(1);
         const noAP = !Game.hasActionPoints(1);
+        const dualState = (typeof Nations !== 'undefined' && Nations.getDualNationalityState)
+            ? Nations.getDualNationalityState()
+            : { active: false, secondaryNationId: null, durationDays: 60, startedDay: 0 };
+        const dualRemaining = (typeof Nations !== 'undefined' && Nations.getDualNationalityRemainingDays)
+            ? Nations.getDualNationalityRemainingDays()
+            : 0;
+        const dualCosts = (typeof Nations !== 'undefined' && Nations.getDualNationalityDailyCosts)
+            ? Nations.getDualNationalityDailyCosts()
+            : { coherence: 20, money: 5000 };
+        const dualEndDay = Number(dualState.startedDay || 0) + Number(dualState.durationDays || 60);
+        const dualCriticalClass = dualState.active
+            ? (dualRemaining <= 3 ? 'politica-dual-critical-danger' : (dualRemaining <= 10 ? 'politica-dual-critical-warning' : ''))
+            : '';
+        const canUseDual = (typeof Nations !== 'undefined' && Nations.isNationChangeProActive)
+            ? Nations.isNationChangeProActive()
+            : false;
+        const currentNationId = Game.state.nation && Game.state.nation.id ? Game.state.nation.id : 'italy';
+        const unlockedNationIds = (typeof Nations !== 'undefined' && Nations.getUnlockedNationSet)
+            ? Nations.getUnlockedNationSet()
+            : ['italy', 'france', 'germany', 'uk'];
+        const dualCandidates = unlockedNationIds
+            .filter(nid => nid && nid !== currentNationId)
+            .map(nid => {
+                const nMeta = (typeof Nations !== 'undefined' && Nations.getNation) ? Nations.getNation(nid) : null;
+                return { id: nid, label: (nMeta && nMeta.name) ? nMeta.name : nid.toUpperCase() };
+            });
+        const activeDualNationName = dualState.secondaryNationId
+            ? ((typeof Nations !== 'undefined' && Nations.getNation && Nations.getNation(dualState.secondaryNationId)) || { name: dualState.secondaryNationId.toUpperCase() }).name
+            : '—';
+
+        const fallbackMechanicsCatalog = [
+            { id: 'ngo_pressure', label: 'Pressione NGO', logo: 'photos/mechanics/ngo_pressure.svg' },
+            { id: 'ngo_deals', label: 'Accordi NGO', logo: 'photos/mechanics/ngo_deals.svg' },
+            { id: 'ngo_reputation', label: 'Reputazione NGO', logo: 'photos/mechanics/ngo_reputation.svg' },
+            { id: 'ngo_scandal', label: 'Scandalo NGO', logo: 'photos/mechanics/ngo_scandal.svg' },
+            { id: 'ngo_lobby', label: 'Lobby NGO', logo: 'photos/mechanics/ngo_lobby.svg' },
+        ];
+        const mechanicsCatalog = this._getMechanicsCatalog(fallbackMechanicsCatalog);
 
         const _pct = (v) => Math.round((v || 0) * 100);
         const _bar = (icon, label, pct, color) => `
@@ -2270,6 +2345,7 @@ const Phone = {
             <div class="politica-party-badge">
                 ${partyIcon} <strong>${this.esc(partyName)}</strong>
                 <span class="politica-career-level">${this.esc(careerLabel)}</span>
+                <span id="politica-party-logo-slot"></span>
             </div>
             <div class="politica-progress-row">
                 <span>Avanzamento:</span>
@@ -2327,6 +2403,32 @@ const Phone = {
                 </button>
             </div>
         </div>
+
+        <div class="politica-section politica-section-dual">
+            <div class="politica-section-title">🛂 Doppia Cittadinanza</div>
+            ${canUseDual ? `
+            <div class="politica-dual-row"><span>Stato</span><strong>${dualState.active ? 'Attiva' : 'Disattiva'}</strong></div>
+            <div class="politica-dual-row"><span>Nazione secondaria</span><strong>${this.esc(activeDualNationName)}</strong></div>
+            <div class="politica-dual-row ${dualCriticalClass}"><span>Timer</span><strong>${dualState.active ? `${dualRemaining} giorni rimanenti` : '60 giorni (alla prossima attivazione)'}</strong></div>
+            <div class="politica-dual-row ${dualCriticalClass}"><span>Scadenza</span><strong>${dualState.active ? `Giorno ${dualEndDay}` : 'Da definire all\'attivazione'}</strong></div>
+            <div class="politica-dual-costs">Costo giornaliero: <strong>-${Math.abs(dualCosts.coherence)} Coerenza</strong> e <strong>-€${Math.abs(dualCosts.money)}</strong></div>
+            ${!dualState.active ? `
+            <div class="politica-dual-controls">
+                <select id="pol-dual-nation-select" class="politica-dual-select">
+                    ${dualCandidates.map(n => `<option value="${this.esc(n.id)}">${this.esc(n.label)}</option>`).join('')}
+                </select>
+                <button class="politica-action-btn" id="pol-dual-activate" ${noPA || dualCandidates.length === 0 ? 'disabled' : ''}>Attiva (1 📱)</button>
+            </div>
+            ` : `
+            <div class="politica-dual-controls">
+                <button class="politica-action-btn" id="pol-dual-deactivate" ${noPA ? 'disabled' : ''}>Disattiva (1 📱)</button>
+            </div>
+            `}
+            ` : `
+            <div class="politica-dual-locked">Richiede DLC Cambio Nazione Pro (dipendenza: Il Vecchio Mondo Expansion).</div>
+            `}
+            <div id="politica-mechanics-icons" class="politica-mechanics-icons" aria-label="Icone meccaniche politiche"></div>
+        </div>
         ${crim.mafiaReputation > 0 || crim.policeSuspicion > 0 ? `
         <div class="politica-section politica-section-criminal">
             <div class="politica-section-title">🕵️ Zona Grigia</div>
@@ -2337,6 +2439,36 @@ const Phone = {
         `;
 
         container.innerHTML = html;
+
+        const logoSlot = container.querySelector('#politica-party-logo-slot');
+        if (logoSlot && partyLogoPath) {
+            const partyLogo = this.loadPartyLogo({ name: partyName, logo: partyLogoPath, icon: partyIcon });
+            if (partyLogo) logoSlot.appendChild(partyLogo);
+        }
+
+        const mechanicsIcons = container.querySelector('#politica-mechanics-icons');
+        if (mechanicsIcons) {
+            mechanicsCatalog.forEach(m => {
+                const icon = this.loadMechanicIcon(m);
+                if (!icon) return;
+                icon.title = m.label;
+                mechanicsIcons.appendChild(icon);
+            });
+        }
+
+        if (dualState.active && dualRemaining <= 10) {
+            const bucket = dualRemaining <= 3 ? 'danger' : 'warning';
+            const key = `dual-expiry-${bucket}-${dualEndDay}`;
+            if (this._lastDualExpiryAnnounceKey !== key) {
+                this._lastDualExpiryAnnounceKey = key;
+                if (window.SR && SR.announce) {
+                    const msg = dualRemaining <= 3
+                        ? `Attenzione critica: doppia cittadinanza in scadenza tra ${dualRemaining} giorni.`
+                        : `Avviso: doppia cittadinanza in scadenza tra ${dualRemaining} giorni.`;
+                    SR.announce(msg, dualRemaining <= 3 ? 'assertive' : 'polite');
+                }
+            }
+        }
 
         // Wire action buttons
         this._bindPoliticaActions();
@@ -2419,6 +2551,78 @@ const Phone = {
             Game.addWorkNotif('🔗 Rete', 'Rete di lealtà consolidata. +4% lealtà, +5 Morale.', `Giorno ${Game.state.day}`);
             if (window.SR) SR.announce('Rete di lealtà consolidata.', 'polite');
         });
+
+        const dualActivateBtn = document.getElementById('pol-dual-activate');
+        if (dualActivateBtn && !dualActivateBtn.disabled) {
+            dualActivateBtn.addEventListener('click', () => {
+                if (!Game.spendPhoneAction(1)) {
+                    Game.emit('no-ap', { reason: 'Azioni telefono esaurite!' });
+                    return;
+                }
+                const sel = document.getElementById('pol-dual-nation-select');
+                const secondaryNationId = sel ? sel.value : null;
+                const result = (typeof Nations !== 'undefined' && Nations.activateDualNationality)
+                    ? Nations.activateDualNationality(secondaryNationId)
+                    : { ok: false, reason: 'system-missing' };
+                if (!result.ok) {
+                    const reason = result.reason || 'errore';
+                    Game.addWorkNotif('🛂 Doppia Cittadinanza', `Attivazione fallita: ${reason}.`, `Giorno ${Game.state.day}`);
+                    if (window.SR) SR.announce('Attivazione doppia cittadinanza fallita.', 'assertive');
+                } else if (window.SR) {
+                    SR.announce('Doppia cittadinanza attivata.', 'polite');
+                }
+                this.renderPolitica();
+            }, { once: true });
+        }
+
+        _act('pol-dual-deactivate', 1, 0, () => {
+            if (typeof Nations !== 'undefined' && Nations.deactivateDualNationality) {
+                Nations.deactivateDualNationality('manual');
+            }
+            if (window.SR) SR.announce('Doppia cittadinanza disattivata.', 'polite');
+        });
+    },
+
+    loadPartyLogo(party) {
+        if (!party || !party.logo) return null;
+        const img = document.createElement('img');
+        img.src = party.logo;
+        img.alt = `Logo ${party.name || party.id || 'partito'}`;
+        img.className = 'party-logo';
+        img.onerror = () => {
+            img.replaceWith(document.createTextNode(party.icon || '🏛️'));
+        };
+        return img;
+    },
+
+    loadMechanicIcon(mechanic) {
+        if (!mechanic || !mechanic.logo) return null;
+        const img = document.createElement('img');
+        img.src = mechanic.logo;
+        img.alt = mechanic.label || mechanic.id || 'Icona meccanica';
+        img.className = 'mechanic-icon';
+        img.onerror = () => {
+            img.style.display = 'none';
+        };
+        return img;
+    },
+
+    _getMechanicsCatalog(fallbackCatalog) {
+        if (Array.isArray(this._mechanicsCatalog) && this._mechanicsCatalog.length > 0) {
+            return this._mechanicsCatalog;
+        }
+        if (!this._mechanicsFetchPromise) {
+            this._mechanicsFetchPromise = fetch('data/mechanics.json')
+                .then(r => (r && r.ok ? r.json() : []))
+                .then(items => {
+                    if (Array.isArray(items) && items.length > 0) {
+                        this._mechanicsCatalog = items.map(m => ({ id: m.id, label: m.name || m.id, logo: m.logo }));
+                        this.renderPolitica();
+                    }
+                })
+                .catch(() => null);
+        }
+        return fallbackCatalog;
     },
 
     esc(str) {

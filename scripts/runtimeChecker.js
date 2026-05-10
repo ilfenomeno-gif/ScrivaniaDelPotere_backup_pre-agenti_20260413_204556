@@ -164,7 +164,9 @@ async function run() {
 
                 const n = setValue('#char-name', 'Runtime Tester');
                 const g = clickSel('.stamp-btn[data-group="gender"][data-value="M"]');
-                const i = clickSel('.ideology-card[data-value="centro"]');
+                const i = clickSel('.ideology-card[data-value="center"]')
+                    || clickSel('.ideology-card[data-value="center_left"]')
+                    || clickSel('.ideology-card[data-value="centro"]');
                 if (typeof Character !== 'undefined') {
                     if (!Character._selectedMentorId) {
                         const firstMentor = document.querySelector('#onboarding-mentor-choices .mentor-quick-card');

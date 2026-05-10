@@ -1,0 +1,41 @@
+[
+  {
+    "id": "bx_epp_union",
+    "name": "Benelux Civic Union",
+    "shortName": "BCU",
+    "icon": "🇪🇺",
+    "color": "#0057b8",
+    "ideology": "centro",
+    "country": "benelux",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 1, "immigrazione": 5, "ambiente": 5, "difesa": 2, "diritti": 7 },
+    "currents": [{ "id": "curr_bx_union_main", "name": "Federalisti", "icon": "🏛️", "leader": "Sophie Vermeer", "influence": 60, "bonus": "+12 diplomazia", "malus": "Burocrazia +stress" }],
+    "startingBonus": { "networking": 8, "reputazioneNazionale": 4 }
+  },
+  {
+    "id": "bx_green_pact",
+    "name": "Green Pact Benelux",
+    "shortName": "GPB",
+    "icon": "🌿",
+    "color": "#2a9d8f",
+    "ideology": "sinistra",
+    "country": "benelux",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 3, "immigrazione": 8, "ambiente": 10, "difesa": -2, "diritti": 8 },
+    "currents": [{ "id": "curr_bx_green_main", "name": "Transizione Verde", "icon": "♻️", "leader": "Noor De Wilde", "influence": 65, "bonus": "+10 consenso under30", "malus": "Industry donor -" }],
+    "startingBonus": { "morale": 10, "reputazione": 3 }
+  },
+  {
+    "id": "bx_national_frontier",
+    "name": "National Frontier",
+    "shortName": "NF",
+    "icon": "🛡️",
+    "color": "#4a4e69",
+    "ideology": "estremistra",
+    "country": "benelux",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -3, "immigrazione": -8, "ambiente": -2, "difesa": 8, "diritti": -6 },
+    "currents": [{ "id": "curr_bx_nf_main", "name": "Sovranisti", "icon": "📢", "leader": "Pieter Van Doorn", "influence": 68, "bonus": "+6 reputazione locale", "malus": "Media pressure" }],
+    "startingBonus": { "carisma": 4, "stress": 3 }
+  }
+]

@@ -26,6 +26,10 @@ const CitySearch = (() => {
         france:  ['data/cities_france.json'],
         germany: ['data/cities_germany.json'],
         uk:      ['data/cities_uk.json'],
+        spain: ['data/cities_spain.json'],
+        portugal: ['data/cities_portugal.json'],
+        benelux: ['data/cities_benelux.json'],
+        switzerland: ['data/cities_switzerland.json'],
     };
 
     /* ── Init ─────────────────────────────────── */

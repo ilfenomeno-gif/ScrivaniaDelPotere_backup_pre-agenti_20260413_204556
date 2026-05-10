@@ -13,6 +13,10 @@ const Parties = (() => {
         france: 'parties_france.json',
         germany: 'parties_germany.json',
         uk: 'parties_uk.json',
+        spain: 'parties_spain.json',
+        portugal: 'parties_portugal.json',
+        benelux: 'parties_benelux.json',
+        switzerland: 'parties_switzerland.json',
     };
 
     /* ── Inizializzazione ────────────────────── */
@@ -91,6 +95,12 @@ const Parties = (() => {
         const parties = await loadPartiesForNation(nId);
         const party = parties.find(p => p.id === partyId);
         if (!party) return false;
+
+        // National exclusivity: a party must belong to the active nation.
+        if (party.country && party.country !== nId) {
+            Game.addWorkNotif('🚫 Partito non disponibile', 'Questo partito non appartiene alla nazione corrente.', `Giorno ${Game.state.day}`);
+            return false;
+        }
 
         // Salva storico
         if (Game.state.party.id) {

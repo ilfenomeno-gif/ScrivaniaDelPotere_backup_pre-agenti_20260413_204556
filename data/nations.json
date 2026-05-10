@@ -1111,5 +1111,143 @@
         }
       ]
     }
+  },
+  "spain": {
+    "id": "spain",
+    "name": "Espana",
+    "language": "spagnolo",
+    "code": "ES",
+    "politicalSystem": "parlamentare_proporzionale",
+    "electionThreshold": 3,
+    "coalitionRequired": true,
+    "headOfState": "Re",
+    "headOfGov": "Presidente del Gobierno",
+    "currency": "€",
+    "careerRoles": [
+      "Concejal",
+      "Alcalde",
+      "Diputado",
+      "Ministro",
+      "Presidente"
+    ],
+    "salaryMultiplier": 1.35,
+    "rentMultiplier": 1.2,
+    "taxRate": 0.24,
+    "description": "Sistema parlamentare con multipartitismo e forti dinamiche territoriali.",
+    "startingCity": "madrid",
+    "startingMoney": 400,
+    "ideologies": {
+      "radicale": { "localName": "Izquierda Radical", "icon": "🚩", "desc": "Sinistra movimentista" },
+      "sinistra": { "localName": "Socialdemocrata", "icon": "🔴", "desc": "PSOE e area progressista" },
+      "centro": { "localName": "Centro Liberal", "icon": "⚖️", "desc": "Centristi e liberali" },
+      "populista": { "localName": "Populista", "icon": "📢", "desc": "Antisistema e anti-establishment" },
+      "tecnocrate": { "localName": "Tecnocrata", "icon": "📊", "desc": "Riformismo tecnico" },
+      "destra": { "localName": "Conservador", "icon": "🔵", "desc": "Partiti conservatori" },
+      "estremistra": { "localName": "Soberanista", "icon": "🦅", "desc": "Destra identitaria" }
+    },
+    "mentors": {
+      "sinistra": ["mentor_es_psoe_1", "mentor_es_psoe_2"],
+      "destra": ["mentor_es_pp_1", "mentor_es_pp_2"],
+      "estremistra": ["mentor_es_vox_1", "mentor_es_vox_2"]
+    }
+  },
+  "portugal": {
+    "id": "portugal",
+    "name": "Portugal",
+    "language": "portoghese",
+    "code": "PT",
+    "politicalSystem": "parlamentare_proporzionale",
+    "electionThreshold": 2,
+    "coalitionRequired": true,
+    "headOfState": "Presidente da Republica",
+    "headOfGov": "Primeiro-Ministro",
+    "currency": "€",
+    "careerRoles": ["Vereador", "Presidente da Camara", "Deputado", "Ministro", "Primeiro-Ministro"],
+    "salaryMultiplier": 1.1,
+    "rentMultiplier": 1,
+    "taxRate": 0.22,
+    "description": "Sistema stabile ma competitivo, forte centralita di Lisbona.",
+    "startingCity": "lisbon",
+    "startingMoney": 400,
+    "ideologies": {
+      "radicale": { "localName": "Esquerda Radical", "icon": "🚩", "desc": "Bloco e sinistra sociale" },
+      "sinistra": { "localName": "Socialista", "icon": "🔴", "desc": "Area socialista" },
+      "centro": { "localName": "Centro", "icon": "⚖️", "desc": "Area moderata" },
+      "populista": { "localName": "Populista", "icon": "📢", "desc": "Linea anti-sistema" },
+      "tecnocrate": { "localName": "Tecnocrata", "icon": "📊", "desc": "Riformisti di bilancio" },
+      "destra": { "localName": "Conservador", "icon": "🔵", "desc": "Centrodestra" },
+      "estremistra": { "localName": "Soberanista", "icon": "🦅", "desc": "Nazional-conservatori" }
+    },
+    "mentors": {
+      "sinistra": ["mentor_pt_ps_1"],
+      "centro": ["mentor_pt_psd_1"],
+      "populista": ["mentor_pt_chega_1"]
+    }
+  },
+  "benelux": {
+    "id": "benelux",
+    "name": "Benelux Union",
+    "language": "multilingue",
+    "code": "BX",
+    "politicalSystem": "federale_coalizionale",
+    "electionThreshold": 4,
+    "coalitionRequired": true,
+    "headOfState": "Consiglio Benelux",
+    "headOfGov": "Primo Coordinatore",
+    "currency": "€",
+    "careerRoles": ["Councillor", "Regional Deputy", "Federal Deputy", "Minister", "Coordinator"],
+    "salaryMultiplier": 1.4,
+    "rentMultiplier": 1.35,
+    "taxRate": 0.29,
+    "description": "Sistema federale multi-paese con forte peso diplomatico europeo.",
+    "startingCity": "brussels",
+    "startingMoney": 400,
+    "ideologies": {
+      "radicale": { "localName": "Progressive Radical", "icon": "🚩", "desc": "Sinistra movimentista" },
+      "sinistra": { "localName": "Social Green", "icon": "🔴", "desc": "Centrosinistra verde" },
+      "centro": { "localName": "Civic Liberal", "icon": "⚖️", "desc": "Centro istituzionale" },
+      "populista": { "localName": "Protest", "icon": "📢", "desc": "Anti-establishment" },
+      "tecnocrate": { "localName": "Institutionalist", "icon": "📊", "desc": "Tecnocrazia UE" },
+      "destra": { "localName": "Conservative", "icon": "🔵", "desc": "Centrodestra" },
+      "estremistra": { "localName": "National Frontier", "icon": "🦅", "desc": "Sovranismo duro" }
+    },
+    "mentors": {
+      "centro": ["mentor_bx_union_1"],
+      "sinistra": ["mentor_bx_green_1"],
+      "estremistra": ["mentor_bx_nf_1"]
+    }
+  },
+  "switzerland": {
+    "id": "switzerland",
+    "name": "Schweiz",
+    "language": "multilingue",
+    "code": "CH",
+    "politicalSystem": "federale_consensuale",
+    "electionThreshold": 0,
+    "coalitionRequired": true,
+    "headOfState": "Consiglio Federale",
+    "headOfGov": "Presidenza Rotante",
+    "currency": "CHF",
+    "careerRoles": ["Gemeinderat", "Kantonsrat", "Nationalrat", "Bundesrat", "Federal President"],
+    "salaryMultiplier": 1.6,
+    "rentMultiplier": 1.55,
+    "taxRate": 0.21,
+    "description": "Federazione ad alta stabilita con forte democrazia consensuale.",
+    "startingCity": "zurich",
+    "startingMoney": 400,
+    "ideologies": {
+      "radicale": { "localName": "Linke", "icon": "🚩", "desc": "Sinistra radicale" },
+      "sinistra": { "localName": "Sozialdemokratisch", "icon": "🔴", "desc": "Area socialdemocratica" },
+      "centro": { "localName": "Liberal Zentrum", "icon": "⚖️", "desc": "Centro liberale" },
+      "populista": { "localName": "Volksnah", "icon": "📢", "desc": "Populismo referendario" },
+      "tecnocrate": { "localName": "Technokrat", "icon": "📊", "desc": "Gestione tecnica" },
+      "destra": { "localName": "Konservativ", "icon": "🔵", "desc": "Conservatori moderati" },
+      "estremistra": { "localName": "Nationalkonservativ", "icon": "🦅", "desc": "Destra sovranista" }
+    },
+    "mentors": {
+      "centro": ["mentor_ch_fdp_1"],
+      "sinistra": ["mentor_ch_sp_1"],
+      "destra": ["mentor_ch_svp_1"]
+    }
   }
 }

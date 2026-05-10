@@ -1,0 +1,47 @@
+[
+  {
+    "id": "es_psoe",
+    "name": "PSOE",
+    "shortName": "PSOE",
+    "logo": "photos/parties/spain/psoe.svg",
+    "icon": "🌹",
+    "color": "#d7263d",
+    "ideology": "sinistra",
+    "country": "spain",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": 4, "immigrazione": 5, "ambiente": 6, "difesa": 1, "diritti": 8 },
+    "currents": [{ "id": "curr_es_psoe_social", "name": "Socialdemocratici", "icon": "🔴", "leader": "Pedro Sanchez", "influence": 60, "bonus": "+10% consensi urbani", "malus": "Tensioni regionali +5 stress" }],
+    "bonuses": [{ "stat": "urbanPopularity", "value": 0.1, "condition": "metropolis", "label": "+10% popolarita metropoli" }],
+    "startingBonus": { "reputazione": 4, "coherence": 4 }
+  },
+  {
+    "id": "es_pp",
+    "name": "Partido Popular",
+    "shortName": "PP",
+    "logo": "photos/parties/spain/pp.svg",
+    "icon": "🔵",
+    "color": "#0057b8",
+    "ideology": "destra",
+    "country": "spain",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -5, "immigrazione": -4, "ambiente": 0, "difesa": 6, "diritti": -2 },
+    "currents": [{ "id": "curr_es_pp_moderata", "name": "Ala Moderata", "icon": "⚖️", "leader": "Alberto Nunez Feijoo", "influence": 55, "bonus": "+8 networking impresa", "malus": "Base dura -5 fedelta" }],
+    "bonuses": [{ "stat": "money", "value": 25, "condition": "always", "label": "+25 euro al giorno da donor network" }],
+    "startingBonus": { "money": 80, "reputazioneNazionale": 3 }
+  },
+  {
+    "id": "es_vox",
+    "name": "Vox",
+    "shortName": "VOX",
+    "logo": "photos/parties/spain/vox.svg",
+    "icon": "🦅",
+    "color": "#2b9348",
+    "ideology": "estremistra",
+    "country": "spain",
+    "isReal": true,
+    "ideologyMatrix": { "tasse": -6, "immigrazione": -9, "ambiente": -3, "difesa": 8, "diritti": -6 },
+    "currents": [{ "id": "curr_es_vox_sovranista", "name": "Sovranisti", "icon": "📢", "leader": "Santiago Abascal", "influence": 70, "bonus": "+12 consenso base", "malus": "Media ostile +10 stress" }],
+    "bonuses": [{ "stat": "reputazione", "value": 3, "condition": "always", "label": "+3 reputazione su temi identitari" }],
+    "startingBonus": { "carisma": 4, "stress": 4 }
+  }
+]

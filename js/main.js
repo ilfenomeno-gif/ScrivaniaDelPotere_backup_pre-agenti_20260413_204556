@@ -180,6 +180,20 @@ document.addEventListener('DOMContentLoaded', function () {
             desc: 'Sistema slot giornalieri (mattina/pomeriggio/sera), attività personali strutturate, sistema fatigue. Gratuito: slot visibili, 3 slot/giorno. Completo: attività avanzate, burnout events.',
             systems: ['dailySlots.js'],
         },
+        {
+            id: 'il_vecchio_mondo_expansion',
+            type: 'Expansion',
+            title: '🏰 Il Vecchio Mondo Expansion',
+            desc: 'Espansione geopolitica europea con Spagna, Portogallo, Benelux e Svizzera, partiti reali e profili nazionali avanzati.',
+            systems: ['nation_profile.js'],
+        },
+        {
+            id: 'cambio_nazione_pro',
+            type: 'Expansion',
+            title: '🛂 Cambio Nazione Pro',
+            desc: 'Trasferimenti politici avanzati, regole di esclusivita nazionale, doppia cittadinanza opzionale e approvazione trasferimento a 7 giorni.',
+            systems: ['nation_profile.js'],
+        },
 
         // === FLAVOR PACKS ===
         {
@@ -241,6 +255,53 @@ document.addEventListener('DOMContentLoaded', function () {
             systems: ['hobbySystem.js'],
         },
     ];
+
+    const DLC_PRICE_MAP = {
+        dlc_toghe_judiciary: 9.99,
+        dlc_oltre_confini_diplomacy: 12.99,
+        dlc_radici_housing: 8.99,
+        dlc_agenda_piena_slots: 8.99,
+        dlc_cupola_mafia: 6.99,
+        il_vecchio_mondo_expansion: 14.99,
+        cambio_nazione_pro: 9.99,
+        dlc_prima_repubblica_scenario: 7.99,
+        dlc_corpo_mente_wellness: 6.99,
+        dlc_casa_dolce_casa_narrative: 5.99,
+        dlc_potere_tasca_lifestyle: 4.99,
+        dlc_stampa_media: 5.99,
+        dlc_prezzo_potere_expenses: 5.99,
+        dlc_tempo_libero_hobbies: 4.99,
+    };
+
+    const DLC_BUNDLES = [
+        {
+            id: 'bundle_expansion_pass',
+            name: 'Expansion Pass',
+            desc: 'Tutti gli Expansion Pack in un unico pacchetto.',
+            price: 39.99,
+            ids: ['dlc_toghe_judiciary', 'dlc_oltre_confini_diplomacy', 'dlc_radici_housing', 'dlc_agenda_piena_slots', 'il_vecchio_mondo_expansion', 'cambio_nazione_pro'],
+        },
+        {
+            id: 'bundle_flavor_pack',
+            name: 'Flavor Collection',
+            desc: 'Profondita narrativa e sistemi flavor completi.',
+            price: 19.99,
+            ids: ['dlc_cupola_mafia', 'dlc_prima_repubblica_scenario', 'dlc_corpo_mente_wellness', 'dlc_casa_dolce_casa_narrative'],
+        },
+        {
+            id: 'bundle_immersion_pack',
+            name: 'Immersion Kit',
+            desc: 'Media, lifestyle, economia quotidiana e hobby.',
+            price: 14.99,
+            ids: ['dlc_potere_tasca_lifestyle', 'dlc_stampa_media', 'dlc_prezzo_potere_expenses', 'dlc_tempo_libero_hobbies'],
+        },
+    ];
+
+    const DEPARTMENT_LABELS = {
+        Expansion: 'Reparto Espansioni',
+        Flavor: 'Reparto Flavor',
+        Immersion: 'Reparto Immersion',
+    };
 
     function nowIso() { return new Date().toISOString(); }
 
@@ -392,6 +453,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!Game || !Game.state) return;
         if (!Game.state.flags) Game.state.flags = {};
         Game.state.flags.activeDlc = getCurrentUserActiveDlcIds();
+    }
+
+    function toggleDlcWithDependencies(user, id, nextState) {
+        if (!user.dlcState) user.dlcState = {};
+
+        if (id === 'cambio_nazione_pro' && nextState && !user.dlcState.il_vecchio_mondo_expansion) {
+            return { ok: false, message: 'Per attivare Cambio Nazione Pro devi prima attivare Il Vecchio Mondo Expansion.' };
+        }
+
+        user.dlcState[id] = nextState;
+
+        if (id === 'il_vecchio_mondo_expansion' && !nextState) {
+            user.dlcState.cambio_nazione_pro = false;
+        }
+
+        return { ok: true, message: 'Stato DLC aggiornato.' };
     }
 
     Game.on('screen-change', (d) => {
@@ -628,6 +705,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof HouseNarrative !== 'undefined' && HouseNarrative.init) HouseNarrative.init();
     if (typeof DailyExpenses !== 'undefined' && DailyExpenses.init) DailyExpenses.init();
     if (typeof HobbySystem !== 'undefined' && HobbySystem.init) HobbySystem.init();
+    if (typeof NationProfileSystem !== 'undefined' && NationProfileSystem.init) NationProfileSystem.init();
 
     /* ----- Campaign Win/Loss ----- */
     Game.on('campaign-won', (d) => {
@@ -710,11 +788,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const homeCampaignBtn = document.getElementById('home-campaign');
     const homeLoadCampaignBtn = document.getElementById('home-load-campaign');
     const homeDlcBtn = document.getElementById('home-dlc');
+    const homeStoreBtn = document.getElementById('home-store');
     const homeSettingsBtn = document.getElementById('home-settings');
     const homeExitBtn = document.getElementById('home-exit');
     const panelCampaign = document.getElementById('home-panel-campaign');
     const panelLoad = document.getElementById('home-panel-load');
     const panelDlc = document.getElementById('home-panel-dlc');
+    const panelStore = document.getElementById('home-panel-store');
     const campaignTypeButtons = document.getElementById('campaign-type-buttons');
     const btnTypeSandbox = document.getElementById('campaign-type-sandbox');
     const btnTypeCampaign = document.getElementById('campaign-type-campaign');
@@ -722,8 +802,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnTypeBack = document.getElementById('campaign-type-back');
     const homeCampaignList = document.getElementById('home-campaign-list');
     const homeDlcList = document.getElementById('home-dlc-list');
+    const homeStoreList = document.getElementById('home-store-list');
+    const homeStoreBundles = document.getElementById('home-store-bundles');
+    const homeStoreDetail = document.getElementById('home-store-detail');
 
     let selectedCampaignType = null;
+    let selectedStoreDlcId = null;
 
     function setAuthMessage(msg) {
         if (authMessage) authMessage.textContent = msg || '';
@@ -737,6 +821,11 @@ document.addEventListener('DOMContentLoaded', function () {
         panelCampaign && panelCampaign.classList.add('hidden');
         panelLoad && panelLoad.classList.add('hidden');
         panelDlc && panelDlc.classList.add('hidden');
+        panelStore && panelStore.classList.add('hidden');
+    }
+
+    function formatEuro(v) {
+        return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(v || 0));
     }
 
     function switchAuthTab(kind) {
@@ -837,15 +926,170 @@ document.addEventListener('DOMContentLoaded', function () {
         homeDlcList.querySelectorAll('[data-dlc-id]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-dlc-id');
+                let outcome = { ok: true, message: 'Stato DLC aggiornato.' };
                 updateCurrentUser((u) => {
-                    if (!u.dlcState) u.dlcState = {};
-                    u.dlcState[id] = !u.dlcState[id];
+                    const current = !!(u.dlcState && u.dlcState[id]);
+                    outcome = toggleDlcWithDependencies(u, id, !current);
                 });
+                if (!outcome.ok) {
+                    setHomeMessage(outcome.message);
+                    renderDlcList();
+                    return;
+                }
                 syncActiveDlcToGameState();
                 renderDlcList();
-                setHomeMessage('Stato DLC aggiornato.');
+                setHomeMessage(outcome.message);
             });
         });
+    }
+
+    function renderStoreDetail(id) {
+        if (!homeStoreDetail) return;
+        const user = getCurrentUser();
+        if (!user) {
+            homeStoreDetail.innerHTML = '';
+            return;
+        }
+        if (!user.dlcState) user.dlcState = {};
+        const dlc = DLC_CATALOG.find((d) => d.id === id);
+        if (!dlc) {
+            homeStoreDetail.innerHTML = '<p>Seleziona un DLC per vedere i dettagli.</p>';
+            return;
+        }
+        const active = !!user.dlcState[dlc.id];
+        const bundles = DLC_BUNDLES.filter((b) => b.ids.includes(dlc.id)).map((b) => b.name);
+        const bundlesText = bundles.length ? bundles.join(', ') : 'Nessuno';
+        homeStoreDetail.innerHTML = `
+            <h3>${dlc.title}</h3>
+            <p><strong>Prezzo:</strong> ${formatEuro(DLC_PRICE_MAP[dlc.id])}</p>
+            <p><strong>Descrizione:</strong> ${dlc.desc}</p>
+            <p><strong>Sistemi:</strong> ${(dlc.systems || []).join(', ')}</p>
+            <p><strong>Bundle:</strong> ${bundlesText}</p>
+            <p><strong>Stato:</strong> ${active ? 'Attivo' : 'Disattivato'}</p>
+            <div class="home-store-card-actions">
+                <button class="home-action-btn primary" data-store-toggle-id="${dlc.id}">${active ? 'Disattiva DLC' : 'Acquista e Attiva DLC'}</button>
+            </div>
+        `;
+
+        homeStoreDetail.querySelectorAll('[data-store-toggle-id]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const toggleId = btn.getAttribute('data-store-toggle-id');
+                let outcome = { ok: true, message: 'Store aggiornato. Stato DLC sincronizzato.' };
+                updateCurrentUser((u) => {
+                    const current = !!(u.dlcState && u.dlcState[toggleId]);
+                    outcome = toggleDlcWithDependencies(u, toggleId, !current);
+                });
+                if (!outcome.ok) {
+                    setHomeMessage(outcome.message);
+                    renderStore();
+                    return;
+                }
+                syncActiveDlcToGameState();
+                renderStore();
+                setHomeMessage(outcome.message);
+            });
+        });
+    }
+
+    function renderStore() {
+        if (!homeStoreList || !homeStoreBundles) return;
+        const user = getCurrentUser();
+        if (!user) {
+            homeStoreList.innerHTML = '';
+            homeStoreBundles.innerHTML = '';
+            homeStoreDetail && (homeStoreDetail.innerHTML = '');
+            return;
+        }
+        if (!user.dlcState) user.dlcState = {};
+
+        homeStoreBundles.innerHTML = DLC_BUNDLES.map((b) => {
+            const allActive = b.ids.every((id) => !!user.dlcState[id]);
+            return `
+                <div class="home-store-bundle">
+                    <div class="home-store-title">${b.name}</div>
+                    <div class="home-store-price">${formatEuro(b.price)}</div>
+                    <div class="home-store-mini-desc">${b.desc}</div>
+                    <div class="home-store-mini-desc">Include: ${b.ids.length} DLC</div>
+                    <div class="home-store-bundle-actions">
+                        <button class="home-action-btn primary" data-store-bundle-id="${b.id}">${allActive ? 'Bundle già attivo' : 'Acquista e Attiva Bundle'}</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        homeStoreBundles.querySelectorAll('[data-store-bundle-id]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const bundleId = btn.getAttribute('data-store-bundle-id');
+                const bundle = DLC_BUNDLES.find((b) => b.id === bundleId);
+                if (!bundle) return;
+                updateCurrentUser((u) => {
+                    if (!u.dlcState) u.dlcState = {};
+                    bundle.ids.forEach((id) => { u.dlcState[id] = true; });
+                });
+                syncActiveDlcToGameState();
+                renderStore();
+                setHomeMessage(`Bundle ${bundle.name} attivato.`);
+            });
+        });
+
+        const grouped = DLC_CATALOG.reduce((acc, d) => {
+            const key = d.type || 'Altro';
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(d);
+            return acc;
+        }, {});
+
+        homeStoreList.innerHTML = Object.keys(grouped).map((type) => {
+            const items = grouped[type].map((d) => {
+                const active = !!user.dlcState[d.id];
+                const selected = selectedStoreDlcId === d.id;
+                return `
+                    <div class="home-store-card${selected ? ' active' : ''}">
+                        <div class="home-store-title">${d.title}</div>
+                        <div class="home-store-price">${formatEuro(DLC_PRICE_MAP[d.id])} • ${active ? 'Attivo' : 'Non attivo'}</div>
+                        <div class="home-store-mini-desc">${d.desc}</div>
+                        <div class="home-store-card-actions">
+                            <button class="home-action-btn" data-store-open-id="${d.id}">Dettagli</button>
+                            <button class="home-action-btn" data-store-quick-toggle-id="${d.id}">${active ? 'Disattiva' : 'Attiva'}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            return `
+                <div class="home-store-dept">
+                    <h3 class="home-store-dept-title">${DEPARTMENT_LABELS[type] || type}</h3>
+                    <div class="home-store-grid">${items}</div>
+                </div>
+            `;
+        }).join('');
+
+        homeStoreList.querySelectorAll('[data-store-open-id]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                selectedStoreDlcId = btn.getAttribute('data-store-open-id');
+                renderStore();
+            });
+        });
+
+        homeStoreList.querySelectorAll('[data-store-quick-toggle-id]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-store-quick-toggle-id');
+                let outcome = { ok: true, message: 'Store aggiornato. Stato DLC sincronizzato.' };
+                updateCurrentUser((u) => {
+                    const current = !!(u.dlcState && u.dlcState[id]);
+                    outcome = toggleDlcWithDependencies(u, id, !current);
+                });
+                if (!outcome.ok) {
+                    setHomeMessage(outcome.message);
+                    renderStore();
+                    return;
+                }
+                syncActiveDlcToGameState();
+                selectedStoreDlcId = id;
+                renderStore();
+                setHomeMessage(outcome.message);
+            });
+        });
+        renderStoreDetail(selectedStoreDlcId || (DLC_CATALOG[0] && DLC_CATALOG[0].id));
     }
 
     function showHome() {
@@ -995,7 +1239,17 @@ document.addEventListener('DOMContentLoaded', function () {
         panelDlc && panelDlc.classList.remove('hidden');
     });
 
+    homeStoreBtn && homeStoreBtn.addEventListener('click', () => {
+        hideHomePanels();
+        renderStore();
+        panelStore && panelStore.classList.remove('hidden');
+    });
+
     document.getElementById('home-dlc-back')?.addEventListener('click', () => {
+        hideHomePanels();
+    });
+
+    document.getElementById('home-store-back')?.addEventListener('click', () => {
         hideHomePanels();
     });
 

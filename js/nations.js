@@ -4,20 +4,40 @@
 
 const Nations = {
     nationsData: null,
+    universalIdeologies: null,
     currentNation: null,
     ideologyAliases: {
-        'estrema-sinistra': 'radicale',
-        'estrema-destra': 'estremistra',
-        'sinistra': 'sinistra',
-        'centro': 'centro',
-        'populista': 'populista',
-        'tecnocrate': 'tecnocrate',
-        'destra': 'destra',
+        'radical_left': 'radical_left',
+        'left': 'left',
+        'center_left': 'center_left',
+        'center': 'center',
+        'center_right': 'center_right',
+        'right': 'right',
+        'radical_right': 'radical_right',
+        'radicale': 'radical_left',
+        'estrema-sinistra': 'radical_left',
+        'sinistra': 'left',
+        'populista': 'center_left',
+        'centro': 'center',
+        'tecnocrate': 'center_right',
+        'destra': 'right',
+        'estremistra': 'radical_right',
+        'estrema-destra': 'radical_right',
     },
 
     ideologyReverseAliases: {
-        'radicale': 'estrema-sinistra',
-        'estremistra': 'estrema-destra',
+        'radical_left': 'estrema-sinistra',
+        'radical_right': 'estrema-destra',
+    },
+
+    canonicalToNationIdeologyKey: {
+        radical_left: 'radicale',
+        left: 'sinistra',
+        center_left: 'populista',
+        center: 'centro',
+        center_right: 'tecnocrate',
+        right: 'destra',
+        radical_right: 'estremistra',
     },
 
     normalizeIdeologyKey(ideologyKey) {
@@ -30,6 +50,7 @@ const Nations = {
 
     async init() {
         await this.loadNations();
+        await this.loadUniversalIdeologies();
         // Se non è impostata una nazione, usa Italia come default
         if (!Game.state.nation) {
             Game.state.nation = {
@@ -39,6 +60,140 @@ const Nations = {
             };
         }
         this.currentNation = this.nationsData[Game.state.nation.id] || this.nationsData.italy;
+        this.ensureDualNationalityState();
+
+        if (!this._dailyHooksRegistered && typeof Game !== 'undefined' && Game.on) {
+            this._dailyHooksRegistered = true;
+            Game.on('new-day', () => {
+                if (!this.isNationChangeProActive()) return;
+                const dual = this.getDualNationalityState();
+                if (!dual || !dual.active) return;
+
+                const expiryDay = Number(dual.startedDay || 0) + Number(dual.durationDays || 60);
+                if ((Game.state.day || 0) > expiryDay) {
+                    this.deactivateDualNationality('timer-expired');
+                    return;
+                }
+
+                const daily = this.getDualNationalityDailyCosts();
+                Game.changeStat('coherence', -Math.abs(daily.coherence));
+                Game.changeMoney(-Math.abs(daily.money));
+            });
+        }
+    },
+
+    async loadUniversalIdeologies() {
+        if (Array.isArray(this.universalIdeologies) && this.universalIdeologies.length > 0) {
+            return this.universalIdeologies;
+        }
+        try {
+            const resp = await fetch('data/ideologies.json');
+            const data = await resp.json();
+            this.universalIdeologies = Array.isArray(data.ideologies) ? data.ideologies : [];
+        } catch (e) {
+            this.universalIdeologies = [];
+        }
+        return this.universalIdeologies;
+    },
+
+    toNationIdeologyKey(ideologyKey) {
+        const canonical = this.normalizeIdeologyKey(ideologyKey);
+        return this.canonicalToNationIdeologyKey[canonical] || canonical;
+    },
+
+    ensureDualNationalityState() {
+        if (!Game.state.flags) Game.state.flags = {};
+        if (!Game.state.flags.dualNationality || typeof Game.state.flags.dualNationality !== 'object') {
+            Game.state.flags.dualNationality = {
+                active: false,
+                secondaryNationId: null,
+                startedDay: 0,
+                durationDays: 60,
+            };
+            return;
+        }
+        const d = Game.state.flags.dualNationality;
+        if (typeof d.active !== 'boolean') d.active = false;
+        if (!Number.isFinite(d.startedDay)) d.startedDay = 0;
+        if (!Number.isFinite(d.durationDays) || d.durationDays <= 0) d.durationDays = 60;
+        if (typeof d.secondaryNationId !== 'string' && d.secondaryNationId !== null) d.secondaryNationId = null;
+    },
+
+    getDualNationalityState() {
+        this.ensureDualNationalityState();
+        return Game.state.flags.dualNationality;
+    },
+
+    getDualNationalityRemainingDays() {
+        const d = this.getDualNationalityState();
+        if (!d.active) return 0;
+        const currentDay = Number(Game.state.day || 0);
+        const endDay = Number(d.startedDay || 0) + Number(d.durationDays || 60);
+        return Math.max(0, endDay - currentDay);
+    },
+
+    activateDualNationality(secondaryNationId) {
+        if (!this.isNationChangeProActive()) {
+            return { ok: false, reason: 'nation-change-pro-required' };
+        }
+        if (!secondaryNationId || secondaryNationId === (Game.state.nation && Game.state.nation.id)) {
+            return { ok: false, reason: 'invalid-secondary-nation' };
+        }
+        if (!this.canTransferToNation(Game.state.nation && Game.state.nation.id, secondaryNationId)) {
+            return { ok: false, reason: 'nation-locked-by-dlc' };
+        }
+
+        const d = this.getDualNationalityState();
+        d.active = true;
+        d.secondaryNationId = secondaryNationId;
+        d.startedDay = Number(Game.state.day || 0);
+        d.durationDays = 60;
+        if (typeof Game.addWorkNotif === 'function') {
+            Game.addWorkNotif('🛂 Doppia Cittadinanza', `Attivata con ${secondaryNationId.toUpperCase()}: durata 60 giorni.`, `Giorno ${Game.state.day}`);
+        }
+        return { ok: true };
+    },
+
+    deactivateDualNationality(reason) {
+        const d = this.getDualNationalityState();
+        d.active = false;
+        d.secondaryNationId = null;
+        d.startedDay = 0;
+        d.durationDays = 60;
+        if (typeof Game.addWorkNotif === 'function') {
+            const why = reason === 'timer-expired' ? 'Timer 60 giorni scaduto.' : 'Disattivata manualmente.';
+            Game.addWorkNotif('🛂 Doppia Cittadinanza', why, `Giorno ${Game.state.day}`);
+        }
+        return { ok: true };
+    },
+
+    isOldWorldExpansionActive() {
+        const active = (Game.state.flags && Array.isArray(Game.state.flags.activeDlc)) ? Game.state.flags.activeDlc : [];
+        return active.includes('il_vecchio_mondo_expansion');
+    },
+
+    isNationChangeProActive() {
+        const active = (Game.state.flags && Array.isArray(Game.state.flags.activeDlc)) ? Game.state.flags.activeDlc : [];
+        return active.includes('cambio_nazione_pro');
+    },
+
+    getUnlockedNationSet() {
+        const base = ['italy', 'france', 'germany', 'uk'];
+        if (!this.isOldWorldExpansionActive()) return base;
+        return [...base, 'spain', 'portugal', 'benelux', 'switzerland'];
+    },
+
+    canTransferToNation(fromNationId, toNationId) {
+        if (!toNationId || fromNationId === toNationId) return true;
+        return this.getUnlockedNationSet().includes(toNationId);
+    },
+
+    getApprovalWindowDays() {
+        return 7;
+    },
+
+    getDualNationalityDailyCosts() {
+        return { coherence: 20, money: 5000 };
     },
 
     async loadNations() {
@@ -290,8 +445,8 @@ const Nations = {
     getIdeologyData(ideologyKey, nationId) {
         const nation = this.getNation(nationId);
         if (!nation || !nation.ideologies) return null;
-        const normalized = this.normalizeIdeologyKey(ideologyKey);
-        return nation.ideologies[normalized] || null;
+        const localKey = this.toNationIdeologyKey(ideologyKey);
+        return nation.ideologies[localKey] || null;
     },
 
     /**
@@ -324,8 +479,8 @@ const Nations = {
     getMentorsForIdeology(ideologyKey, nationId) {
         const nation = this.getNation(nationId);
         if (!nation || !nation.mentors) return [];
-        const normalized = this.normalizeIdeologyKey(ideologyKey);
-        return nation.mentors[normalized] || [];
+        const localKey = this.toNationIdeologyKey(ideologyKey);
+        return nation.mentors[localKey] || [];
     },
 
     /**
@@ -333,11 +488,31 @@ const Nations = {
      */
     getIdeologiesList(nationId) {
         const nation = this.getNation(nationId);
-        if (!nation || !nation.ideologies) return [];
-        return Object.entries(nation.ideologies).map(([key, data]) => ({
-            id: this.denormalizeIdeologyKey(key),
-            ...data
-        }));
+        const source = Array.isArray(this.universalIdeologies) && this.universalIdeologies.length > 0
+            ? this.universalIdeologies
+            : [
+                { id: 'radical_left', name: 'Sinistra radicale', color: 'crimson', position: -3 },
+                { id: 'left', name: 'Sinistra', color: 'red', position: -2 },
+                { id: 'center_left', name: 'Centro-sinistra', color: 'orange', position: -1 },
+                { id: 'center', name: 'Centro', color: 'green', position: 0 },
+                { id: 'center_right', name: 'Centro-destra', color: 'yellow', position: 1 },
+                { id: 'right', name: 'Destra', color: 'blue', position: 2 },
+                { id: 'radical_right', name: 'Destra radicale', color: 'purple', position: 3 },
+            ];
+
+        return source.map((ideo) => {
+            const localized = nation && nation.ideologies
+                ? nation.ideologies[this.toNationIdeologyKey(ideo.id)]
+                : null;
+            return {
+                id: ideo.id,
+                localName: (localized && localized.localName) || ideo.name,
+                icon: (localized && localized.icon) || '•',
+                desc: (localized && localized.desc) || ideo.name,
+                color: ideo.color,
+                position: ideo.position,
+            };
+        });
     },
 
     /**
@@ -412,6 +587,10 @@ const Nations = {
             france: { italy: 1400, germany: 1200, uk: 1700 },
             germany: { italy: 1700, france: 1200, uk: 1800 },
             uk: { italy: 2100, france: 1700, germany: 1800 },
+            spain: { portugal: 900, france: 1200, italy: 1600, benelux: 1700, switzerland: 1750, germany: 1800, uk: 1900 },
+            portugal: { spain: 900, france: 1400, italy: 1700, benelux: 1800, switzerland: 1800, germany: 1900, uk: 2000 },
+            benelux: { france: 1000, germany: 1100, uk: 1300, italy: 1550, spain: 1700, portugal: 1800, switzerland: 1250 },
+            switzerland: { france: 1000, germany: 1100, italy: 1200, benelux: 1250, spain: 1750, portugal: 1800, uk: 1650 },
         };
         const baseCost = (matrix[fromNationId] && matrix[fromNationId][toNationId]) || 1800;
 

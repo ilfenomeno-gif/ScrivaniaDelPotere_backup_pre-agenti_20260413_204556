@@ -1,0 +1,50 @@
+{
+  "lisbon": {
+    "id": "lisbon",
+    "name": "Lisbona",
+    "region": "Lisboa",
+    "lat": 38.7223,
+    "lng": -9.1393,
+    "desc": "Capitale atlantica, nodo diplomatico.",
+    "bonus": { "reputazione": 2, "networking": 12 },
+    "malus": { "stress": 2, "concorrenza": 0.91 },
+    "rentMultiplier": 1.25,
+    "salaryMultiplier": 1.15,
+    "startingMoney": 400,
+    "tier": 1,
+    "settlementType": "city",
+    "population": "large"
+  },
+  "porto": {
+    "id": "porto",
+    "name": "Porto",
+    "region": "Norte",
+    "lat": 41.1579,
+    "lng": -8.6291,
+    "desc": "Seconda metropoli economica.",
+    "bonus": { "reputazione": 1, "networking": 10 },
+    "malus": { "stress": 1, "concorrenza": 0.93 },
+    "rentMultiplier": 1.05,
+    "salaryMultiplier": 1.05,
+    "startingMoney": 400,
+    "tier": 2,
+    "settlementType": "city",
+    "population": "medium"
+  },
+  "coimbra": {
+    "id": "coimbra",
+    "name": "Coimbra",
+    "region": "Centro",
+    "lat": 40.2033,
+    "lng": -8.4103,
+    "desc": "Citta universitaria.",
+    "bonus": { "intelligenza": 2, "morale": 2 },
+    "malus": { "stress": 1, "concorrenza": 0.95 },
+    "rentMultiplier": 0.9,
+    "salaryMultiplier": 0.95,
+    "startingMoney": 400,
+    "tier": 3,
+    "settlementType": "municipality",
+    "population": "small"
+  }
+}

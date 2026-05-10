@@ -17,7 +17,7 @@
         },
         BALANCE: {
             POLITICAL_REPUTATION_MULTIPLIER: 0.85,
-            FIRE_POST_STRESS_MULTIPLIER: 0.45,
+            FIRE_POST_STRESS_MULTIPLIER: 0.35,
             DEFAULT_SIMULATION_RUNS: 100,
         },
         DEBT: {
