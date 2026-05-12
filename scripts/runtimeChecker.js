@@ -167,10 +167,25 @@ async function run() {
                 const i = clickSel('.ideology-card[data-value="center"]')
                     || clickSel('.ideology-card[data-value="center_left"]')
                     || clickSel('.ideology-card[data-value="centro"]');
+
+                if (typeof Game !== 'undefined') {
+                    if (!Game.state.character) Game.state.character = {};
+                    Game.state.character.name = 'Runtime Tester';
+                    Game.state.character.gender = 'M';
+                    if (!Game.state.character.ideology) {
+                        Game.state.character.ideology = 'center';
+                    }
+                }
+
                 if (typeof Character !== 'undefined') {
                     if (!Character._selectedMentorId) {
                         const firstMentor = document.querySelector('#onboarding-mentor-choices .mentor-quick-card');
-                        if (firstMentor) firstMentor.click();
+                        if (firstMentor) {
+                            firstMentor.click();
+                            Character._selectedMentorId = firstMentor.dataset.mentorId || Character._selectedMentorId;
+                        } else {
+                            Character._selectedMentorId = 'anziano';
+                        }
                     }
                     if (!Character._selectedStartingCityId) Character._selectedStartingCityId = 'roma';
                     if (Character.checkReady) Character.checkReady();
@@ -180,9 +195,10 @@ async function run() {
             if (!ok) throw new Error('Elementi creazione personaggio non trovati');
 
             await page.waitForFunction(() => {
+                if (typeof Character !== 'undefined' && Character.checkReady) Character.checkReady();
                 const btn = document.getElementById('btn-approve');
                 return !!btn && !btn.disabled;
-            }, { timeout: 6000 });
+            }, { timeout: 12000 });
 
             await page.evaluate(() => {
                 const btn = document.getElementById('btn-approve');

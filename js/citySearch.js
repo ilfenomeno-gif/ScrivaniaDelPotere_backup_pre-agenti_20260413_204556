@@ -22,7 +22,7 @@ const CitySearch = (() => {
 
     /* ── Dati nazioni disponibili ────────────── */
     const _FILES = {
-        italy:   ['data/cities.json'],
+        italy:   ['data/cities_italy.json', 'data/cities.json'],
         france:  ['data/cities_france.json'],
         germany: ['data/cities_germany.json'],
         uk:      ['data/cities_uk.json'],

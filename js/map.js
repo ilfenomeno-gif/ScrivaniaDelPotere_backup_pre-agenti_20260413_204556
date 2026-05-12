@@ -320,6 +320,7 @@ const GameMap = {
     citiesData: null,
     allCitiesData: null,
     citiesCache: {},
+    _citiesCacheSignature: null,
     debugCitySelection: false,
     mapInstance: null,
     mapRegistry: {},
@@ -445,6 +446,38 @@ const GameMap = {
         return out;
     },
 
+    _getCitiesCacheSignature() {
+        const activeDlc = (Game && Game.state && Game.state.flags && Array.isArray(Game.state.flags.activeDlc))
+            ? [...Game.state.flags.activeDlc].sort().join('|')
+            : '';
+        const unlocked = (typeof Nations !== 'undefined' && Nations.getUnlockedNationSet)
+            ? Nations.getUnlockedNationSet().join('|')
+            : '';
+        return `${activeDlc}::${unlocked}`;
+    },
+
+    _ensureCitiesCacheFresh() {
+        const nextSignature = this._getCitiesCacheSignature();
+        if (this._citiesCacheSignature == null) {
+            this._citiesCacheSignature = nextSignature;
+            return;
+        }
+        if (this._citiesCacheSignature !== nextSignature) {
+            this.invalidateCitiesCache('dlc-or-unlocked-nations-changed');
+            this._citiesCacheSignature = nextSignature;
+        }
+    },
+
+    invalidateCitiesCache(reason = 'manual') {
+        this.citiesData = null;
+        this.allCitiesData = null;
+        this.citiesCache = {};
+        this._lastLoadedNation = null;
+        if (this.debugCitySelection) {
+            console.info('[CitySelection] cache invalidated:', reason);
+        }
+    },
+
     _getNationSelectionMeta(nationId) {
         const labels = {
             italy: { name: 'Italia', center: [42.5, 12.5], zoom: 6 },
@@ -511,6 +544,7 @@ const GameMap = {
     },
 
     async loadCities(forceNation) {
+        this._ensureCitiesCacheFresh();
         const nationId = forceNation || (Game.state.nation && Game.state.nation.id) || 'italy';
         
         // Use cached data only if it's for the same nation
@@ -555,6 +589,7 @@ const GameMap = {
     },
 
     async loadCitiesForNation(nationId) {
+        this._ensureCitiesCacheFresh();
         const id = nationId || 'italy';
         if (this.citiesCache[id]) return this.citiesCache[id];
         try {
@@ -582,7 +617,10 @@ const GameMap = {
     },
 
     async loadAllCapoluoghi() {
-        const nations = ['italy', 'france', 'germany', 'uk', 'spain', 'portugal', 'benelux', 'switzerland'];
+        this._ensureCitiesCacheFresh();
+        const nations = (typeof Nations !== 'undefined' && Nations.getUnlockedNationSet)
+            ? Nations.getUnlockedNationSet()
+            : ['italy', 'france', 'germany', 'uk'];
         const all = {};
         for (const nation of nations) {
             const cities = await this.loadCitiesForNation(nation);
@@ -616,6 +654,7 @@ const GameMap = {
     },
 
     async loadAllCities() {
+        this._ensureCitiesCacheFresh();
         if (this.allCitiesData) return this.allCitiesData;
 
         const sources = [
@@ -1072,6 +1111,25 @@ const GameMap = {
         let currentSizeFilter = 'all';
         let currentSearchQuery = '';
         let currentCities = {};
+        const availableNationIds = (typeof Nations !== 'undefined' && Nations.getUnlockedNationSet)
+            ? Nations.getUnlockedNationSet()
+            : ['italy', 'france', 'germany', 'uk'];
+        if (!availableNationIds.includes(currentNation)) {
+            currentNation = availableNationIds[0] || 'italy';
+        }
+        const nationNames = {
+            italy: 'Italia',
+            france: 'Francia',
+            germany: 'Germania',
+            uk: 'Regno Unito',
+            spain: 'Spagna',
+            portugal: 'Portogallo',
+            benelux: 'Benelux',
+            switzerland: 'Svizzera',
+        };
+        const nationOptionsHtml = availableNationIds
+            .map((id) => `<option value="${id}" ${currentNation === id ? 'selected' : ''}>${nationNames[id] || id}</option>`)
+            .join('');
 
         const getVisibleCities = async () => {
             let cities;
@@ -1111,14 +1169,7 @@ const GameMap = {
                         Tutti gli stati (solo capoluoghi)
                     </label>
                     <select id="nation-selector" class="nation-selector">
-                        <option value="italy" ${currentNation === 'italy' ? 'selected' : ''}>Italia</option>
-                        <option value="france" ${currentNation === 'france' ? 'selected' : ''}>Francia</option>
-                        <option value="germany" ${currentNation === 'germany' ? 'selected' : ''}>Germania</option>
-                        <option value="uk" ${currentNation === 'uk' ? 'selected' : ''}>Regno Unito</option>
-                        <option value="spain" ${currentNation === 'spain' ? 'selected' : ''}>Spagna</option>
-                        <option value="portugal" ${currentNation === 'portugal' ? 'selected' : ''}>Portogallo</option>
-                        <option value="benelux" ${currentNation === 'benelux' ? 'selected' : ''}>Benelux</option>
-                        <option value="switzerland" ${currentNation === 'switzerland' ? 'selected' : ''}>Svizzera</option>
+                        ${nationOptionsHtml}
                     </select>
                     <label class="city-filter-toggle">
                         <input type="checkbox" id="city-filter-capoluoghi">

@@ -111,7 +111,18 @@ const Desk = {
             if (budgetOverlay && !budgetOverlay.classList.contains('hidden')) return;
 
             if (e.key === 'Escape') {
+                const phoneOpen = !this.panels.phone.classList.contains('hidden');
                 const anyOpen = Object.values(this.panels).some(p => !p.classList.contains('hidden'));
+
+                // Level 1 — phone has an app open: ESC goes back to phone home
+                if (phoneOpen && typeof Phone !== 'undefined' && Phone._activeApp) {
+                    Phone.goPhoneHome();
+                    if (window.SR) SR.announce('Torna alla home del telefono. Premi di nuovo Esc per chiudere il telefono.', 'assertive');
+                    e.stopImmediatePropagation();
+                    return;
+                }
+
+                // Level 2 — any panel open: ESC closes it
                 if (anyOpen) {
                     this.closeAllPanels();
                 } else {

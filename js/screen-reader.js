@@ -53,6 +53,8 @@ const SR = (() => {
             el.textContent = '';
             requestAnimationFrame(() => requestAnimationFrame(() => { el.textContent = item.message; }));
         }
+        // Mostra la descrizione fantasma (ghost bar visiva)
+        _ghostShow(item.message);
         if (_queue.length > 0) {
             // Space out announcements: critical/high = 600ms, normal = 900ms, low = 1200ms
             const delay = item.priority >= SR_PRIORITY.HIGH ? 600 : item.priority === SR_PRIORITY.NORMAL ? 900 : 1200;
@@ -72,6 +74,40 @@ const SR = (() => {
         }
         _queue.push({ message, urgency: urgency || 'polite', priority: p });
         if (!_queueTimer) _queueTimer = setTimeout(_flushQueue, 50);
+    }
+
+    /* ── Descrizione Fantasma (Ghost Reader bar) ─────────────
+       Striscia visibile in basso che mostra ciò che la sintesi
+       sta leggendo — utile per chi testa l'accessibilità.
+       aria-hidden=true: è solo per gli occhi, non per gli SR.
+    ──────────────────────────────────────────────────────── */
+    let _ghostHideTimer = null;
+
+    function _ensureGhostBar() {
+        if (document.getElementById('sr-ghost-bar')) return;
+        const bar = document.createElement('div');
+        bar.id = 'sr-ghost-bar';
+        bar.setAttribute('aria-hidden', 'true');
+        bar.style.cssText = [
+            'position:fixed', 'bottom:0', 'left:0', 'right:0',
+            'background:rgba(10,10,20,0.88)', 'color:#FFD700',
+            'font-size:12px', 'line-height:1.4', 'padding:5px 14px',
+            'z-index:99990', 'pointer-events:none',
+            'display:none', 'max-height:52px', 'overflow:hidden',
+            'text-align:center', 'letter-spacing:.01em',
+            'border-top:1px solid rgba(255,215,0,.25)',
+        ].join(';');
+        document.body.appendChild(bar);
+    }
+
+    function _ghostShow(msg) {
+        _ensureGhostBar();
+        const bar = document.getElementById('sr-ghost-bar');
+        if (!bar) return;
+        bar.textContent = '\uD83D\uDD0A\u00A0' + msg; // 🔊
+        bar.style.display = 'block';
+        clearTimeout(_ghostHideTimer);
+        _ghostHideTimer = setTimeout(() => { bar.style.display = 'none'; }, 4500);
     }
 
     /* ── Live regions ──────────────────────────────────────── */
@@ -200,6 +236,33 @@ const SR = (() => {
         if (announcement) announce(announcement, 'polite');
     }
 
+    /* ── Nota nascosta (visually-hidden hint) in un pannello ─
+       Inserisce una nota testuale invisibile ai vedenti ma
+       letta dagli screen reader quando il focus entra nel pannello.
+    ──────────────────────────────────────────────────────── */
+    function _ensureHiddenNote(containerEl, key, text) {
+        if (!containerEl) return;
+        const attr = `data-sr-note-${key}`;
+        if (containerEl.querySelector(`[${attr}]`)) return;
+        const p = document.createElement('p');
+        p.setAttribute(attr, '1');
+        p.className = 'visually-hidden';
+        p.textContent = text;
+        containerEl.insertBefore(p, containerEl.firstChild);
+    }
+
+    /* ── Popup Esc: nota nascosta + annuncio ─────────────────
+       Inietta un suggerimento visivamente nascosto nel pannello
+       e lo annuncia via live region. Gli SR lo leggeranno
+       quando entrano nel pannello.
+    ──────────────────────────────────────────────────────── */
+    function _injectEscTip(panelEl, isPhone) {
+        const txt = isPhone
+            ? 'Usa Esc per tornare alla home del telefono. Premi di nuovo Esc per chiudere il telefono.'
+            : 'Premi Esc per chiudere questo pannello. Usa Tab per navigare tra i controlli.';
+        _ensureHiddenNote(panelEl, 'esc', txt);
+    }
+
     /* ── openPanel: annuncia apertura pannello + sposta focus  */
     const _PANEL_LABELS = {
         phone:  'Telefono — Messaggi, relazioni, notifiche',
@@ -212,11 +275,14 @@ const SR = (() => {
     function openPanel(panelEl, panelName, context) {
         if (!panelEl) return;
         const label = _PANEL_LABELS[panelName] || panelName || 'Pannello';
+        const isPhone = panelName === 'phone';
         if (!panelEl.getAttribute('role')) panelEl.setAttribute('role', 'region');
         if (!panelEl.getAttribute('aria-label')) panelEl.setAttribute('aria-label', label);
         // Ensure there's a visible heading for screen readers
         _ensurePanelHeading(panelEl, label);
-        // Move focus to first focusable element (close button, first tab, or heading)
+        // Inietta suggerimento Esc nascosto nel pannello
+        _injectEscTip(panelEl, isPhone);
+        // Move focus to close button first (most expected target), then first tab, then heading
         requestAnimationFrame(() => {
             const closeBtn = panelEl.querySelector('[id$="-close"],[aria-label*="Chiudi"],button[class*="close"]');
             const firstTab = panelEl.querySelector('[role="tab"],[class*="tab-btn"],[class*="-tab"]');
@@ -229,8 +295,11 @@ const SR = (() => {
                 target.focus({ preventScroll: false });
             }
         });
+        const escHint = isPhone
+            ? 'Esc torna alla home del telefono; Esc di nuovo chiude il telefono.'
+            : 'Premi Esc per chiudere.';
         const contextMsg = context ? `. ${context}` : '';
-        announce(`${label} aperto${contextMsg}. Premi Escape per chiudere.`, 'assertive');
+        announce(`${label} aperto${contextMsg}. ${escHint}`, 'assertive');
     }
 
     function _ensurePanelHeading(panelEl, label) {
@@ -510,6 +579,7 @@ const SR = (() => {
 
     /* ── Keyboard nav globale ─────────────────────────────── */
     function _setupKeyboardNav() {
+        // Spazio/Invio su elementi role=button non-nativi
         document.addEventListener('keydown', (e) => {
             if ((e.key === 'Enter' || e.key === ' ') &&
                 e.target.getAttribute('role') === 'button' &&
@@ -517,17 +587,19 @@ const SR = (() => {
                 e.preventDefault(); e.target.click();
             }
         });
+        // ESC: gestisce solo modali transfer (il resto lo gestisce desk.js)
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
+            // Modali di trasferimento / nazione
             const modal = document.getElementById('nation-transfer-modal')
                        || document.getElementById('transfer-modal');
             if (modal && !modal.classList.contains('hidden')) {
-                modal.querySelector('[data-action="close"],.modal-close,#modal-cancel')?.click()
-                    ?? modal.classList.add('hidden');
+                const closer = modal.querySelector('[data-action="close"],.modal-close,#modal-cancel');
+                if (closer) closer.click(); else modal.classList.add('hidden');
+                announce('Finestra chiusa.', 'polite');
                 return;
             }
-            document.querySelector('.phone-panel.active,.phone-screen.open')
-                ?.querySelector('.phone-back-btn,[data-action="back"]')?.click();
+            // Focus trap ESC già gestito dentro trapFocus — non serve altro qui
         });
     }
 
@@ -562,9 +634,42 @@ const SR = (() => {
         document.head.appendChild(s);
     }
 
+    /* ── Note nascoste su sezioni principali del DOM ─────────
+       Aggiunge descrizioni visivamente nascoste (lette dagli SR)
+       alle aree chiave del gioco al primo accesso.
+    ──────────────────────────────────────────────────────── */
+    function _applyHiddenSectionNotes() {
+        // HUD stats
+        const hudStats = document.getElementById('hud-stats');
+        _ensureHiddenNote(hudStats, 'intro',
+            'Barra di stato personaggio. Contiene stanchezza, stress, morale, salute, coerenza, denaro e azioni disponibili.');
+
+        // Scrivania
+        const desk = document.getElementById('desk') || document.getElementById('screen-desk');
+        _ensureHiddenNote(desk, 'intro',
+            'Scrivania principale. Usa i tasti 1-4 per aprire Telefono, Compiti, Casa, Statistiche. Premi Spazio o Invio sulle icone.');
+
+        // Ticker
+        const ticker = document.getElementById('ticker-text') || document.querySelector('.ticker');
+        if (ticker && !ticker.getAttribute('aria-label')) {
+            ticker.setAttribute('aria-label', 'Notizie in scorrimento');
+            ticker.setAttribute('aria-live', 'off');
+        }
+
+        // Bottone avanza turno
+        const btn = document.getElementById('btn-advance');
+        if (btn && !btn.querySelector('[data-sr-note-advance]')) {
+            const hint = document.createElement('span');
+            hint.setAttribute('data-sr-note-advance', '1');
+            hint.className = 'visually-hidden';
+            hint.textContent = '. Usa questo pulsante per avanzare al prossimo momento della giornata.';
+            btn.appendChild(hint);
+        }
+    }
+
     /* ── INIT ──────────────────────────────────────────────── */
     function init() {
-        _ensureLiveRegions(); _ensureSkipLink(); _ensureCSS(); _setupKeyboardNav();
+        _ensureLiveRegions(); _ensureSkipLink(); _ensureCSS(); _setupKeyboardNav(); _ensureGhostBar();
 
         if (typeof Game === 'undefined' || !Game.on) {
             setTimeout(init, 600); return;
@@ -583,7 +688,7 @@ const SR = (() => {
         Game.on('bill-paid',      _onBillPaid);
 
         Game.on('game-loaded', () => {
-            _applyPanelARIA(); updateHUD();
+            _applyPanelARIA(); updateHUD(); _applyHiddenSectionNotes();
             _prevMoney     = Game.state.money;
             _prevAP        = Game.state.actionPoints;
             _prevCity      = Game.state.city?.name;
@@ -594,7 +699,7 @@ const SR = (() => {
             setTimeout(_patchPhoneTabFocus, 500);
         });
 
-        requestAnimationFrame(() => { _applyPanelARIA(); updateHUD(); _patchPhoneTabFocus(); });
+        requestAnimationFrame(() => { _applyPanelARIA(); updateHUD(); _patchPhoneTabFocus(); _applyHiddenSectionNotes(); });
 
         if (Game.state) {
             _prevMoney     = Game.state.money;
@@ -831,7 +936,8 @@ const SR = (() => {
              moveFocus, openModal, closeModal, openPanel, closePanel,
              sectionHeading, labelList,
              announceNVDA, focusPhoneTabPanel, afterActionFocus, announceSectionEntry,
-             _applyPoliticaARIA, _validateHUDConsistency, _patchPhoneTabFocus };
+             _applyPoliticaARIA, _validateHUDConsistency, _patchPhoneTabFocus,
+             _ensureHiddenNote, _applyHiddenSectionNotes };
 })();
 
 if (typeof window !== 'undefined') window.SR = window.SR || SR;

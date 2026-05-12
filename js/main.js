@@ -453,6 +453,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!Game || !Game.state) return;
         if (!Game.state.flags) Game.state.flags = {};
         Game.state.flags.activeDlc = getCurrentUserActiveDlcIds();
+        if (typeof GameMap !== 'undefined' && GameMap.invalidateCitiesCache) {
+            GameMap.invalidateCitiesCache('active-dlc-sync');
+        }
     }
 
     function toggleDlcWithDependencies(user, id, nextState) {
@@ -777,6 +780,11 @@ document.addEventListener('DOMContentLoaded', function () {
         syncActiveDlcToGameState();
         if (typeof HUD !== 'undefined' && HUD.refreshAll) HUD.refreshAll();
     }
+
+    // Keep DLC flags aligned after flows that rebuild parts of game state.
+    Game.on('game-started', () => {
+        syncActiveDlcToGameState();
+    });
 
     const loginTab = document.getElementById('auth-tab-login');
     const registerTab = document.getElementById('auth-tab-register');

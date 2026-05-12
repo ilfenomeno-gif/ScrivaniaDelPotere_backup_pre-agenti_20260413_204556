@@ -357,9 +357,36 @@ const Character = {
     },
 
     getAvailableMentors() {
-        const ideology = Game.state.character.ideology;
+        const ideology = this.normalizeIdeologyKey(this.getCurrentIdeologyKey());
         const ideologyMentors = this.MENTORS_BY_IDEOLOGY[ideology] || [];
         return [...ideologyMentors, this.MENTOR_AUTONOMO];
+    },
+
+    getCurrentIdeologyKey() {
+        const stateIdeology = Game && Game.state && Game.state.character ? Game.state.character.ideology : '';
+        if (stateIdeology) return String(stateIdeology).toLowerCase().trim();
+        if (typeof document === 'undefined') return '';
+        const selectedCard = document.querySelector('.ideology-card.selected, .ideology-card[aria-pressed="true"]');
+        return String((selectedCard && selectedCard.dataset && selectedCard.dataset.value) || '').toLowerCase().trim();
+    },
+
+    normalizeIdeologyKey(rawIdeology) {
+        const key = String(rawIdeology || '').toLowerCase().trim();
+        const map = {
+            radical_left: 'estrema-sinistra',
+            left: 'centro',
+            center_left: 'centro',
+            center: 'centro',
+            center_right: 'tecnocrate',
+            right: 'populista',
+            radical_right: 'estrema-destra',
+            'estrema-sinistra': 'estrema-sinistra',
+            centro: 'centro',
+            populista: 'populista',
+            tecnocrate: 'tecnocrate',
+            'estrema-destra': 'estrema-destra',
+        };
+        return map[key] || key;
     },
 
     getDefaultArchetypeForIdeology(ideology) {
@@ -436,7 +463,13 @@ const Character = {
         // Load mentors from mentors-parties.json (per-nation party-based mentors)
         if (!this._mentorsPartiesDB) {
             try {
-                const resp = await fetch('/data/mentors-parties.json');
+                let resp = await fetch('data/mentors-parties.json');
+                if (!resp.ok) {
+                    resp = await fetch('/data/mentors-parties.json');
+                }
+                if (!resp.ok) {
+                    throw new Error(`HTTP ${resp.status}`);
+                }
                 this._mentorsPartiesDB = await resp.json();
             } catch (err) {
                 console.error('Failed to load mentors-parties.json:', err);
@@ -444,7 +477,7 @@ const Character = {
             }
         }
 
-        const ideology = Game.state.character.ideology;
+        const ideology = this.getCurrentIdeologyKey();
         if (!ideology) return [];
 
         // Get nation ID
@@ -456,22 +489,43 @@ const Character = {
         }
 
         // Filter mentors by selected ideology
-        const mentorsForIdeology = nationData.mentors.filter(m => this.mapPartyIdeologyToGame(m.ideology) === ideology);
-        return [...mentorsForIdeology, this.MENTOR_AUTONOMO];
+        const mentorsForIdeology = nationData.mentors.filter((m) => this.mapPartyIdeologyToGame(m.ideology) === ideology);
+        if (!mentorsForIdeology.length) {
+            return this.getAvailableMentors();
+        }
+
+        const fallbackPool = this.getAvailableMentors();
+        const normalizedMentors = mentorsForIdeology.map((entry, index) => {
+            const fallbackMentor = fallbackPool[index % fallbackPool.length] || null;
+            return this.normalizeNationMentorEntry(entry, ideology, fallbackMentor, index, Game.state.nation);
+        });
+        return [...normalizedMentors, this.MENTOR_AUTONOMO];
     },
 
     // Map ideology from mentors-parties.json (Italian names) to game ideology constants (English)
     mapPartyIdeologyToGame(partyIdeology) {
+        const key = String(partyIdeology || '').toLowerCase().trim();
         const ideologyMap = {
-            'sinistra_radicale': 'radical_left',
-            'sinistra': 'left',
-            'centro_sinistra': 'center_left',
-            'centro': 'center',
-            'centro_destra': 'center_right',
-            'destra': 'right',
-            'destra_radicale': 'radical_right',
+            sinistra_radicale: 'radical_left',
+            sinistra: 'left',
+            centro_sinistra: 'center_left',
+            centro: 'center',
+            centro_destra: 'center_right',
+            destra: 'right',
+            destra_radicale: 'radical_right',
+            radical_left: 'radical_left',
+            left: 'left',
+            center_left: 'center_left',
+            center: 'center',
+            center_right: 'center_right',
+            right: 'right',
+            radical_right: 'radical_right',
+            'estrema-sinistra': 'radical_left',
+            'estrema-destra': 'radical_right',
+            populista: 'right',
+            tecnocrate: 'center_right',
         };
-        return ideologyMap[partyIdeology] || 'center';  // Default to center if unknown
+        return ideologyMap[key] || 'center';  // Default to center if unknown
     },
 
     // A. Ideology → protocol color codes

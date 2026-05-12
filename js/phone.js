@@ -277,6 +277,9 @@ const Phone = {
 
         this._activeApp = null;
 
+        // Annuncia che si è tornati alla home del telefono
+        if (window.SR) SR.announce('Home telefono. Premi Esc per chiudere il telefono.', 'polite');
+
         if (!home || !content || reduceMotion || content.classList.contains('hidden')) {
             if (home) home.classList.remove('hidden');
             if (content) content.classList.add('hidden');

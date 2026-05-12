@@ -647,10 +647,14 @@ const Nations = {
 
     /**
      * Restituisce Array di nazioni disponibili (per UI di selezione nazione)
+     * Di default include solo nazioni sbloccate dai DLC attivi.
      */
-    getAvailableNations() {
+    getAvailableNations(includeLocked = false) {
         if (!this.nationsData) return [];
-        return Object.values(this.nationsData).map(n => ({
+        const unlocked = new Set(this.getUnlockedNationSet());
+        return Object.values(this.nationsData)
+            .filter((n) => includeLocked || unlocked.has(n.id))
+            .map(n => ({
             id: n.id,
             name: n.name,
             language: n.language,
@@ -662,7 +666,7 @@ const Nations = {
             startingMoney: n.startingMoney,
             economicTier: n.salaryMultiplier > 1.2 ? 'high' : (n.salaryMultiplier > 1.05 ? 'medium' : 'low'),
             ideologiesCount: n.ideologies ? Object.keys(n.ideologies).length : 0
-        }));
+            }));
     },
 
     /**
