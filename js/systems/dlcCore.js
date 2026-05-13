@@ -6,11 +6,24 @@
 const DlcCore = {
     init() {
         this.ensureBaseState();
+        // Init reputation system (multi-dimensional)
+        if (typeof ReputationSystem !== 'undefined') ReputationSystem.init();
+        // Init new DLC systems
+        if (typeof PartyInternals !== 'undefined') PartyInternals.init();
+        if (typeof MinistrySystem !== 'undefined') MinistrySystem.init();
+        if (typeof LobbySystem !== 'undefined') LobbySystem.init();
+        if (typeof BackstorySystem !== 'undefined') BackstorySystem.init();
+        if (typeof CampaignSystem !== 'undefined') CampaignSystem.init();
+        // Init cross-DLC events
+        if (typeof CrossDlcEvents !== 'undefined') CrossDlcEvents.init();
+        
         Game.on('new-day', () => {
             this.ensureBaseState();
             this.applyDormantFormulas();
             this.runBaseEvents();
             this.runActiveDlcLayers();
+            // Apply DLC-specific reputation changes
+            if (typeof ReputationSystem !== 'undefined') ReputationSystem.applyDlcInfluence();
         });
     },
 
@@ -184,5 +197,25 @@ const DlcCore = {
         } else {
             Game.state.dlcFlags.diplomacySystem = false;
         }
+
+        // NEW DLC SYSTEMS (5)
+        const correntiInterne = this.isDlcActive('dlc_correnti_interne_party');
+        const ministerium = this.isDlcActive('dlc_ministero_governo');
+        const lobbies = this.isDlcActive('dlc_lobby_pressure');
+        const backstory = this.isDlcActive('dlc_sangue_memoria_backstory');
+        const campagna = this.isDlcActive('dlc_campagna_elettorale');
+
+        Game.state.dlcFlags.correntiInterne = correntiInterne;
+        Game.state.dlcFlags.ministerium = ministerium;
+        Game.state.dlcFlags.lobbies = lobbies;
+        Game.state.dlcFlags.backstory = backstory;
+        Game.state.dlcFlags.campagna = campagna;
+
+        // Trigger new DLC systems' onNewDay
+        if (typeof PartyInternals !== 'undefined') PartyInternals.onNewDay();
+        if (typeof MinistrySystem !== 'undefined') MinistrySystem.onNewDay();
+        if (typeof LobbySystem !== 'undefined') LobbySystem.onNewDay();
+        if (typeof BackstorySystem !== 'undefined') BackstorySystem.onNewDay();
+        if (typeof CampaignSystem !== 'undefined') CampaignSystem.onNewDay();
     },
 };

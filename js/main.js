@@ -254,6 +254,43 @@ document.addEventListener('DOMContentLoaded', function () {
             desc: '8 hobby con connessioni trasversali, identità pubblica, rischi scandalo. Gratuito: 2 hobby base. Completo: 8 hobby avanzati con 5 eventi ciascuno, integrazioni factions/intel.',
             systems: ['hobbySystem.js'],
         },
+
+        // === NEW DLC SYSTEMS (5) ===
+        {
+            id: 'dlc_correnti_interne_party',
+            type: 'Expansion',
+            title: '🎭 Correnti Interne — Dinamiche di Partito',
+            desc: 'Gestione delle correnti interne del partito, leader rivali, voti segretariato. Gratuito: tensioni generiche, notizie congressuali. Completo: fazioni strutturate, elezioni segretariato, scissioni.',
+            systems: ['partyInternals.js'],
+        },
+        {
+            id: 'dlc_ministero_governo',
+            type: 'Expansion',
+            title: '⚖️ Il Ministero — Governo e Burocrazia',
+            desc: 'Nomina a ministro, gestione budget, decreti, scandali e audit Corte Conti. Gratuito: nomina generica. Completo: pipeline decisionale, lobbyisti ministeriali, rischi di corruzione.',
+            systems: ['ministrySystem.js'],
+        },
+        {
+            id: 'dlc_lobby_pressure',
+            type: 'Flavor',
+            title: '💼 Le Lobby — Gruppi di Pressione',
+            desc: 'Associazioni industriali, sindacati, ordini professionali. Gratuito: contatti casuali. Completo: relazioni persistenti, favori politici, conflitti di interesse tracciati.',
+            systems: ['lobbySystem.js'],
+        },
+        {
+            id: 'dlc_sangue_memoria_backstory',
+            type: 'Flavor',
+            title: '👻 Sangue e Memoria — Storie Personali',
+            desc: 'Backstory procedurale, famiglia d\'origine, NPCs dal passato. Gratuito: accenni narrativi. Completo: riemergenza fantasmi, riconciliazioni, vendette, scheletri nell\'armadio.',
+            systems: ['backstorySystem.js'],
+        },
+        {
+            id: 'dlc_campagna_elettorale',
+            type: 'Immersion',
+            title: '🗳️ Campagna Elettorale — Cicli Politici',
+            desc: 'Cicli elettorali con fasi (preparazione, momentum, closing), rally, sondaggi, dibattiti TV. Gratuito: elezioni casuali. Completo: gestione campagna attiva, momentum system, sondaggi settimanali.',
+            systems: ['campaignSystem.js'],
+        },
     ];
 
     const DLC_PRICE_MAP = {
@@ -271,6 +308,12 @@ document.addEventListener('DOMContentLoaded', function () {
         dlc_stampa_media: 5.99,
         dlc_prezzo_potere_expenses: 5.99,
         dlc_tempo_libero_hobbies: 4.99,
+        // New DLC systems
+        dlc_correnti_interne_party: 8.99,
+        dlc_ministero_governo: 10.99,
+        dlc_lobby_pressure: 6.99,
+        dlc_sangue_memoria_backstory: 7.99,
+        dlc_campagna_elettorale: 7.99,
     };
 
     const DLC_BUNDLES = [
@@ -294,6 +337,28 @@ document.addEventListener('DOMContentLoaded', function () {
             desc: 'Media, lifestyle, economia quotidiana e hobby.',
             price: 14.99,
             ids: ['dlc_potere_tasca_lifestyle', 'dlc_stampa_media', 'dlc_prezzo_potere_expenses', 'dlc_tempo_libero_hobbies'],
+        },
+        // New bundle packs
+        {
+            id: 'bundle_potere_criminale',
+            name: '🎭 Pacchetto Potere Criminale',
+            desc: 'Domina gli equilibri politici interni e le pressioni criminali.',
+            price: 24.99,
+            ids: ['dlc_correnti_interne_party', 'dlc_lobby_pressure', 'dlc_campagna_elettorale'],
+        },
+        {
+            id: 'bundle_vita_pubblica',
+            name: '⚖️ Pacchetto Vita Pubblica',
+            desc: 'Governa con autorità: ministero, burocrazia, istituzioni.',
+            price: 18.99,
+            ids: ['dlc_ministero_governo', 'dlc_campagna_elettorale', 'dlc_sangue_memoria_backstory'],
+        },
+        {
+            id: 'bundle_storia_mondo',
+            name: '👻 Pacchetto Storia e Mondo',
+            desc: 'Scopri le tue radici personali e l\'intreccio del fato.',
+            price: 16.99,
+            ids: ['dlc_sangue_memoria_backstory', 'dlc_correnti_interne_party', 'dlc_lobby_pressure'],
         },
     ];
 
